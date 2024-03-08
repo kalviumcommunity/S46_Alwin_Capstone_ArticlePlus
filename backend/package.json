@@ -1,0 +1,26 @@
+{
+    "name": "article-plus-backend",
+    "version": "1.0.0",
+    "description": "Backend application for Article plus",
+    "main": "server.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kalviumcommunity/S46_Alwin_Capstone_ArticlePlus.git"
+    },
+    "author": "Alwin Sunil",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/kalviumcommunity/S46_Alwin_Capstone_ArticlePlus/issues"
+    },
+    "homepage": "https://github.com/kalviumcommunity/S46_Alwin_Capstone_ArticlePlus#readme",
+    "devDependencies": {
+        "nodemon": "^3.1.0"
+    },
+    "dependencies": {
+        "express": "^4.18.3"
+    }
+}
