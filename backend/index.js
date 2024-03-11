@@ -2,8 +2,16 @@ const express = require("express")
 const app = express()
 const port = 3000
 
+const { startDB, isConnected } = require("./db")
+
+startDB()
+
 app.get("/", (req, res) => {
-    res.send("Hello World!")
+    res.json({
+        "📦 Database connection status": isConnected()
+            ? "✅ Connected"
+            : "❌ Not connected",
+    })
 })
 
 app.listen(port, () => {

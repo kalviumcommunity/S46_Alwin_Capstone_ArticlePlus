@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: "Roboto Serif";
+        font-weight: 700;
+        src:
+            url("/fonts/RobotoSerif_Bold.woff2") format("woff2"),
+            url("/fonts/RobotoSerif_Bold.woff") format("woff");
+    }
+
+    body {
+        font-family: "Poppins", sans-serif;
+    }
+}
+
+* {
+    transition: 0.1s padding ease-in-out;
+}
+
+@layer components {
+    .container {
+        @apply flex flex-col gap-8 px-4 py-10 sm:px-16 sm:flex-row;
+    }
+
+    .input {
+        @apply border border-2 bg-gray-50 px-4 py-2 rounded-xl focus:outline-none;
+    }
+}
