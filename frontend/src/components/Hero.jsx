@@ -10,7 +10,7 @@ function Hero() {
             <div className="flex gap-1">
                 <Link
                     to="/read"
-                    className="font-semibold px-6 py-1 bg-rose-500 text-white"
+                    className="font-semibold px-6 py-1 bg-rose-500 text-white rounded-full"
                 >
                     Read
                 </Link>
