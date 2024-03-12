@@ -1,6 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
+import { setCookie } from "../helpers/cookies"
+import { userExists } from "../signals/user"
+import axios from "../axios"
 
 function Login() {
     const {
@@ -9,7 +12,21 @@ function Login() {
         formState: { errors },
     } = useForm()
 
-    const onSubmit = (data) => console.log(data)
+    const handleLogin = (payload) => {
+        axios
+            .post("auth/login", payload)
+            .then((res) => {
+                const data = res.data
+                setCookie("accessToken", data.accessToken, 0.041)
+                setCookie("refreshToken", data.refreshToken, 1)
+                userExists.value = true
+            })
+            .catch((error) => console.log("Login error:", error))
+    }
+
+    const onSubmit = (data) => {
+        handleLogin(data)
+    }
 
     return (
         <div className="flex flex-col items-center mx-4 pt-10 pb-16  gap-4 border-b sm:mx-16 sm:py-26 sm:gap-6">
@@ -26,6 +43,7 @@ function Login() {
                         <input
                             className={`input ${errors.email ? "border-red-500" : ""}`}
                             type="email"
+                            autoComplete="username"
                             {...register("email", {
                                 required: "Email is required",
                                 pattern: {
@@ -47,6 +65,7 @@ function Login() {
                         <input
                             className={`input ${errors.password ? "border-red-500" : ""}`}
                             type="password"
+                            autoComplete="current-password"
                             {...register("password", {
                                 required: "Password is required",
                                 minLength: {

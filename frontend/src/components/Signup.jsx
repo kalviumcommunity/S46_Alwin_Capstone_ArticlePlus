@@ -1,6 +1,8 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
+import { userExists } from "../signals/user"
+import axios from "../axios"
 
 function Signup() {
     const {
@@ -10,7 +12,18 @@ function Signup() {
         formState: { errors },
     } = useForm()
 
-    const onSubmit = (data) => console.log(data)
+    const handleSignup = (payload) => {
+        axios
+            .post("auth/signup", payload)
+            .then((res) => (userExists.value = true))
+            .catch((error) =>
+                console.error("Signup error:", error.response.data.message),
+            )
+    }
+
+    const onSubmit = (data) => {
+        handleSignup(data)
+    }
 
     return (
         <div className="flex flex-col items-center mx-4 pt-10 pb-16  gap-4 border-b sm:mx-16 sm:py-26 sm:gap-6">
@@ -21,13 +34,13 @@ function Signup() {
                     onSubmit={handleSubmit(onSubmit)}
                 >
                     <div className="flex flex-col gap-1">
-                        <label className="font-medium" htmlFor="fullname">
+                        <label className="font-medium" htmlFor="name">
                             Full name
                         </label>
                         <input
-                            className={`input ${errors.fullname ? "border-red-500" : ""}`}
+                            className={`input ${errors.name ? "border-red-500" : ""}`}
                             type="text"
-                            {...register("fullname", {
+                            {...register("name", {
                                 required: "Full name is required",
                             })}
                         />
@@ -44,6 +57,7 @@ function Signup() {
                         <input
                             className={`input ${errors.email ? "border-red-500" : ""}`}
                             type="email"
+                            autoComplete="username"
                             {...register("email", {
                                 required: "Email is required",
                                 pattern: {
@@ -65,6 +79,7 @@ function Signup() {
                         <input
                             className={`input ${errors.password ? "border-red-500" : ""}`}
                             type="password"
+                            autoComplete="new-password"
                             {...register("password", {
                                 required: "Password is required",
                                 minLength: {
@@ -90,6 +105,7 @@ function Signup() {
                         <input
                             className={`input ${errors.confirmPassword ? "border-red-500" : ""}`}
                             type="password"
+                            autoComplete="new-password"
                             {...register("confirmPassword", {
                                 required: "Please confirm your password",
                                 validate: (value) =>
