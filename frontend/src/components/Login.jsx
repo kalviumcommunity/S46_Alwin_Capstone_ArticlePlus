@@ -1,8 +1,8 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { setCookie } from "../helpers/cookies"
-import { userExists } from "../signals/user"
+import { setCookie } from "@/helpers/cookies"
+import { userExists } from "@/signals/user"
 import axios from "../axios"
 
 function Login() {

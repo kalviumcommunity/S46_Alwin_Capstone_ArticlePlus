@@ -1,7 +1,8 @@
-import React from "react"
-import { userExists } from "../signals/user"
+import React, { useEffect } from "react"
+import { userExists } from "@/signals/user"
 import { useSignals } from "@preact/signals-react/runtime"
-import { setCookie } from "../helpers/cookies"
+import { setCookie } from "@/helpers/cookies"
+import axios from "@/axios"
 
 function Read() {
     useSignals()
@@ -11,6 +12,13 @@ function Read() {
         setCookie("refreshToken", null)
         userExists.value = false
     }
+
+    useEffect(() => {
+        axios
+            .get("auth/")
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err))
+    })
 
     return (
         <div className="container flex-col">

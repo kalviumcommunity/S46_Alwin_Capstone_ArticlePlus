@@ -1,8 +1,8 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { userExists } from "../signals/user"
-import axios from "../axios"
+import { userExists } from "@/signals/user"
+import axios from "@/axios"
 
 function Signup() {
     const {
