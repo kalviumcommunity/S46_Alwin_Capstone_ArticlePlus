@@ -5,7 +5,14 @@ const isUserLoggedIn = () => {
     const accessToken = getCookie("accessToken")
     const refreshToken = getCookie("refreshToken")
 
-    return accessToken !== "null" && refreshToken !== "null"
+    console.log(accessToken, refreshToken)
+
+    return (
+        accessToken !== null &&
+        refreshToken !== null &&
+        accessToken !== "null" &&
+        refreshToken !== "null"
+    )
 }
 
 export const userExists = signal(isUserLoggedIn())
