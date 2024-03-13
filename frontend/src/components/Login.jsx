@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { setCookie } from "@/helpers/cookies"
 import { userExists } from "@/signals/user"
-import axios from "../axios"
+import axiosInstance from "@/axios"
 
 function Login() {
     const {
@@ -13,7 +13,7 @@ function Login() {
     } = useForm()
 
     const handleLogin = (payload) => {
-        axios
+        axiosInstance
             .post("auth/login", payload)
             .then((res) => {
                 const data = res.data

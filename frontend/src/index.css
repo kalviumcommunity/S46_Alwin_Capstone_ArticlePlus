@@ -28,4 +28,8 @@
     .input {
         @apply border-2 bg-gray-50 px-4 py-2 rounded-xl focus:outline-none;
     }
+
+    .DropdownMenuItem {
+        @apply text-sm py-1 px-2 m-1 rounded-sm hover:cursor-pointer hover:bg-gray-100 font-medium;
+    }
 }
