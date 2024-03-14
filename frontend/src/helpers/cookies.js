@@ -12,6 +12,7 @@ export const getCookie = (name) => {
             return cookie.substring(cookieName.length, cookie.length)
         }
     }
+
     return null
 }
 

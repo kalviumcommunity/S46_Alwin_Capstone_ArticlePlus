@@ -1,8 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { userExists } from "../signals/user"
-import axios from "../axios"
+import { userExists } from "@/signals/user"
+import { setCookie } from "@/helpers/cookies"
+import axiosInstance from "@/axios"
 
 function Signup() {
     const {
@@ -13,12 +14,15 @@ function Signup() {
     } = useForm()
 
     const handleSignup = (payload) => {
-        axios
+        axiosInstance
             .post("auth/signup", payload)
-            .then((res) => (userExists.value = true))
-            .catch((error) =>
-                console.error("Signup error:", error.response.data.message),
-            )
+            .then((res) => {
+                const data = res.data
+                setCookie("accessToken", data.accessToken, 0.041)
+                setCookie("refreshToken", data.refreshToken, 1)
+                userExists.value = true
+            })
+            .catch((error) => console.error("Signup error:", error))
     }
 
     const onSubmit = (data) => {
