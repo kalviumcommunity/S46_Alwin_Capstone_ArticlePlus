@@ -29,6 +29,10 @@ function Signup() {
         handleSignup(data)
     }
 
+    const handleGoogleSignup = () => {
+        window.open(`${import.meta.env.VITE_API_URL}/auth/google/`, "_self")
+    }
+
     return (
         <div className="sm:py-26 mx-4 flex flex-col items-center gap-4  border-b pb-16 pt-10 sm:mx-16 sm:gap-6">
             <div className="flex flex-col gap-3 sm:w-96">
@@ -134,7 +138,10 @@ function Signup() {
                 </form>
                 <hr className="my-2" />
                 <div>
-                    <span className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer">
+                    <span
+                        className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
+                        onClick={handleGoogleSignup}
+                    >
                         <img
                             src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                             alt=""

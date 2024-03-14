@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet, Navigate } from "react-router-dom"
+import { Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom"
 import { useSignals } from "@preact/signals-react/runtime"
 import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
