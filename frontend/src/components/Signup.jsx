@@ -30,9 +30,9 @@ function Signup() {
     }
 
     return (
-        <div className="flex flex-col items-center mx-4 pt-10 pb-16  gap-4 border-b sm:mx-16 sm:py-26 sm:gap-6">
+        <div className="sm:py-26 mx-4 flex flex-col items-center gap-4  border-b pb-16 pt-10 sm:mx-16 sm:gap-6">
             <div className="flex flex-col gap-3 sm:w-96">
-                <h1 className="text-4xl font-semibold mr-auto mb-2">Signup</h1>
+                <h1 className="mb-2 mr-auto text-4xl font-semibold">Signup</h1>
                 <form
                     className="flex flex-col gap-3"
                     onSubmit={handleSubmit(onSubmit)}
@@ -126,7 +126,7 @@ function Signup() {
                     <div className="my-3">
                         <button
                             type="submit"
-                            className="w-full px-4 py-2 font-semibold border-2 border-black bg-rose-500 text-white underline decoration-white decoration-wavy rounded-full"
+                            className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white underline decoration-white decoration-wavy"
                         >
                             Signup
                         </button>
@@ -134,7 +134,7 @@ function Signup() {
                 </form>
                 <hr className="my-2" />
                 <div>
-                    <span className="flex gap-2 border-2 border-black font-semibold shadow px-4 py-2 justify-center hover:cursor-pointer rounded-full">
+                    <span className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer">
                         <img
                             src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                             alt=""
@@ -142,11 +142,11 @@ function Signup() {
                         Sign up with Google
                     </span>
                 </div>
-                <div className="flex gap-4 justify-center py-2">
+                <div className="flex justify-center gap-4 py-2">
                     <span className="text-base">
                         Already have an account?&nbsp;
                         <Link
-                            className="font-semibold underline text-blue-700"
+                            className="font-semibold text-blue-700 underline"
                             to="/login"
                         >
                             Login

@@ -22,14 +22,14 @@
 
 @layer components {
     .container {
-        @apply flex flex-col gap-8 px-4 py-10 sm:px-16 sm:flex-row;
+        @apply flex flex-col gap-8 px-4 py-10 sm:flex-row sm:px-16;
     }
 
     .input {
-        @apply border-2 bg-gray-50 px-4 py-2 rounded-xl focus:outline-none;
+        @apply rounded-xl border-2 bg-gray-50 px-4 py-2 focus:outline-none;
     }
 
     .DropdownMenuItem {
-        @apply text-sm py-1 px-2 m-1 rounded-sm hover:cursor-pointer hover:bg-gray-100 font-medium;
+        @apply m-1 rounded-sm px-2 py-1 text-sm font-medium hover:cursor-pointer hover:bg-gray-100;
     }
 }

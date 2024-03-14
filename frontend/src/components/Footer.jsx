@@ -3,7 +3,7 @@ import React from "react"
 function Footer() {
     return (
         <div className="flex flex-col">
-            <div className="flex flex-col border-t mx-4 py-10 gap-8 sm:mx-16 sm:flex-row">
+            <div className="mx-4 flex flex-col gap-8 border-t py-10 sm:mx-16 sm:flex-row">
                 <div className="flex flex-col gap-3 sm:flex-auto">
                     <span className="font-semibold">For readers</span>
                     <div className="grid grid-cols-2 gap-2 text-gray-700">
@@ -28,11 +28,11 @@ function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col border-t px-4 py-6 gap-3 sm:px-16 sm:flex-row sm:items-end">
-                <div className="flex flex-wrap gap-2 sm:flex-1 items-end">
-                    <div className="flex gap-3 items-center">
+            <div className="flex flex-col gap-3 border-t px-4 py-6 sm:flex-row sm:items-end sm:px-16">
+                <div className="flex flex-wrap items-end gap-2 sm:flex-1">
+                    <div className="flex items-center gap-3">
                         <img className="h-5" src="./logo.svg" alt="" />
-                        <span className="text-xl font-semibold leading-6 font-serif pt-[0.1rem]">
+                        <span className="pt-[0.1rem] font-serif text-xl font-semibold leading-6">
                             Article+
                         </span>
                     </div>
