@@ -30,6 +30,6 @@
     }
 
     .DropdownMenuItem {
-        @apply m-1 rounded-sm px-2 py-1 text-sm font-medium hover:cursor-pointer hover:bg-gray-100;
+        @apply m-1 rounded-sm px-2 py-1 text-sm font-medium hover:cursor-pointer hover:bg-gray-100 hover:outline-none;
     }
 }

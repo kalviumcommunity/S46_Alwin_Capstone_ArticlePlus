@@ -9,7 +9,7 @@
     "scripts": {
         "install": "concurrently --names \"NODE,VITE\" -c \"cyan,green\" \"cd backend && npm install\" \"cd frontend && npm install\"",
         "dev": "concurrently --names \"NODE,VITE\" -c \"cyan,green\" \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
-        "format": "prettier --write \"**/*.{md,js,jsx,json,css,html}\""
+        "format": "prettier --write \"**/*.{md,js,jsx,cjs,json,css,html}\""
     },
     "keywords": [],
     "author": "Alwin Sunil",

@@ -1,11 +1,14 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
+import { useSignals } from "@preact/signals-react/runtime"
 import { userExists } from "@/signals/user"
 import { setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
 function Signup() {
+    useSignals()
+
     const {
         register,
         handleSubmit,
@@ -142,11 +145,8 @@ function Signup() {
                         className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
                         onClick={handleGoogleSignup}
                     >
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                            alt=""
-                        />{" "}
-                        Sign up with Google
+                        <img src="/assets/icons/google.svg" alt="" /> Sign up
+                        with Google
                     </span>
                 </div>
                 <div className="flex justify-center gap-4 py-2">

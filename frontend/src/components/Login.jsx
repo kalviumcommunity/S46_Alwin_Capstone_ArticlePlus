@@ -2,10 +2,13 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { setCookie } from "@/helpers/cookies"
-import { userExists } from "@/signals/user"
+import { useSignals } from "@preact/signals-react/runtime"
 import axiosInstance from "@/axios"
+import { userExists } from "@/signals/user"
 
 function Login() {
+    useSignals()
+
     const {
         register,
         handleSubmit,
@@ -21,11 +24,15 @@ function Login() {
                 setCookie("refreshToken", data.refreshToken, 1)
                 userExists.value = true
             })
-            .catch((error) => console.log("Login error:", error))
+            .catch((error) => console.error("Login error:", error))
     }
 
     const onSubmit = (data) => {
         handleLogin(data)
+    }
+
+    const handleGoogleLogin = () => {
+        window.open(`${import.meta.env.VITE_API_URL}/auth/google/`, "_self")
     }
 
     return (
@@ -92,7 +99,10 @@ function Login() {
                 </form>
                 <hr className="my-2" />
                 <div>
-                    <span className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer">
+                    <span
+                        className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
+                        onClick={handleGoogleLogin}
+                    >
                         <img
                             src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                             alt=""

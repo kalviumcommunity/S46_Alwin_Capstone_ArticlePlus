@@ -8,26 +8,31 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: `${process.env.API_URL}/auth/google/redirect`,
+            callbackURL: `${process.env.API_URL}/auth/google/callback`,
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                const email = profile._json.email
-                const existingUser = await User.findOne({ email })
+                const googleAuthUser = profile._json
+
+                const existingUser = await User.findOne({
+                    email: googleAuthUser.email,
+                })
 
                 if (existingUser) {
-                    return done(null, existingUser)
+                    return done(null, existingUser._id.toString())
                 }
 
                 const newUser = new User({
-                    name: profile._json.name,
-                    email,
-                    verified: profile._json.email_verified,
+                    name: googleAuthUser.name,
+                    email: googleAuthUser.email,
+                    verified: googleAuthUser.email_verified,
                     provider: "google",
+                    picture: googleAuthUser.picture,
                 })
 
                 const savedUser = await newUser.save()
-                done(null, savedUser)
+
+                done(null, savedUser._id.toString())
             } catch (err) {
                 done(err, null)
             }
@@ -36,7 +41,7 @@ passport.use(
 )
 
 passport.serializeUser((user, done) => {
-    done(null, user.id)
+    done(null, user)
 })
 
 passport.deserializeUser(async (id, done) => {

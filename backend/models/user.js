@@ -9,10 +9,11 @@ const userSchema = new mongoose.Schema({
             return this.provider === "email"
         },
     },
-    creator: { type: Boolean, default: false },
     refreshToken: { type: String },
     verified: { type: Boolean, required: true, default: false },
     provider: { type: String, required: true, default: "email" },
+    picture: { type: String },
+    creator: { type: Boolean, default: false },
 })
 
 const User = mongoose.model("users", userSchema)

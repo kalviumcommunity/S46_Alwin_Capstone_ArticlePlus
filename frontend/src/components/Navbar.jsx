@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useSignals } from "@preact/signals-react/runtime"
 import { useSignalEffect } from "@preact/signals-react"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
@@ -35,9 +35,8 @@ function Navbar() {
                 setCookie("accessToken", null)
                 setCookie("refreshToken", null)
                 userExists.value = false
-                console.log(res.data)
             })
-            .catch((err) => console.log(err))
+            .catch((err) => console.error(err))
     }
 
     return (
@@ -47,7 +46,7 @@ function Navbar() {
             }`}
             id="navbar"
         >
-            <Link to="/" className="flex items-center gap-4">
+            <Link to="/" className="flex items-center gap-3">
                 <>
                     <img className="h-6" src="./logo.svg" alt="" />
                     <span className="pt-[0.1rem] font-serif text-2xl font-semibold leading-6">
@@ -60,11 +59,19 @@ function Navbar() {
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                             <div className="flex items-center gap-2 rounded-full border p-1 pr-4 hover:cursor-pointer hover:bg-gray-50 ">
-                                <img
-                                    className="h-8 w-8 rounded-full"
-                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
-                                    alt=""
-                                />
+                                {user.picture ? (
+                                    <img
+                                        className="h-8 w-8 rounded-full"
+                                        src={`${user.picture}`}
+                                        alt=""
+                                    />
+                                ) : (
+                                    <img
+                                        className="h-8 w-8 rounded-full"
+                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+                                        alt=""
+                                    />
+                                )}
                                 <span className="font-medium">{user.name}</span>
                             </div>
                         </DropdownMenu.Trigger>

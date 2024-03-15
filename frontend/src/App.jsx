@@ -1,15 +1,27 @@
-import { Routes, Route, Outlet, Navigate, useNavigate } from "react-router-dom"
-import { useSignals } from "@preact/signals-react/runtime"
+import { Routes, Route, Outlet, Navigate } from "react-router-dom"
+import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
+import { userExists, userDetails } from "@/signals/user"
 import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
 import Login from "@/components/Login"
 import Signup from "@/components/Signup"
 import Footer from "@/components/Footer"
 import Read from "@/components/Read"
-import { userExists } from "@/signals/user"
+import axiosInstance from "@/axios"
+import AuthGoogle from "./components/AuthGoogle"
 import "./App.css"
 
 function Layout() {
+    useSignals()
+
+    useSignalEffect(() => {
+        if (userExists.value) {
+            axiosInstance
+                .get("auth")
+                .then((res) => (userDetails.value = res.data))
+        }
+    })
+
     return (
         <>
             <Navbar />
@@ -25,9 +37,13 @@ function App() {
     return (
         <Routes>
             <Route path="/" element={<Layout />}>
-                <Route index element={<Hero />} />
                 {userExists.value === true ? (
                     <>
+                        <Route index element={<Read />} />
+                        <Route
+                            path="read"
+                            element={<Navigate to="/" replace={true} />}
+                        />
                         <Route
                             path="login"
                             element={<Navigate to="/read" replace={true} />}
@@ -36,12 +52,17 @@ function App() {
                             path="signup"
                             element={<Navigate to="/read" replace={true} />}
                         />
-                        <Route path="read" element={<Read />} />
+                        <Route
+                            path="auth/google"
+                            element={<Navigate to="/" replace={true} />}
+                        />
                     </>
                 ) : (
                     <>
+                        <Route index element={<Hero />} />
                         <Route path="signup" element={<Signup />} />
                         <Route path="login" element={<Login />} />
+                        <Route path="auth/google" element={<AuthGoogle />} />
                         <Route
                             path="read"
                             element={<Navigate to="/login" replace={true} />}
