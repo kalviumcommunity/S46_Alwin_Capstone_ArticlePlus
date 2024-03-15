@@ -3,30 +3,10 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
 const asyncHandler = require("../middlewares/asyncHandler")
+const { generateToken } = require("../helpers/generateToken")
 const User = require("../models/user")
 
 const router = express.Router()
-
-const ACCESS_TOKEN_LIFE = "15m"
-const REFRESH_TOKEN_LIFE = "30d"
-
-const generateToken = async (userId) => {
-    try {
-        const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET, {
-            expiresIn: ACCESS_TOKEN_LIFE,
-        })
-
-        const refreshToken = jwt.sign(
-            { userId },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: REFRESH_TOKEN_LIFE },
-        )
-
-        return { accessToken, refreshToken }
-    } catch (error) {
-        throw new Error("Failed to generate tokens")
-    }
-}
 
 const handleSignup = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body
@@ -106,9 +86,9 @@ const handleAccessTokenRefresh = async (req, res) => {
         // Generate a new access token
         const accessToken = jwt.sign(
             { userId: user._id },
-            process.env.JWT_SECRET,
+            process.env.ACCESS_TOKEN_SECRET,
             {
-                expiresIn: ACCESS_TOKEN_LIFE,
+                expiresIn: process.env.ACCESS_TOKEN_LIFE,
             },
         )
 
@@ -127,7 +107,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(accessToken, process.env.JWT_SECRET)
+        const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
         req.userId = decoded.userId
         next()
     } catch (error) {
@@ -137,14 +117,15 @@ const verifyToken = (req, res, next) => {
 
 const handleAuthUserStatus = async (req, res) => {
     const userId = req.userId
+
     const user = await User.findById(userId).select("-password -refreshToken")
 
     if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
 
-    const { name, email, creator, verifed } = user
-    res.status(200).json({ name, email, creator, verifed })
+    const { name, email, creator, verifed, provider, picture } = user
+    res.status(200).json({ name, email, creator, verifed, provider, picture })
 }
 
 const handleLogOut = async (req, res) => {
@@ -166,10 +147,9 @@ const handleLogOut = async (req, res) => {
 
 router.post("/signup", asyncHandler(handleSignup))
 router.post("/login", asyncHandler(handleLogin))
-
 router.post("/refresh", asyncHandler(handleAccessTokenRefresh))
+router.post("/logout", verifyToken, asyncHandler(handleLogOut))
 
 router.get("/", verifyToken, asyncHandler(handleAuthUserStatus))
-router.post("/logout", verifyToken, asyncHandler(handleLogOut))
 
 module.exports = router

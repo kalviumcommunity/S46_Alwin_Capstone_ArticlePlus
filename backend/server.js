@@ -1,15 +1,22 @@
 require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
+const session = require("express-session")
+const passport = require("passport")
 
-const { startDB, isConnected } = require("./db")
+const { startDB } = require("./db")
+require("./lib/passport")
 
-const article = require("./routes/article")
-const auth = require("./routes/auth")
+const logger = require("./middlewares/requestLogger")
+const apiRoutes = require("./api")
 
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
+// Start the database connection
+startDB()
+
+// Middleware
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
@@ -17,37 +24,33 @@ app.use(
         credentials: true,
     }),
 )
-
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+        },
+    }),
+)
 app.use(express.json())
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(logger)
 
-// Logging request and response time
-app.use((req, res, next) => {
-    const start = Date.now()
-    const logRequest = `[${new Date().toISOString()}] ${req.method} ${
-        req.originalUrl
-    }`
-
-    res.on("finish", () => {
-        const duration = Date.now() - start
-        console.log(`${logRequest} - ${duration}ms`)
-    })
-
-    next()
-})
-
-startDB()
-
-app.get("/", (req, res) => {
+// Routes
+app.get("/db-status", (req, res) => {
+    const isConnected = require("./db").isConnected()
     res.json({
-        "📦 Database connection status": isConnected()
+        "📦 Database connection status": isConnected
             ? "✅ Connected"
             : "❌ Not connected",
     })
 })
+app.use("/", apiRoutes)
 
-app.use("/article", article)
-app.use("/auth", auth)
-
+// Start the server
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)
 })

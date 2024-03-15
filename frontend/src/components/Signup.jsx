@@ -1,11 +1,14 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
+import { useSignals } from "@preact/signals-react/runtime"
 import { userExists } from "@/signals/user"
 import { setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
 function Signup() {
+    useSignals()
+
     const {
         register,
         handleSubmit,
@@ -29,10 +32,14 @@ function Signup() {
         handleSignup(data)
     }
 
+    const handleGoogleSignup = () => {
+        window.open(`${import.meta.env.VITE_API_URL}/auth/google/`, "_self")
+    }
+
     return (
-        <div className="flex flex-col items-center mx-4 pt-10 pb-16  gap-4 border-b sm:mx-16 sm:py-26 sm:gap-6">
+        <div className="sm:py-26 mx-4 flex flex-col items-center gap-4  border-b pb-16 pt-10 sm:mx-16 sm:gap-6">
             <div className="flex flex-col gap-3 sm:w-96">
-                <h1 className="text-4xl font-semibold mr-auto mb-2">Signup</h1>
+                <h1 className="mb-2 mr-auto text-4xl font-semibold">Signup</h1>
                 <form
                     className="flex flex-col gap-3"
                     onSubmit={handleSubmit(onSubmit)}
@@ -126,7 +133,7 @@ function Signup() {
                     <div className="my-3">
                         <button
                             type="submit"
-                            className="w-full px-4 py-2 font-semibold border-2 border-black bg-rose-500 text-white underline decoration-white decoration-wavy rounded-full"
+                            className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white underline decoration-white decoration-wavy"
                         >
                             Signup
                         </button>
@@ -134,19 +141,19 @@ function Signup() {
                 </form>
                 <hr className="my-2" />
                 <div>
-                    <span className="flex gap-2 border-2 border-black font-semibold shadow px-4 py-2 justify-center hover:cursor-pointer rounded-full">
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                            alt=""
-                        />{" "}
-                        Sign up with Google
+                    <span
+                        className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
+                        onClick={handleGoogleSignup}
+                    >
+                        <img src="/assets/icons/google.svg" alt="" /> Sign up
+                        with Google
                     </span>
                 </div>
-                <div className="flex gap-4 justify-center py-2">
+                <div className="flex justify-center gap-4 py-2">
                     <span className="text-base">
                         Already have an account?&nbsp;
                         <Link
-                            className="font-semibold underline text-blue-700"
+                            className="font-semibold text-blue-700 underline"
                             to="/login"
                         >
                             Login

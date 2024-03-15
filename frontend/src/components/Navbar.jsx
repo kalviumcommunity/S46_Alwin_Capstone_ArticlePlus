@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useSignals } from "@preact/signals-react/runtime"
 import { useSignalEffect } from "@preact/signals-react"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
@@ -35,22 +35,21 @@ function Navbar() {
                 setCookie("accessToken", null)
                 setCookie("refreshToken", null)
                 userExists.value = false
-                console.log(res.data)
             })
-            .catch((err) => console.log(err))
+            .catch((err) => console.error(err))
     }
 
     return (
         <div
-            className={`flex flex-row justify-between sticky top-0 bg-white ${
-                scrolled ? "px-4 py-4 sm:px-12 border" : "px-4 py-6 sm:px-16"
+            className={`sticky top-0 flex flex-row justify-between bg-white ${
+                scrolled ? "border px-4 py-4 sm:px-12" : "px-4 py-6 sm:px-16"
             }`}
             id="navbar"
         >
-            <Link to="/" className="flex gap-4 items-center">
+            <Link to="/" className="flex items-center gap-3">
                 <>
                     <img className="h-6" src="./logo.svg" alt="" />
-                    <span className="text-2xl font-semibold leading-6 font-serif pt-[0.1rem]">
+                    <span className="pt-[0.1rem] font-serif text-2xl font-semibold leading-6">
                         Article+
                     </span>
                 </>
@@ -59,28 +58,36 @@ function Navbar() {
                 <div>
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
-                            <div className="flex items-center gap-2 border rounded-full p-1 pr-4 hover:bg-gray-50 hover:cursor-pointer ">
-                                <img
-                                    className="h-8 w-8 rounded-full"
-                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
-                                    alt=""
-                                />
+                            <div className="flex items-center gap-2 rounded-full border p-1 pr-4 hover:cursor-pointer hover:bg-gray-50 ">
+                                {user.picture ? (
+                                    <img
+                                        className="h-8 w-8 rounded-full"
+                                        src={`${user.picture}`}
+                                        alt=""
+                                    />
+                                ) : (
+                                    <img
+                                        className="h-8 w-8 rounded-full"
+                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+                                        alt=""
+                                    />
+                                )}
                                 <span className="font-medium">{user.name}</span>
                             </div>
                         </DropdownMenu.Trigger>
 
                         <DropdownMenu.Portal>
                             <DropdownMenu.Content
-                                className="DropdownMenuContent border-2 min-w-48 rounded-md"
+                                className="DropdownMenuContent min-w-48 rounded-md border-2"
                                 align="end"
                                 sideOffset={5}
                             >
                                 <DropdownMenu.Item className="DropdownMenuItem">
                                     Account & Settings
                                 </DropdownMenu.Item>
-                                <DropdownMenu.Separator className="h-px bg-gray-100 mx-1" />
+                                <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                                 <DropdownMenu.Item
-                                    className="DropdownMenuItem text-white font-semibold bg-red-500 hover:bg-red-600"
+                                    className="DropdownMenuItem bg-red-500 font-semibold text-white hover:bg-red-600"
                                     onClick={handleLogout}
                                 >
                                     Log out
