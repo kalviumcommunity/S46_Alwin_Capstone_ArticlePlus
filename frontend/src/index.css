@@ -21,8 +21,8 @@
 }
 
 @layer components {
-    .container {
-        @apply flex flex-col gap-8 px-4 py-10 sm:flex-row sm:px-16;
+    .wrapper {
+        @apply flex flex-col gap-8 py-4 sm:flex-row sm:px-16;
     }
 
     .input {

@@ -4,7 +4,7 @@ function Read() {
     useSignals()
 
     return (
-        <div className="container flex-col">
+        <div className="wrapper flex-col">
             <span>Hello, Readers👋</span>
         </div>
     )

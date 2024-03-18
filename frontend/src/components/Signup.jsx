@@ -1,4 +1,3 @@
-import React from "react"
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { useSignals } from "@preact/signals-react/runtime"
@@ -6,6 +5,7 @@ import { userExists } from "@/signals/user"
 import { setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
+// million-ignore
 function Signup() {
     useSignals()
 
@@ -42,8 +42,7 @@ function Signup() {
                 <h1 className="mb-2 mr-auto text-4xl font-semibold">Signup</h1>
                 <form
                     className="flex flex-col gap-3"
-                    onSubmit={handleSubmit(onSubmit)}
-                >
+                    onSubmit={handleSubmit(onSubmit)}>
                     <div className="flex flex-col gap-1">
                         <label className="font-medium" htmlFor="name">
                             Full name
@@ -109,8 +108,7 @@ function Signup() {
                     <div className="flex flex-col gap-1">
                         <label
                             className="font-medium"
-                            htmlFor="confirmPassword"
-                        >
+                            htmlFor="confirmPassword">
                             Confirm Password
                         </label>
                         <input
@@ -133,8 +131,7 @@ function Signup() {
                     <div className="my-3">
                         <button
                             type="submit"
-                            className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white underline decoration-white decoration-wavy"
-                        >
+                            className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white underline decoration-white decoration-wavy">
                             Signup
                         </button>
                     </div>
@@ -143,8 +140,7 @@ function Signup() {
                 <div>
                     <span
                         className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
-                        onClick={handleGoogleSignup}
-                    >
+                        onClick={handleGoogleSignup}>
                         <img src="/assets/icons/google.svg" alt="" /> Sign up
                         with Google
                     </span>
@@ -154,8 +150,7 @@ function Signup() {
                         Already have an account?&nbsp;
                         <Link
                             className="font-semibold text-blue-700 underline"
-                            to="/login"
-                        >
+                            to="/login">
                             Login
                         </Link>
                     </span>
