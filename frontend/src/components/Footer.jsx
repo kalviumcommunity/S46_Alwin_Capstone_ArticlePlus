@@ -46,8 +46,7 @@ function Footer() {
                         className="font-medium underline"
                         href="http://alwinsunil.in"
                         target="_blank"
-                        rel="noopener noreferrer"
-                    >
+                        rel="noopener noreferrer">
                         Alwin Sunil
                     </a>
                 </span>
