@@ -42,7 +42,7 @@ function Navbar() {
     return (
         <div
             className={`sticky top-0 z-30 flex flex-row justify-between bg-white ${
-                scrolled ? "border px-4 py-4 sm:px-12" : "px-4 py-6 sm:px-16"
+                scrolled ? "px-4 py-3 sm:px-12" : "px-4 py-4 sm:px-16"
             }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-3">
@@ -56,37 +56,42 @@ function Navbar() {
             {user && user.name && (
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
-                        <div className="flex items-center gap-2 rounded-full border p-1 pr-4 hover:cursor-pointer hover:bg-gray-50 ">
+                        <div className="flex items-center gap-2 rounded-full border hover:cursor-pointer hover:bg-gray-50 ">
                             {user.picture ? (
                                 <img
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-9 w-9 rounded-full"
                                     src={`${user.picture}`}
                                     alt=""
                                 />
                             ) : (
                                 <img
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-9 w-9 rounded-full"
                                     src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
                                     alt=""
                                 />
                             )}
-                            <span className="font-medium">{user.name}</span>
                         </div>
                     </DropdownMenu.Trigger>
-
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
                             className="DropdownMenuContent z-50 min-w-48 rounded-md border-2 bg-white"
                             align="end"
                             sideOffset={5}>
+                            <div className="mx-3 my-2 flex flex-col px-2 py-1">
+                                <span className="font-medium">{user.name}</span>
+                                <span className="text-sm text-gray-600">
+                                    {user.email}
+                                </span>
+                            </div>
+                            <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <Link to="/account">
-                                <DropdownMenu.Item className="DropdownMenuItem">
+                                <DropdownMenu.Item className="dropdownmenu-item">
                                     Account & Settings
                                 </DropdownMenu.Item>
                             </Link>
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <DropdownMenu.Item
-                                className="DropdownMenuItem bg-red-500 font-semibold text-white hover:bg-red-600"
+                                className="dropdownmenu-item bg-red-50 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
                                 onClick={handleLogout}>
                                 Log out
                             </DropdownMenu.Item>

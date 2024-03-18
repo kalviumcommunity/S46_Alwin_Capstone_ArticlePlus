@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import axiosInstance from "@/axios"
 import { userExists } from "@/signals/user"
 import { setCookie } from "@/helpers/cookies"

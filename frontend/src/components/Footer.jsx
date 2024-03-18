@@ -1,5 +1,3 @@
-import React from "react"
-
 function Footer() {
     return (
         <div className="flex flex-col">
@@ -43,7 +41,7 @@ function Footer() {
                 <span className="text-sm sm:flex-1">
                     Created by{" "}
                     <a
-                        className="font-medium underline"
+                        className="font-medium text-rose-500"
                         href="http://alwinsunil.in"
                         target="_blank"
                         rel="noopener noreferrer">

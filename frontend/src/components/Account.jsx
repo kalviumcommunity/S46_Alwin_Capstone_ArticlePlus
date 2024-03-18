@@ -67,36 +67,36 @@ function Account() {
                 </div>
             </div>
             <Tabs.Root
-                className="flex divide-x py-10 sm:px-16"
+                className="flex flex-col gap-2 divide-x py-2 sm:flex-row sm:gap-0 sm:px-16 sm:py-10"
                 defaultValue="tab1">
                 <Tabs.List
-                    className="gap mr-3 flex max-w-56 flex-1 flex-col items-start"
+                    className="flex flex-1 flex-row items-start gap-2 px-4 py-2 sm:mr-3 sm:max-w-56 sm:flex-col sm:py-0"
                     aria-label="Manage your account">
                     <Tabs.Trigger
-                        className="w-full px-4 py-2 text-start font-medium text-gray-500 hover:bg-slate-50 [&[data-state='active']]:text-black"
+                        className="w-fit border-b-2 border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-slate-50 sm:w-full sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-200 [&[data-state='active']]:bg-gray-50 [&[data-state='active']]:text-black"
                         value="tab1">
                         Account
                     </Tabs.Trigger>
                     <Tabs.Trigger
-                        className="w-full px-4 py-2 text-start font-medium text-gray-500 hover:bg-slate-50 [&[data-state='active']]:text-black"
+                        className="w-fit px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-slate-50 sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:bg-gray-50 [&[data-state='active']]:text-black"
                         value="tab2">
                         Purchases and memberships
                     </Tabs.Trigger>
                 </Tabs.List>
-                <div className="flex-auto pl-4" z>
+                <div className="flex-auto px-4 sm:pl-4">
                     <Tabs.Content value="tab1">
-                        <div className="mx-4 my-2 flex flex-col gap-3">
-                            <span className="mb-2 text-2xl font-semibold">
+                        <div className="my-2 flex flex-col gap-3 sm:mx-4">
+                            <span className="text-2xl font-semibold">
                                 Authentication
                             </span>
                             <div className="grid auto-cols-auto divide-y">
-                                <div className="flex flex-1 py-4">
-                                    <span className="flex-1 text-base font-medium">
+                                <div className="flex flex-1 items-center gap-4 py-4 sm:gap-0">
+                                    <span className="text-base font-medium sm:flex-1">
                                         Login method:
                                     </span>
-                                    <div className="flex flex-1 gap-4">
+                                    <div className="flex gap-4 sm:flex-1 sm:gap-0">
                                         {user.provider === "google" && (
-                                            <div className="flex items-center gap-2 text-gray-500">
+                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-medium text-gray-700">
                                                 <img
                                                     className="h-5 w-5"
                                                     src="assets/icons/google.svg"
@@ -106,15 +106,15 @@ function Account() {
                                             </div>
                                         )}
                                         {user.provider === "email" && (
-                                            <div className="flex text-gray-700">
+                                            <div className="flex rounded-full border px-6 py-1 font-medium text-gray-700">
                                                 <span>Email & Password</span>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                                 {user.provider === "email" && (
-                                    <div className="flex flex-1 items-center py-4">
-                                        <span className="flex-1 text-base font-medium">
+                                    <div className="flex items-center gap-4 py-4 sm:flex-1 sm:gap-0">
+                                        <span className="text-base font-medium sm:flex-1">
                                             Password:
                                         </span>
                                         <ChangePassword />
@@ -124,7 +124,7 @@ function Account() {
                         </div>
                     </Tabs.Content>
                     <Tabs.Content value="tab2">
-                        <div className=" mx-4 my-2 flex flex-col gap-2">
+                        <div className="my-2 flex flex-col gap-2 sm:mx-4">
                             <span className="mb-2 text-2xl font-semibold">
                                 Memberships
                             </span>

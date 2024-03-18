@@ -1,5 +1,3 @@
-import { userExists } from "@/signals/user"
-import React from "react"
 import { Link } from "react-router-dom"
 
 function Hero() {

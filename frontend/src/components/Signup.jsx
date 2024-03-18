@@ -5,7 +5,6 @@ import { userExists } from "@/signals/user"
 import { setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
-// million-ignore
 function Signup() {
     useSignals()
 

@@ -17,7 +17,10 @@
 }
 
 * {
-    transition: 0.1s padding ease-in-out;
+    transition:
+        0.1s padding ease-in-out,
+        0.1s background-color ease-in-out,
+        0.1s color ease-in-out;
 }
 
 @layer components {
@@ -29,7 +32,7 @@
         @apply rounded-xl border-2 bg-gray-50 px-4 py-2 focus:outline-none;
     }
 
-    .DropdownMenuItem {
-        @apply m-1 rounded-sm px-2 py-1 text-sm font-medium hover:cursor-pointer hover:bg-gray-100 hover:outline-none;
+    .dropdownmenu-item {
+        @apply m-1 rounded-sm px-3 py-1 text-sm font-medium hover:cursor-pointer hover:bg-gray-100 hover:outline-none;
     }
 }
