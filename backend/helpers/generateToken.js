@@ -9,13 +9,17 @@ const generateToken = async (userId) => {
             process.env.ACCESS_TOKEN_SECRET,
             {
                 expiresIn: process.env.ACCESS_TOKEN_LIFE,
+                algorithm: process.env.JWT_ALGORITHM,
             },
         )
 
         const refreshToken = jwt.sign(
             { userId },
             process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: process.env.REFRESH_TOKEN_LIFE },
+            {
+                expiresIn: process.env.REFRESH_TOKEN_LIFE,
+                algorithm: process.env.JWT_ALGORITHM,
+            },
         )
 
         return { accessToken, refreshToken }

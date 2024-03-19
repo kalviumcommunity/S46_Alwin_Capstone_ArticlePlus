@@ -1,5 +1,3 @@
-import { userExists } from "@/signals/user"
-import React from "react"
 import { Link } from "react-router-dom"
 
 function Hero() {
@@ -11,14 +9,12 @@ function Hero() {
             <div className="flex gap-1">
                 <Link
                     to="/read"
-                    className="rounded-full bg-rose-500 px-6 py-1 font-semibold text-white"
-                >
+                    className="rounded-full bg-rose-500 px-6 py-1 font-semibold text-white">
                     Read
                 </Link>
                 <Link
                     to="/signup"
-                    className="px-6 py-1 font-semibold underline decoration-rose-500 decoration-wavy"
-                >
+                    className="px-6 py-1 font-semibold underline decoration-rose-500 decoration-wavy">
                     Signup
                 </Link>
             </div>

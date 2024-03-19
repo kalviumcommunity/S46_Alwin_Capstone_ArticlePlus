@@ -10,6 +10,7 @@ import Read from "@/components/Read"
 import axiosInstance from "@/axios"
 import AuthGoogle from "./components/AuthGoogle"
 import "./App.css"
+import Account from "./components/Account"
 
 function Layout() {
     useSignals()
@@ -40,6 +41,7 @@ function App() {
                 {userExists.value === true ? (
                     <>
                         <Route index element={<Read />} />
+                        <Route path="/account" element={<Account />} />
                         <Route
                             path="read"
                             element={<Navigate to="/" replace={true} />}
@@ -66,6 +68,10 @@ function App() {
                         <Route
                             path="read"
                             element={<Navigate to="/login" replace={true} />}
+                        />
+                        <Route
+                            path="*"
+                            element={<Navigate to="/" replace={true} />}
                         />
                     </>
                 )}

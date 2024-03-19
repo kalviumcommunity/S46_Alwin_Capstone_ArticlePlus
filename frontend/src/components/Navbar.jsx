@@ -41,11 +41,10 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 flex flex-row justify-between bg-white ${
-                scrolled ? "border px-4 py-4 sm:px-12" : "px-4 py-6 sm:px-16"
+            className={`sticky top-0 z-30 flex flex-row justify-between bg-white ${
+                scrolled ? "px-4 py-3 sm:px-12" : "px-4 py-4 sm:px-16"
             }`}
-            id="navbar"
-        >
+            id="navbar">
             <Link to="/" className="flex items-center gap-3">
                 <>
                     <img className="h-6" src="./logo.svg" alt="" />
@@ -55,47 +54,50 @@ function Navbar() {
                 </>
             </Link>
             {user && user.name && (
-                <div>
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                            <div className="flex items-center gap-2 rounded-full border p-1 pr-4 hover:cursor-pointer hover:bg-gray-50 ">
-                                {user.picture ? (
-                                    <img
-                                        className="h-8 w-8 rounded-full"
-                                        src={`${user.picture}`}
-                                        alt=""
-                                    />
-                                ) : (
-                                    <img
-                                        className="h-8 w-8 rounded-full"
-                                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
-                                        alt=""
-                                    />
-                                )}
+                <DropdownMenu.Root>
+                    <DropdownMenu.Trigger asChild>
+                        <div className="flex items-center gap-2 rounded-full border hover:cursor-pointer hover:bg-gray-50 ">
+                            {user.picture ? (
+                                <img
+                                    className="h-9 w-9 rounded-full"
+                                    src={`${user.picture}`}
+                                    alt=""
+                                />
+                            ) : (
+                                <img
+                                    className="h-9 w-9 rounded-full"
+                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+                                    alt=""
+                                />
+                            )}
+                        </div>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                            className="DropdownMenuContent z-50 min-w-48 rounded-md border-2 bg-white"
+                            align="end"
+                            sideOffset={5}>
+                            <div className="mx-3 my-2 flex flex-col px-2 py-1">
                                 <span className="font-medium">{user.name}</span>
+                                <span className="text-sm text-gray-600">
+                                    {user.email}
+                                </span>
                             </div>
-                        </DropdownMenu.Trigger>
-
-                        <DropdownMenu.Portal>
-                            <DropdownMenu.Content
-                                className="DropdownMenuContent min-w-48 rounded-md border-2"
-                                align="end"
-                                sideOffset={5}
-                            >
-                                <DropdownMenu.Item className="DropdownMenuItem">
+                            <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
+                            <Link to="/account">
+                                <DropdownMenu.Item className="dropdown-item">
                                     Account & Settings
                                 </DropdownMenu.Item>
-                                <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
-                                <DropdownMenu.Item
-                                    className="DropdownMenuItem bg-red-500 font-semibold text-white hover:bg-red-600"
-                                    onClick={handleLogout}
-                                >
-                                    Log out
-                                </DropdownMenu.Item>
-                            </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
-                </div>
+                            </Link>
+                            <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
+                            <DropdownMenu.Item
+                                className="dropdown-item bg-red-50 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
+                                onClick={handleLogout}>
+                                Log out
+                            </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                </DropdownMenu.Root>
             )}
         </div>
     )

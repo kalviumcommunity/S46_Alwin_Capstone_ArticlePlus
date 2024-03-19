@@ -48,14 +48,14 @@ instance.interceptors.response.use(
                 return axios(originalRequest)
             } catch (error) {
                 forceLogoutUser()
-                return
+                return Promise.reject(error)
             }
         } else if (error.response.status === 403) {
             forceLogoutUser()
             alert("Your session has expired. Please login again.")
         }
 
-        return
+        return Promise.reject(error)
     },
 )
 
