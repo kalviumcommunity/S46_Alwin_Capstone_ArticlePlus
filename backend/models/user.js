@@ -9,7 +9,16 @@ const userSchema = new mongoose.Schema({
             return this.provider === "email"
         },
     },
-    refreshToken: { type: String },
+    refreshTokens: [
+        {
+            token: { type: String, required: true },
+            deviceInfo: {
+                userAgent: { type: String, required: true },
+                deviceMetadata: { type: String, required: true },
+            },
+            createdAt: { type: Date, required: true, default: Date.now },
+        },
+    ],
     verified: { type: Boolean, required: true, default: false },
     provider: { type: String, required: true, default: "email" },
     picture: { type: String },

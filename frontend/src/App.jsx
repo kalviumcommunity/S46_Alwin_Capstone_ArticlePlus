@@ -17,9 +17,10 @@ function Layout() {
 
     useSignalEffect(() => {
         if (userExists.value) {
-            axiosInstance
-                .get("auth")
-                .then((res) => (userDetails.value = res.data))
+            axiosInstance.get("auth").then((res) => {
+                console.log(res)
+                userDetails.value = res.data
+            })
         }
     })
 

@@ -3,6 +3,40 @@ import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 import { useState } from "react"
 import * as Tabs from "@radix-ui/react-tabs"
 import ChangePassword from "@/components/ChangePassword"
+import axiosInstance from "@/axios"
+
+function Session({ session }) {
+    const [timeZone] = useState(
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+    )
+
+    const handleLogout = (refreshTokenId) => {
+        axiosInstance
+            .patch("session/remove", { refreshTokenId })
+            .then((res) => console.log(res.data))
+            .catch((err) => console.log(err))
+    }
+
+    return (
+        <div className="grid w-full auto-rows-auto grid-cols-3 items-center px-2 py-3">
+            <span>{session.deviceInfo.deviceMetadata}</span>
+            <span>
+                {new Date(session.createdAt).toLocaleString("en-US", {
+                    timeZone: timeZone,
+                    dateStyle: "long",
+                    timeStyle: "medium",
+                })}
+            </span>
+            <span>
+                <button
+                    className="rounded-full bg-red-50 px-5 py-1 font-medium text-red-500 hover:bg-red-500 hover:text-white"
+                    onClick={() => handleLogout(session._id)}>
+                    Log out
+                </button>
+            </span>
+        </div>
+    )
+}
 
 function Account() {
     useSignals()
@@ -13,6 +47,7 @@ function Account() {
     useSignalEffect(() => {
         randomGradient()
         setUser(userDetails.value)
+        console.log(userDetails.value.refreshTokens)
     })
 
     const randomGradient = () => {
@@ -84,7 +119,7 @@ function Account() {
                     </Tabs.Trigger>
                 </Tabs.List>
                 <div className="flex-auto px-4 sm:pl-4">
-                    <Tabs.Content value="tab1">
+                    <Tabs.Content value="tab1" className="flex flex-col gap-2">
                         <div className="my-2 flex flex-col gap-3 sm:mx-4">
                             <span className="text-2xl font-semibold">
                                 Authentication
@@ -120,6 +155,25 @@ function Account() {
                                         <ChangePassword />
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                        <div className="my-2 flex flex-col gap-3 sm:mx-4">
+                            <span className="text-2xl font-semibold">
+                                Your devices
+                            </span>
+                            <div className="grid auto-cols-auto divide-y">
+                                <div className="grid w-full grid-cols-3 grid-rows-1 px-2 py-3 text-base font-semibold">
+                                    <span>Device</span>
+                                    <span>Logged in</span>
+                                    <span></span>
+                                </div>
+                                {user.refreshTokens &&
+                                    user.refreshTokens.map((session) => (
+                                        <Session
+                                            session={session}
+                                            key={session._id}
+                                        />
+                                    ))}
                             </div>
                         </div>
                     </Tabs.Content>

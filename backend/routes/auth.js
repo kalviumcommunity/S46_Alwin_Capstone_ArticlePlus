@@ -1,6 +1,7 @@
 const express = require("express")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+var uap = require("ua-parser-js")
 
 const asyncHandler = require("../middlewares/asyncHandler")
 const { generateToken } = require("../helpers/generateToken")
@@ -31,7 +32,14 @@ const handleSignup = async (req, res) => {
     const { accessToken, refreshToken } = await generateToken(
         newUser._id.toString(),
     )
-    newUser.refreshToken = refreshToken
+
+    const userAgent = uap(req.headers["user-agent"])
+    const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
+
+    newUser.refreshTokens.push({
+        token: refreshToken,
+        deviceInfo: { userAgent: userAgent.ua, deviceMetadata },
+    })
 
     await newUser.save()
 
@@ -62,7 +70,14 @@ const handleLogin = async (req, res) => {
         user._id.toString(),
     )
 
-    user.refreshToken = refreshToken
+    const userAgent = uap(req.headers["user-agent"])
+    const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.cpu.architecture}`
+
+    user.refreshTokens.push({
+        token: refreshToken,
+        deviceInfo: { userAgent: userAgent.ua, deviceMetadata },
+    })
+
     await user.save()
 
     res.status(200).json({ accessToken, refreshToken })
@@ -152,7 +167,10 @@ const handleAccessTokenRefresh = async (req, res) => {
 
         // Check if the refresh token is valid
         const user = await User.findOne({ _id: decoded.userId })
-        if (user.refreshToken !== refreshToken) {
+        const refreshTokenObj = user.refreshTokens.find(
+            (token) => token.token === refreshToken,
+        )
+        if (!refreshTokenObj) {
             return res.status(403).json({ message: "Invalid refresh token" })
         }
 
@@ -174,16 +192,26 @@ const handleAccessTokenRefresh = async (req, res) => {
 
 const handleLogOut = async (req, res) => {
     const userId = req.userId
+    const { refreshToken } = req.body
 
-    const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { refreshToken: null },
-        { new: true },
-    )
-
-    if (!updatedUser) {
+    const user = await User.findById(userId)
+    if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
+
+    const refreshTokenObj = user.refreshTokens.find(
+        (token) => token.token === refreshToken,
+    )
+    if (!refreshTokenObj) {
+        return res.status(403).json({ message: "Invalid refresh token" })
+    }
+
+    // Remove the refresh token from the user's list of refresh tokens
+    user.refreshTokens = user.refreshTokens.filter(
+        (token) => token.token !== refreshToken,
+    )
+
+    await user.save()
 
     // Send a success response
     res.status(200).json({ message: "Logout successful" })
@@ -192,14 +220,25 @@ const handleLogOut = async (req, res) => {
 const handleAuthUserStatus = async (req, res) => {
     const userId = req.userId
 
-    const user = await User.findById(userId).select("-password -refreshToken")
+    const user = await User.findById(userId).select(
+        "-password -refreshTokens.token -refreshTokens.deviceInfo.userAgent",
+    )
 
     if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
 
-    const { name, email, creator, verifed, provider, picture } = user
-    res.status(200).json({ name, email, creator, verifed, provider, picture })
+    const { name, email, creator, verified, provider, picture, refreshTokens } =
+        user
+    res.status(200).json({
+        name,
+        email,
+        creator,
+        verified,
+        provider,
+        picture,
+        refreshTokens,
+    })
 }
 
 router.post("/signup", asyncHandler(handleSignup))
