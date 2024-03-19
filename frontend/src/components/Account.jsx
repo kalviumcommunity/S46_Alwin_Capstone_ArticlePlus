@@ -106,9 +106,9 @@ function Account() {
                                             </div>
                                         )}
                                         {user.provider === "email" && (
-                                            <div className="flex rounded-full border px-6 py-1 font-medium text-gray-700">
-                                                <span>Email & Password</span>
-                                            </div>
+                                            <span className="flex rounded-full border px-6 py-1 text-center font-medium leading-5 text-gray-700">
+                                                Email & Password
+                                            </span>
                                         )}
                                     </div>
                                 </div>

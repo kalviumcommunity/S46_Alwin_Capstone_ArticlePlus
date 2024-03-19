@@ -69,7 +69,7 @@ const handleLogin = async (req, res) => {
 }
 
 // Middleware to verify the access token
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
     const accessToken = req.headers.authorization?.split(" ")[1]
 
     if (!accessToken) {
@@ -77,7 +77,11 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+        const decoded = await jwt.verify(
+            accessToken,
+            process.env.ACCESS_TOKEN_SECRET,
+            { algorithms: [process.env.JWT_ALGORITHM] },
+        )
         req.userId = decoded.userId
         next()
     } catch (error) {
@@ -91,10 +95,22 @@ const handleResetPassword = asyncHandler(async (req, res) => {
 
     // Check if new password and confirm new password match
     if (newPassword !== confirmNewPassword) {
-        return res.status(400).json({ message: "New passwords do not match" })
+        return res.status(400).json({
+            success: false,
+            icon: "🚫",
+            message: "New passwords do not match",
+        })
     }
 
     const user = await User.findById(userId)
+
+    if (!user) {
+        res.status(404).json({
+            success: false,
+            icon: "🚫",
+            message: "User not found",
+        })
+    }
 
     // Check if the old password is correct
     const isCurrentPasswordValid = await bcrypt.compare(
@@ -102,7 +118,11 @@ const handleResetPassword = asyncHandler(async (req, res) => {
         user.password,
     )
     if (!isCurrentPasswordValid) {
-        return res.status(400).json({ message: "Invalid current password" })
+        return res.status(400).json({
+            success: false,
+            icon: "❌",
+            message: "Invalid current password",
+        })
     }
 
     // Hash the new password
@@ -113,16 +133,21 @@ const handleResetPassword = asyncHandler(async (req, res) => {
     user.password = hashedNewPassword
     await user.save()
 
-    res.status(200).json({ message: "Password reset successful" })
+    res.status(400).json({
+        success: true,
+        icon: "✅",
+        message: "Successfully changed password",
+    })
 })
 
 const handleAccessTokenRefresh = async (req, res) => {
     const { refreshToken } = req.body
 
     try {
-        const decoded = jwt.verify(
+        const decoded = await jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET,
+            { algorithms: [process.env.JWT_ALGORITHM] },
         )
 
         // Check if the refresh token is valid
@@ -137,6 +162,7 @@ const handleAccessTokenRefresh = async (req, res) => {
             process.env.ACCESS_TOKEN_SECRET,
             {
                 expiresIn: process.env.ACCESS_TOKEN_LIFE,
+                algorithm: process.env.JWT_ALGORITHM,
             },
         )
 
@@ -178,7 +204,7 @@ const handleAuthUserStatus = async (req, res) => {
 
 router.post("/signup", asyncHandler(handleSignup))
 router.post("/login", asyncHandler(handleLogin))
-router.patch("/reset-password", verifyToken, handleResetPassword)
+router.patch("/reset-password", verifyToken, asyncHandler(handleResetPassword))
 
 router.post("/refresh", asyncHandler(handleAccessTokenRefresh))
 router.post("/logout", verifyToken, asyncHandler(handleLogOut))

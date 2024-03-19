@@ -85,13 +85,13 @@ function Navbar() {
                             </div>
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <Link to="/account">
-                                <DropdownMenu.Item className="dropdownmenu-item">
+                                <DropdownMenu.Item className="dropdown-item">
                                     Account & Settings
                                 </DropdownMenu.Item>
                             </Link>
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <DropdownMenu.Item
-                                className="dropdownmenu-item bg-red-50 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
+                                className="dropdown-item bg-red-50 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
                                 onClick={handleLogout}>
                                 Log out
                             </DropdownMenu.Item>
