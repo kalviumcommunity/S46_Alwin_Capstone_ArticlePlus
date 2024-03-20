@@ -13,6 +13,7 @@ const forceLogoutUser = () => {
     userExists.value = false
     setCookie("accessToken", null)
     setCookie("refreshToken", null)
+    setCookie("refreshTokenId", null)
 }
 
 instance.interceptors.request.use(

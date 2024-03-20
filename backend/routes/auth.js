@@ -19,7 +19,11 @@ const handleSignup = async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email })
     if (existingUser) {
-        return res.status(400).json({ message: "Email already exists" })
+        return res.status(400).json({
+            email,
+            message:
+                "This email linked to an existing account. Log in or use another.",
+        })
     }
 
     // Hash the password
@@ -36,17 +40,23 @@ const handleSignup = async (req, res) => {
     const userAgent = uap(req.headers["user-agent"])
     const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
 
-    newUser.refreshTokens.push({
+    const refreshTokenObj = {
         token: refreshToken,
         deviceInfo: { userAgent: userAgent.ua, deviceMetadata },
-    })
+    }
+
+    newUser.refreshTokens.push(refreshTokenObj)
 
     await newUser.save()
+
+    const refreshTokenId =
+        newUser.refreshTokens[newUser.refreshTokens - 1]._id.toString()
 
     res.status(201).json({
         message: "User created successfully",
         accessToken,
         refreshToken,
+        refreshTokenId,
     })
 }
 
@@ -57,13 +67,19 @@ const handleLogin = async (req, res) => {
     // Check if the user exists
     const user = await User.findOne({ email })
     if (!user) {
-        return res.status(400).json({ message: "Invalid credentials" })
+        return res.status(400).json({
+            email,
+            message:
+                "This email isn't registered with an account. Try another or sign up",
+        })
     }
 
     // Check if the password is correct
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-        return res.status(400).json({ message: "Invalid credentials" })
+        return res
+            .status(400)
+            .json({ email, message: "Invalid credentials for the given email" })
     }
 
     const { accessToken, refreshToken } = await generateToken(
@@ -71,16 +87,28 @@ const handleLogin = async (req, res) => {
     )
 
     const userAgent = uap(req.headers["user-agent"])
-    const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.cpu.architecture}`
+    const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
 
-    user.refreshTokens.push({
+    const refreshTokenObj = {
         token: refreshToken,
-        deviceInfo: { userAgent: userAgent.ua, deviceMetadata },
-    })
+        deviceInfo: {
+            userAgent: userAgent.ua,
+            deviceMetadata,
+        },
+    }
+
+    user.refreshTokens.push(refreshTokenObj)
 
     await user.save()
 
-    res.status(200).json({ accessToken, refreshToken })
+    const refreshTokenId =
+        user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
+
+    res.status(200).json({
+        accessToken,
+        refreshToken,
+        refreshTokenId,
+    })
 }
 
 // Middleware to verify the access token
@@ -220,9 +248,14 @@ const handleLogOut = async (req, res) => {
 const handleAuthUserStatus = async (req, res) => {
     const userId = req.userId
 
-    const user = await User.findById(userId).select(
-        "-password -refreshTokens.token -refreshTokens.deviceInfo.userAgent",
-    )
+    const user = await User.findById(userId)
+        .select(
+            "-password -refreshTokens.token -refreshTokens.deviceInfo.userAgent",
+        )
+        .populate({
+            path: "refreshTokens",
+            options: { createdAt: { _id: -1 } },
+        })
 
     if (!user) {
         return res.status(404).json({ message: "User not found" })

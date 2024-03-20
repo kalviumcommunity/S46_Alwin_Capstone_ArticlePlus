@@ -33,15 +33,33 @@ router.get("/status", async (req, res) => {
             req.session.userId,
         )
 
-        user.refreshToken = refreshToken
+        const userAgent = uap(req.headers["user-agent"])
+        const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
+
+        const refreshTokenObj = {
+            token: refreshToken,
+            deviceInfo: {
+                userAgent: userAgent.ua,
+                deviceMetadata,
+            },
+        }
+
+        user.refreshTokens.push(refreshTokenObj)
+
         await user.save()
 
-        res.json({ isAuthenticated: true, accessToken, refreshToken })
+        const refreshTokenId =
+            user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
+
+        res.json({
+            isAuthenticated: true,
+            accessToken,
+            refreshToken,
+            refreshTokenId,
+        })
     } else {
         res.json({ isAuthenticated: false })
     }
 })
-
-router.get("/logout")
 
 module.exports = router
