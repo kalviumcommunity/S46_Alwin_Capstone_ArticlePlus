@@ -19,7 +19,7 @@ router.get("/", async function (req, res, next) {
     const code = req.query.code
 
     try {
-        const redirectURL = "http://localhost:3000/auth/google"
+        const redirectURL = `${process.env.API_URL}/auth/google`
         const oAuth2Client = new OAuth2Client(
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET,
@@ -97,7 +97,7 @@ router.get("/", async function (req, res, next) {
 })
 
 router.post("/request", async function (req, res, next) {
-    const redirectURL = "http://localhost:3000/auth/google"
+    const redirectURL = `${process.env.API_URL}/auth/google`
 
     const oAuth2Client = new OAuth2Client(
         process.env.GOOGLE_CLIENT_ID,
