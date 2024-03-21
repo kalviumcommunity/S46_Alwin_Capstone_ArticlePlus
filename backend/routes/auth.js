@@ -53,20 +53,17 @@ const handleSignup = async (req, res) => {
         newUser.refreshTokens[newUser.refreshTokens.length - 1]._id.toString()
 
     res.cookie("accessToken", accessToken, {
-        maxAge: 15 * 60 * 1000, // Cookie expires in 15 minutes
+        maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
         secure: true,
-        sameSite: "strict",
     })
     res.cookie("refreshToken", refreshToken, {
-        maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
     })
     res.cookie("refreshTokenId", refreshTokenId, {
-        maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
         secure: true,
-        sameSite: "strict",
     })
 
     res.status(201).json({
@@ -119,20 +116,17 @@ const handleLogin = async (req, res) => {
         user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
 
     res.cookie("accessToken", accessToken, {
-        maxAge: 15 * 60 * 1000, // Cookie expires in 15 minutes
+        maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
         secure: true,
-        sameSite: "strict",
     })
     res.cookie("refreshToken", refreshToken, {
-        maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
     })
     res.cookie("refreshTokenId", refreshTokenId, {
-        maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
         secure: true,
-        sameSite: "strict",
     })
 
     res.status(200).json({
@@ -242,9 +236,8 @@ const handleAccessTokenRefresh = async (req, res) => {
         )
 
         res.cookie("accessToken", accessToken, {
-            maxAge: 15 * 60 * 1000, // Cookie expires in 15 minutes
+            maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
             secure: true,
-            sameSite: "strict",
         })
 
         res.status(200).json({ accessToken })

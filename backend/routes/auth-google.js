@@ -68,21 +68,19 @@ router.get("/", async function (req, res) {
             user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
 
         res.cookie("accessToken", accessToken, {
-            maxAge: 15 * 60 * 1000, // Cookie expires in 15 minutes
+            maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
             secure: true,
-            sameSite: "strict",
         })
         res.cookie("refreshToken", refreshToken, {
-            maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+            maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
         })
         res.cookie("refreshTokenId", refreshTokenId, {
-            maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+            maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
             secure: true,
-            sameSite: "strict",
         })
+
         res.redirect(
             303,
             `${process.env.FRONTEND_URL}/auth/google?status=success`,
