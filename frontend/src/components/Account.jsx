@@ -1,4 +1,4 @@
-import { userDetails } from "@/signals/user"
+import { userDetails, userDetailsUpdate } from "@/signals/user"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 import { useState } from "react"
 import * as Tabs from "@radix-ui/react-tabs"
@@ -10,7 +10,7 @@ import Loader from "./Loader"
 
 function Session({ session }) {
     const [loader, setLoader] = useState(false)
-    const [actionStatus, setActionStatus] = useState("")
+    const [actionStatus, setActionStatus] = useState()
     const [timeZone] = useState(
         Intl.DateTimeFormat().resolvedOptions().timeZone,
     )
@@ -18,9 +18,7 @@ function Session({ session }) {
     const removeSession = (refreshTokenId) => {
         axiosInstance
             .patch("session/remove", { refreshTokenId })
-            .then((res) => {
-                setActionStatus(res.data)
-            })
+            .then((res) => setActionStatus(res.data))
             .catch((err) => setActionStatus(err.response.data))
             .finally(() => setLoader(false))
     }
@@ -33,9 +31,14 @@ function Session({ session }) {
                 "This session is your current device. Are you sure you want to log out?",
             )
             if (confirmLogout) removeSession(refreshTokenId)
+            else setLoader(false)
         } else {
             removeSession(refreshTokenId)
         }
+    }
+
+    const handleDoneRemoveAccess = () => {
+        userDetailsUpdate.value += 1
     }
 
     return (
@@ -88,16 +91,15 @@ function Session({ session }) {
                                         Remove access
                                     </Dialog.Title>
                                     <div className="my-6 mt-4 flex flex-col items-start gap-1">
-                                        {/* <span className="text-3xl">
-                                            {actionStatus.icon}
-                                        </span> */}
-                                        <span className="text-base font-medium">
+                                        <span className="text-base text-gray-700">
                                             {actionStatus.message}
                                         </span>
                                     </div>
-                                    <button className="ml-auto mt-4 rounded-full bg-rose-500 px-6 py-1 font-semibold text-white">
+                                    <Dialog.Close
+                                        className="ml-auto mt-4 rounded-full bg-rose-500 px-6 py-1 font-semibold text-white"
+                                        onClick={handleDoneRemoveAccess}>
                                         Done
-                                    </button>
+                                    </Dialog.Close>
                                     <Dialog.Close asChild>
                                         <img
                                             src="/assets/icons/close.svg"
@@ -152,13 +154,13 @@ function Session({ session }) {
                                             </div>
                                         </div>
                                     </div>
-                                    <Dialog.Trigger
+                                    <button
                                         className="ml-auto w-fit  rounded-full bg-red-500 px-5 py-1 font-medium text-white hover:bg-red-600"
                                         onClick={() =>
                                             handleSessionLogout(session._id)
                                         }>
                                         Log out
-                                    </Dialog.Trigger>
+                                    </button>
                                     <Dialog.Close asChild>
                                         <img
                                             src="/assets/icons/close.svg"
@@ -184,7 +186,6 @@ function Account() {
     useSignalEffect(() => {
         randomGradient()
         setUser(userDetails.value)
-        console.log(userDetails.value.refreshTokens)
     })
 
     const randomGradient = () => {
