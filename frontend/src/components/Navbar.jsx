@@ -3,7 +3,7 @@ import { useSignals } from "@preact/signals-react/runtime"
 import { useSignalEffect } from "@preact/signals-react"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Link } from "react-router-dom"
-import { setCookie } from "@/helpers/cookies"
+import { getCookie, setCookie } from "@/helpers/cookies"
 import { userDetails, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -29,11 +29,13 @@ function Navbar() {
     }, [])
 
     const handleLogout = () => {
+        const refreshToken = getCookie("refreshToken")
         axiosInstance
-            .post("auth/logout")
+            .post("auth/logout", { refreshToken })
             .then((res) => {
                 setCookie("accessToken", null)
                 setCookie("refreshToken", null)
+                setCookie("refreshTokenId", null)
                 userExists.value = false
             })
             .catch((err) => console.error(err))
@@ -42,7 +44,9 @@ function Navbar() {
     return (
         <div
             className={`sticky top-0 z-30 flex flex-row justify-between bg-white ${
-                scrolled ? "px-4 py-3 sm:px-12" : "px-4 py-4 sm:px-16"
+                scrolled
+                    ? "px-4 py-3 sm:px-6 lg:px-12"
+                    : "px-4 py-4 sm:px-8 lg:px-16"
             }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-3">

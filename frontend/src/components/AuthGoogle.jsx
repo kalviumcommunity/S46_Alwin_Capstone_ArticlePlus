@@ -12,10 +12,16 @@ function AuthGoogle() {
         axiosInstance
             .get("/auth/google/status", { withCredentials: true })
             .then((res) => {
-                const { isAuthenticated, accessToken, refreshToken } = res.data
+                const {
+                    isAuthenticated,
+                    accessToken,
+                    refreshToken,
+                    refreshTokenId,
+                } = res.data
                 if (isAuthenticated) {
                     setCookie("accessToken", accessToken, 0.041)
-                    setCookie("refreshToken", refreshToken, 1)
+                    setCookie("refreshToken", refreshToken, 30)
+                    setCookie("refreshTokenId", refreshTokenId, 30)
                     userExists.value = true
                 } else {
                     userExists.value = false

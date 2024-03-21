@@ -13,6 +13,7 @@ const isUserLoggedIn = () => {
 
 export const userExists = signal(isUserLoggedIn())
 export const userDetails = signal({})
+export const userDetailsUpdate = signal(0)
 
 effect(() => {
     userExists.value = isUserLoggedIn()

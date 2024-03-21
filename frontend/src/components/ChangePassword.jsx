@@ -17,13 +17,11 @@ function ChangePassword() {
     } = useForm()
 
     const onSubmit = (data) => {
-        console.log(data)
         setLoader(true)
         axiosInstance
             .patch("auth/reset-password", data)
             .then((res) => {
                 setResetStatus(res.data)
-                console.log(res)
             })
             .catch((err) => setResetStatus(err.response.data))
             .finally(() => setLoader(false))

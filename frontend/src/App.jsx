@@ -1,27 +1,39 @@
 import { Routes, Route, Outlet, Navigate } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
-import { userExists, userDetails } from "@/signals/user"
+import { userExists, userDetails, userDetailsUpdate } from "@/signals/user"
 import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
 import Login from "@/components/Login"
 import Signup from "@/components/Signup"
 import Footer from "@/components/Footer"
 import Read from "@/components/Read"
+import AuthGoogle from "@/components/AuthGoogle"
+import Account from "@/components/Account"
 import axiosInstance from "@/axios"
-import AuthGoogle from "./components/AuthGoogle"
 import "./App.css"
-import Account from "./components/Account"
 
 function Layout() {
     useSignals()
 
     useSignalEffect(() => {
-        if (userExists.value) {
-            axiosInstance
-                .get("auth")
-                .then((res) => (userDetails.value = res.data))
+        const fetchUserDetails = async () => {
+            try {
+                const res = await axiosInstance.get("auth")
+                userDetails.value = res.data
+            } catch (error) {
+                console.log("Error fetching user details:", error)
+            }
         }
-    })
+
+        if (userExists.value) {
+            fetchUserDetails()
+        }
+
+        if (userDetailsUpdate.value > 0) {
+            const unsubscribe = userDetailsUpdate.subscribe(fetchUserDetails)
+            return unsubscribe
+        }
+    }, [])
 
     return (
         <>

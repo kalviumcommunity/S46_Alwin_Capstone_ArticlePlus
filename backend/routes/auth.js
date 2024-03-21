@@ -1,6 +1,7 @@
 const express = require("express")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+var uap = require("ua-parser-js")
 
 const asyncHandler = require("../middlewares/asyncHandler")
 const { generateToken } = require("../helpers/generateToken")
@@ -18,7 +19,11 @@ const handleSignup = async (req, res) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email })
     if (existingUser) {
-        return res.status(400).json({ message: "Email already exists" })
+        return res.status(400).json({
+            email,
+            message:
+                "This email linked to an existing account. Log in or use another.",
+        })
     }
 
     // Hash the password
@@ -31,14 +36,27 @@ const handleSignup = async (req, res) => {
     const { accessToken, refreshToken } = await generateToken(
         newUser._id.toString(),
     )
-    newUser.refreshToken = refreshToken
+
+    const userAgent = uap(req.headers["user-agent"])
+    const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
+
+    const refreshTokenObj = {
+        token: refreshToken,
+        deviceInfo: { userAgent: userAgent.ua, deviceMetadata },
+    }
+
+    newUser.refreshTokens.push(refreshTokenObj)
 
     await newUser.save()
+
+    const refreshTokenId =
+        newUser.refreshTokens[newUser.refreshTokens - 1]._id.toString()
 
     res.status(201).json({
         message: "User created successfully",
         accessToken,
         refreshToken,
+        refreshTokenId,
     })
 }
 
@@ -49,23 +67,48 @@ const handleLogin = async (req, res) => {
     // Check if the user exists
     const user = await User.findOne({ email })
     if (!user) {
-        return res.status(400).json({ message: "Invalid credentials" })
+        return res.status(400).json({
+            email,
+            message:
+                "This email isn't registered with an account. Try another or sign up",
+        })
     }
 
     // Check if the password is correct
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-        return res.status(400).json({ message: "Invalid credentials" })
+        return res
+            .status(400)
+            .json({ email, message: "Invalid credentials for the given email" })
     }
 
     const { accessToken, refreshToken } = await generateToken(
         user._id.toString(),
     )
 
-    user.refreshToken = refreshToken
+    const userAgent = uap(req.headers["user-agent"])
+    const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
+
+    const refreshTokenObj = {
+        token: refreshToken,
+        deviceInfo: {
+            userAgent: userAgent.ua,
+            deviceMetadata,
+        },
+    }
+
+    user.refreshTokens.push(refreshTokenObj)
+
     await user.save()
 
-    res.status(200).json({ accessToken, refreshToken })
+    const refreshTokenId =
+        user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
+
+    res.status(200).json({
+        accessToken,
+        refreshToken,
+        refreshTokenId,
+    })
 }
 
 // Middleware to verify the access token
@@ -152,7 +195,10 @@ const handleAccessTokenRefresh = async (req, res) => {
 
         // Check if the refresh token is valid
         const user = await User.findOne({ _id: decoded.userId })
-        if (user.refreshToken !== refreshToken) {
+        const refreshTokenObj = user.refreshTokens.find(
+            (token) => token.token === refreshToken,
+        )
+        if (!refreshTokenObj) {
             return res.status(403).json({ message: "Invalid refresh token" })
         }
 
@@ -174,16 +220,26 @@ const handleAccessTokenRefresh = async (req, res) => {
 
 const handleLogOut = async (req, res) => {
     const userId = req.userId
+    const { refreshToken } = req.body
 
-    const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { refreshToken: null },
-        { new: true },
-    )
-
-    if (!updatedUser) {
+    const user = await User.findById(userId)
+    if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
+
+    const refreshTokenObj = user.refreshTokens.find(
+        (token) => token.token === refreshToken,
+    )
+    if (!refreshTokenObj) {
+        return res.status(403).json({ message: "Invalid refresh token" })
+    }
+
+    // Remove the refresh token from the user's list of refresh tokens
+    user.refreshTokens = user.refreshTokens.filter(
+        (token) => token.token !== refreshToken,
+    )
+
+    await user.save()
 
     // Send a success response
     res.status(200).json({ message: "Logout successful" })
@@ -192,14 +248,30 @@ const handleLogOut = async (req, res) => {
 const handleAuthUserStatus = async (req, res) => {
     const userId = req.userId
 
-    const user = await User.findById(userId).select("-password -refreshToken")
+    const user = await User.findById(userId)
+        .select(
+            "-password -refreshTokens.token -refreshTokens.deviceInfo.userAgent",
+        )
+        .populate({
+            path: "refreshTokens",
+            options: { createdAt: { _id: -1 } },
+        })
 
     if (!user) {
         return res.status(404).json({ message: "User not found" })
     }
 
-    const { name, email, creator, verifed, provider, picture } = user
-    res.status(200).json({ name, email, creator, verifed, provider, picture })
+    const { name, email, creator, verified, provider, picture, refreshTokens } =
+        user
+    res.status(200).json({
+        name,
+        email,
+        creator,
+        verified,
+        provider,
+        picture,
+        refreshTokens,
+    })
 }
 
 router.post("/signup", asyncHandler(handleSignup))
