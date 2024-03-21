@@ -21,7 +21,7 @@ function Layout() {
                 const res = await axiosInstance.get("auth")
                 userDetails.value = res.data
             } catch (error) {
-                console.log("Error fetching user details:", error)
+                console.error("Error fetching user details:", error)
             }
         }
 

@@ -1,37 +1,20 @@
 import { useEffect, useState } from "react"
-import axiosInstance from "@/axios"
-import { userExists } from "@/signals/user"
-import { setCookie } from "@/helpers/cookies"
-import { Link } from "react-router-dom"
 import Loader from "@/components/Loader"
+import { Link, useSearchParams } from "react-router-dom"
+import { userExists } from "@/signals/user"
 
 function AuthGoogle() {
     const [loader, setLoader] = useState(true)
+    const [searchParams] = useSearchParams()
 
     useEffect(() => {
-        axiosInstance
-            .get("/auth/google/status", { withCredentials: true })
-            .then((res) => {
-                const {
-                    isAuthenticated,
-                    accessToken,
-                    refreshToken,
-                    refreshTokenId,
-                } = res.data
-                if (isAuthenticated) {
-                    setCookie("accessToken", accessToken, 0.041)
-                    setCookie("refreshToken", refreshToken, 30)
-                    setCookie("refreshTokenId", refreshTokenId, 30)
-                    userExists.value = true
-                } else {
-                    userExists.value = false
-                    setLoader(false)
-                }
-            })
-            .catch((error) => {
-                console.error("Error checking authentication status:", error)
-            })
-    }, [])
+        const status = searchParams.get("status")
+        if (status === "success") {
+            userExists.value = true
+        } else {
+            setLoader(false)
+        }
+    }, [searchParams])
 
     return (
         <div>

@@ -1,11 +1,9 @@
 require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
-const session = require("express-session")
-const passport = require("passport")
+var cookieParser = require("cookie-parser")
 
 const { startDB } = require("./db")
-require("./lib/passport")
 
 const logger = require("./middlewares/requestLogger")
 const apiRoutes = require("./api")
@@ -24,19 +22,8 @@ app.use(
         credentials: true,
     }),
 )
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            maxAge: 1 * 24 * 60 * 60 * 1000,
-        },
-    }),
-)
+app.use(cookieParser())
 app.use(express.json())
-app.use(passport.initialize())
-app.use(passport.session())
 app.use(logger)
 
 // Routes

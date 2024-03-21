@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { setCookie } from "@/helpers/cookies"
 import { useSignals } from "@preact/signals-react/runtime"
 import axiosInstance from "@/axios"
 import { userExists } from "@/signals/user"
@@ -27,10 +26,6 @@ function Login() {
         axiosInstance
             .post("auth/login", payload)
             .then((res) => {
-                const data = res.data
-                setCookie("accessToken", data.accessToken, 0.041)
-                setCookie("refreshToken", data.refreshToken, 30)
-                setCookie("refreshTokenId", data.refreshTokenId, 30)
                 userExists.value = true
             })
             .catch((error) => {

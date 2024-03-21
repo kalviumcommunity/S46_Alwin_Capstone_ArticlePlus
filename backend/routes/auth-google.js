@@ -1,5 +1,5 @@
 var express = require("express")
-const passport = require("passport")
+const { OAuth2Client } = require("google-auth-library")
 var uap = require("ua-parser-js")
 
 const { generateToken } = require("../helpers/generateToken")
@@ -7,32 +7,47 @@ const User = require("../models/user")
 
 var router = express.Router()
 
-router.get(
-    "/",
-    passport.authenticate("google", { scope: ["profile", "email"] }),
-)
+async function getUserData(access_token) {
+    const response = await fetch(
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
+    )
 
-router.get(
-    "/callback",
-    passport.authenticate("google", {
-        failureRedirect: `${process.env.FRONTEND_URL}/auth/google`,
-    }),
-    (req, res) => {
-        req.session.userId = req.user
-        res.redirect(`${process.env.FRONTEND_URL}/auth/google`)
-    },
-)
+    return response.json()
+}
 
-router.get("/status", async (req, res) => {
-    if (req.session.userId) {
-        const user = await User.findById(req.session.userId)
+router.get("/", async function (req, res, next) {
+    const code = req.query.code
+
+    try {
+        const redirectURL = "http://localhost:3000/auth/google"
+        const oAuth2Client = new OAuth2Client(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            redirectURL,
+        )
+        const googleResponse = await oAuth2Client.getToken(code)
+        await oAuth2Client.setCredentials(googleResponse.tokens)
+
+        const userInfo = await getUserData(
+            oAuth2Client.credentials.access_token,
+        )
+
+        let user = await User.findOne({ email: userInfo.email })
 
         if (!user) {
-            return res.status(404).json({ error: "User not found" })
+            // Create a new user in the database
+            const newUser = new User({
+                name: userInfo.name,
+                email: userInfo.email,
+                verified: userInfo.email_verified,
+                provider: "google",
+                picture: userInfo.picture,
+            })
+            user = await newUser.save()
         }
 
         const { accessToken, refreshToken } = await generateToken(
-            req.session.userId,
+            user._id.toString(),
         )
 
         const userAgent = uap(req.headers["user-agent"])
@@ -47,21 +62,56 @@ router.get("/status", async (req, res) => {
         }
 
         user.refreshTokens.push(refreshTokenObj)
-
         await user.save()
 
         const refreshTokenId =
             user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
 
-        res.json({
-            isAuthenticated: true,
-            accessToken,
-            refreshToken,
-            refreshTokenId,
+        res.cookie("accessToken", accessToken, {
+            maxAge: 15 * 60 * 1000, // Cookie expires in 15 minutes
+            secure: true,
+            sameSite: "strict",
         })
-    } else {
-        res.json({ isAuthenticated: false })
+        res.cookie("refreshToken", refreshToken, {
+            maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+        })
+        res.cookie("refreshTokenId", refreshTokenId, {
+            maxAge: 3600000 * 24 * 30, // Cookie expires in 30 days
+            secure: true,
+            sameSite: "strict",
+        })
+        res.redirect(
+            303,
+            `${process.env.FRONTEND_URL}/auth/google?status=success`,
+        )
+    } catch (err) {
+        console.error("Error logging in with OAuth2 user", err)
+        res.redirect(
+            303,
+            `${process.env.FRONTEND_URL}/auth/google?status=failed`,
+        )
     }
+})
+
+router.post("/request", async function (req, res, next) {
+    const redirectURL = "http://localhost:3000/auth/google"
+
+    const oAuth2Client = new OAuth2Client(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        redirectURL,
+    )
+
+    const authorizeUrl = oAuth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: "https://www.googleapis.com/auth/userinfo.profile email openid ",
+        prompt: "consent",
+    })
+
+    res.json({ url: authorizeUrl })
 })
 
 module.exports = router

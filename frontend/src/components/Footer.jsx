@@ -26,7 +26,7 @@ function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col gap-3 border-t px-4 py-6 sm:flex-row sm:items-end sm:px-8 lg:mx-12 lg:px-4">
+            <div className="flex flex-col gap-3 border-t px-4 py-6 sm:flex-row sm:items-end sm:px-8 lg:px-16">
                 <div className="flex flex-wrap items-end gap-2 sm:flex-1">
                     <div className="flex items-center gap-3">
                         <img className="h-5" src="./logo.svg" alt="" />

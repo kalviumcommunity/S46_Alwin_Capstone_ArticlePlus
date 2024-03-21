@@ -3,7 +3,6 @@ import { getCookie, setCookie } from "./helpers/cookies"
 import { userExists } from "./signals/user"
 
 let accessToken = getCookie("accessToken")
-let refreshToken = getCookie("refreshToken")
 
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -19,7 +18,7 @@ const forceLogoutUser = () => {
 instance.interceptors.request.use(
     (config) => {
         accessToken = getCookie("accessToken")
-        refreshToken = getCookie("refreshToken")
+        config.withCredentials = true
         config.headers.Authorization = `Bearer ${accessToken}`
         return config
     },
@@ -35,12 +34,9 @@ instance.interceptors.response.use(
             originalRequest._retry = true
 
             try {
-                const response = await instance.post("/auth/refresh", {
-                    refreshToken,
-                })
+                const response = await instance.post("/auth/refresh")
 
                 const newAccessToken = response.data.accessToken
-                setCookie("accessToken", newAccessToken)
 
                 userExists.value = true
 

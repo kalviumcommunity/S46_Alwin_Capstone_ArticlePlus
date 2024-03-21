@@ -2,7 +2,6 @@ import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { useSignals } from "@preact/signals-react/runtime"
 import { userExists } from "@/signals/user"
-import { setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 import { useState } from "react"
 import Loader from "@/components/Loader"
@@ -28,10 +27,6 @@ function Signup() {
         axiosInstance
             .post("auth/signup", payload)
             .then((res) => {
-                const data = res.data
-                setCookie("accessToken", data.accessToken, 0.041)
-                setCookie("refreshToken", data.refreshToken, 30)
-                setCookie("refreshTokenId", data.refreshTokenId, 30)
                 userExists.value = true
             })
             .catch((error) => setActionStatus(error.response.data))
@@ -51,7 +46,12 @@ function Signup() {
     }
 
     const handleGoogleSignup = () => {
-        window.open(`${import.meta.env.VITE_API_URL}/auth/google/`, "_self")
+        axiosInstance
+            .post("/auth/google/request")
+            .then((res) => (window.location.href = res.data.url))
+            .catch((error) => {
+                console.error("Error checking authentication status:", error)
+            })
     }
 
     return (

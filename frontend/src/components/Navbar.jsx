@@ -29,9 +29,9 @@ function Navbar() {
     }, [])
 
     const handleLogout = () => {
-        const refreshToken = getCookie("refreshToken")
+        const refreshTokenId = getCookie("refreshTokenId")
         axiosInstance
-            .post("auth/logout", { refreshToken })
+            .post("session/remove", { refreshTokenId })
             .then((res) => {
                 setCookie("accessToken", null)
                 setCookie("refreshToken", null)
