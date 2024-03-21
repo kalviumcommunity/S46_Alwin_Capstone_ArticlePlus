@@ -1,5 +1,7 @@
 var express = require("express")
 const passport = require("passport")
+var uap = require("ua-parser-js")
+
 const { generateToken } = require("../helpers/generateToken")
 const User = require("../models/user")
 

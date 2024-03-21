@@ -1,9 +1,6 @@
 const express = require("express")
-const jwt = require("jsonwebtoken")
-var uap = require("ua-parser-js")
 
 const asyncHandler = require("../middlewares/asyncHandler")
-const { generateToken } = require("../helpers/generateToken")
 const User = require("../models/user")
 
 const router = express.Router()
