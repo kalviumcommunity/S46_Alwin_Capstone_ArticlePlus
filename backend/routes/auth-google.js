@@ -15,7 +15,7 @@ async function getUserData(access_token) {
     return response.json()
 }
 
-router.get("/", async function (req, res, next) {
+router.get("/", async function (req, res) {
     const code = req.query.code
 
     try {
@@ -96,7 +96,7 @@ router.get("/", async function (req, res, next) {
     }
 })
 
-router.post("/request", async function (req, res, next) {
+router.post("/request", async function (req, res) {
     const redirectURL = `${process.env.API_URL}/auth/google`
 
     const oAuth2Client = new OAuth2Client(

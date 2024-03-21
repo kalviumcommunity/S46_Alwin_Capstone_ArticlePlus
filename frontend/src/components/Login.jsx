@@ -51,7 +51,12 @@ function Login() {
     }
 
     const handleGoogleLogin = () => {
-        window.open(`${import.meta.env.VITE_API_URL}/auth/google/`, "_self")
+        axiosInstance
+            .post("/auth/google/request")
+            .then((res) => (window.location.href = res.data.url))
+            .catch((error) => {
+                console.error("Error checking authentication status:", error)
+            })
     }
 
     return (
