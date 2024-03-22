@@ -22,6 +22,12 @@ const handleRemoveRefreshToken = async (req, res) => {
         )
         await user.save()
 
+        res.cookie("refreshToken", "null", {
+            domain: process.env.COOKIE_DOMAIN,
+            httpOnly: true,
+            secure: true,
+        })
+
         res.status(200).json({ message: "Refresh token removed successfully" })
     } catch (error) {
         res.status(500).json({ message: "Internal server error" })

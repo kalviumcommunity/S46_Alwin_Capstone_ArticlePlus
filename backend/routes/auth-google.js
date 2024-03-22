@@ -69,15 +69,18 @@ router.get("/", async function (req, res) {
 
         res.cookie("accessToken", accessToken, {
             maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
+            domain: process.env.COOKIE_DOMAIN,
             secure: true,
         })
         res.cookie("refreshToken", refreshToken, {
             maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
+            domain: process.env.COOKIE_DOMAIN,
             httpOnly: true,
             secure: true,
         })
         res.cookie("refreshTokenId", refreshTokenId, {
             maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
+            domain: process.env.COOKIE_DOMAIN,
             secure: true,
         })
 
