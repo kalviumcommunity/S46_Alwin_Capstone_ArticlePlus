@@ -24,5 +24,9 @@ export const setCookie = (name, value, days) => {
         expires = "; expires=" + date.toUTCString()
     }
     document.cookie =
-        name + "=" + encodeURIComponent(value) + expires + "; path=/; secure"
+        name +
+        "=" +
+        encodeURIComponent(value) +
+        expires +
+        `; path=/; secure; domain=${import.meta.env.VITE_COOKIE_DOMAIN}`
 }
