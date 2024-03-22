@@ -63,13 +63,13 @@ function Navbar() {
                         <div className="flex items-center gap-2 rounded-full border hover:cursor-pointer hover:bg-gray-50 ">
                             {user.picture ? (
                                 <img
-                                    className="h-9 w-9 rounded-full"
+                                    className="h-8 w-8 rounded-full"
                                     src={`${user.picture}`}
                                     alt=""
                                 />
                             ) : (
                                 <img
-                                    className="h-9 w-9 rounded-full"
+                                    className="h-8 w-8 rounded-full"
                                     src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
                                     alt=""
                                 />
