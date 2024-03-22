@@ -50,13 +50,24 @@ const handleSignup = async (req, res) => {
     await newUser.save()
 
     const refreshTokenId =
-        newUser.refreshTokens[newUser.refreshTokens - 1]._id.toString()
+        newUser.refreshTokens[newUser.refreshTokens.length - 1]._id.toString()
+
+    res.cookie("accessToken", accessToken, {
+        maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
+        secure: true,
+    })
+    res.cookie("refreshToken", refreshToken, {
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
+        httpOnly: true,
+        secure: true,
+    })
+    res.cookie("refreshTokenId", refreshTokenId, {
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
+        secure: true,
+    })
 
     res.status(201).json({
         message: "User created successfully",
-        accessToken,
-        refreshToken,
-        refreshTokenId,
     })
 }
 
@@ -104,10 +115,22 @@ const handleLogin = async (req, res) => {
     const refreshTokenId =
         user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
 
+    res.cookie("accessToken", accessToken, {
+        maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
+        secure: true,
+    })
+    res.cookie("refreshToken", refreshToken, {
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
+        httpOnly: true,
+        secure: true,
+    })
+    res.cookie("refreshTokenId", refreshTokenId, {
+        maxAge: process.env.REFRESH_TOKEN_COOKIE_AGE,
+        secure: true,
+    })
+
     res.status(200).json({
-        accessToken,
-        refreshToken,
-        refreshTokenId,
+        message: "Login successfully",
     })
 }
 
@@ -184,7 +207,7 @@ const handleResetPassword = asyncHandler(async (req, res) => {
 })
 
 const handleAccessTokenRefresh = async (req, res) => {
-    const { refreshToken } = req.body
+    const refreshToken = req.cookies.refreshToken
 
     try {
         const decoded = await jwt.verify(
@@ -212,37 +235,15 @@ const handleAccessTokenRefresh = async (req, res) => {
             },
         )
 
+        res.cookie("accessToken", accessToken, {
+            maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
+            secure: true,
+        })
+
         res.status(200).json({ accessToken })
     } catch (error) {
         res.status(403).json({ message: "Invalid refresh token" })
     }
-}
-
-const handleLogOut = async (req, res) => {
-    const userId = req.userId
-    const { refreshToken } = req.body
-
-    const user = await User.findById(userId)
-    if (!user) {
-        return res.status(404).json({ message: "User not found" })
-    }
-
-    const refreshTokenObj = user.refreshTokens.find(
-        (token) => token.token === refreshToken,
-    )
-    if (!refreshTokenObj) {
-        return res.status(403).json({ message: "Invalid refresh token" })
-    }
-
-    // Remove the refresh token from the user's list of refresh tokens
-    user.refreshTokens = user.refreshTokens.filter(
-        (token) => token.token !== refreshToken,
-    )
-
-    await user.save()
-
-    // Send a success response
-    res.status(200).json({ message: "Logout successful" })
 }
 
 const handleAuthUserStatus = async (req, res) => {
@@ -279,7 +280,6 @@ router.post("/login", asyncHandler(handleLogin))
 router.patch("/reset-password", verifyToken, asyncHandler(handleResetPassword))
 
 router.post("/refresh", asyncHandler(handleAccessTokenRefresh))
-router.post("/logout", verifyToken, asyncHandler(handleLogOut))
 
 router.get("/", verifyToken, asyncHandler(handleAuthUserStatus))
 

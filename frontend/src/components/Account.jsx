@@ -17,7 +17,7 @@ function Session({ session }) {
 
     const removeSession = (refreshTokenId) => {
         axiosInstance
-            .patch("session/remove", { refreshTokenId })
+            .post("session/remove", { refreshTokenId })
             .then((res) => setActionStatus(res.data))
             .catch((err) => setActionStatus(err.response.data))
             .finally(() => setLoader(false))

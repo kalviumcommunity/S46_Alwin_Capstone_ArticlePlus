@@ -28,6 +28,6 @@ const handleRemoveRefreshToken = async (req, res) => {
     }
 }
 
-router.patch("/remove", asyncHandler(handleRemoveRefreshToken))
+router.post("/remove", asyncHandler(handleRemoveRefreshToken))
 
 module.exports = router
