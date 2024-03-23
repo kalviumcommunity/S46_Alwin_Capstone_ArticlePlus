@@ -1,22 +1,22 @@
-var express = require("express")
+const express = require("express")
 const { OAuth2Client } = require("google-auth-library")
-var uap = require("ua-parser-js")
+const uap = require("ua-parser-js")
 
 const { generateToken } = require("../helpers/generateToken")
 const User = require("../models/user")
 
-var router = express.Router()
+const router = express.Router()
 
-async function getUserData(access_token) {
+async function getUserData(accessToken) {
     const response = await fetch(
-        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`,
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
     )
 
     return response.json()
 }
 
-router.get("/", async function (req, res) {
-    const code = req.query.code
+router.get("/", async (req, res) => {
+    const { code } = req.query
 
     try {
         const redirectURL = `${process.env.API_URL}/auth/google`
@@ -25,25 +25,24 @@ router.get("/", async function (req, res) {
             process.env.GOOGLE_CLIENT_SECRET,
             redirectURL,
         )
-        const googleResponse = await oAuth2Client.getToken(code)
-        await oAuth2Client.setCredentials(googleResponse.tokens)
 
-        const userInfo = await getUserData(
+        const { tokens } = await oAuth2Client.getToken(code)
+        oAuth2Client.setCredentials(tokens)
+
+        const { email, name, email_verified, picture } = await getUserData(
             oAuth2Client.credentials.access_token,
         )
 
-        let user = await User.findOne({ email: userInfo.email })
+        let user = await User.findOne({ email })
 
         if (!user) {
-            // Create a new user in the database
-            const newUser = new User({
-                name: userInfo.name,
-                email: userInfo.email,
-                verified: userInfo.email_verified,
+            user = await User.create({
+                name,
+                email,
+                verified: email_verified,
                 provider: "google",
-                picture: userInfo.picture,
+                picture,
             })
-            user = await newUser.save()
         }
 
         const { accessToken, refreshToken } = await generateToken(
@@ -53,15 +52,14 @@ router.get("/", async function (req, res) {
         const userAgent = uap(req.headers["user-agent"])
         const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
 
-        const refreshTokenObj = {
+        user.refreshTokens.push({
             token: refreshToken,
             deviceInfo: {
                 userAgent: userAgent.ua,
                 deviceMetadata,
             },
-        }
+        })
 
-        user.refreshTokens.push(refreshTokenObj)
         await user.save()
 
         const refreshTokenId =
@@ -88,8 +86,8 @@ router.get("/", async function (req, res) {
             303,
             `${process.env.FRONTEND_URL}/auth/google?status=success`,
         )
-    } catch (err) {
-        console.error("Error logging in with OAuth2 user", err)
+    } catch (error) {
+        console.error("Error logging in with OAuth2 user", error)
         res.redirect(
             303,
             `${process.env.FRONTEND_URL}/auth/google?status=failed`,
@@ -97,7 +95,7 @@ router.get("/", async function (req, res) {
     }
 })
 
-router.post("/request", async function (req, res) {
+router.post("/request", (req, res) => {
     const redirectURL = `${process.env.API_URL}/auth/google`
 
     const oAuth2Client = new OAuth2Client(
