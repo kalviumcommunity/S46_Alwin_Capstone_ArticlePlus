@@ -18,10 +18,8 @@ function Navbar() {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (user) {
-                const isScrolled = window.scrollY > 0
-                setScrolled(isScrolled)
-            }
+            const isScrolled = window.scrollY > 0
+            setScrolled(isScrolled)
         }
 
         window.addEventListener("scroll", handleScroll)
@@ -46,8 +44,8 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 z-30 flex flex-row justify-between border-b items-center bg-white ${
-                scrolled ? "px-4 py-3.5 sm:px-6 lg:px-12" : "p-4 sm:px-8 lg:px-16"
+            className={`sticky top-0 z-30 flex flex-row justify-between border-b items-center bg-white min-h-16 py-3 ${
+                scrolled ? "px-4 sm:px-6 lg:px-12" : "px-4 sm:px-8 lg:px-16"
             }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-2">

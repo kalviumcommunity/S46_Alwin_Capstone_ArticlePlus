@@ -1,13 +1,27 @@
-const express = require("express")
 const { OAuth2Client } = require("google-auth-library")
 const uap = require("ua-parser-js")
 
-const { generateToken } = require("../helpers/generateToken")
 const User = require("../models/user")
+const { generateToken } = require("../helpers/generateToken")
 
-const router = express.Router()
+const redirectURL = `${process.env.API_URL}/auth/google/callback`
+const oAuth2Client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    redirectURL,
+)
 
-async function getUserData(accessToken) {
+const generateGoogleOauthLink = async (req, res) => {
+    const authorizeUrl = oAuth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: "https://www.googleapis.com/auth/userinfo.profile email openid ",
+        prompt: "consent",
+    })
+
+    res.json({ url: authorizeUrl })
+}
+
+const getUserData = async (accessToken) => {
     const response = await fetch(
         `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
     )
@@ -15,17 +29,10 @@ async function getUserData(accessToken) {
     return response.json()
 }
 
-router.get("/", async (req, res) => {
+const googleOauthCallback = async (req, res) => {
     const { code } = req.query
 
     try {
-        const redirectURL = `${process.env.API_URL}/auth/google`
-        const oAuth2Client = new OAuth2Client(
-            process.env.GOOGLE_CLIENT_ID,
-            process.env.GOOGLE_CLIENT_SECRET,
-            redirectURL,
-        )
-
         const { tokens } = await oAuth2Client.getToken(code)
         oAuth2Client.setCredentials(tokens)
 
@@ -45,9 +52,7 @@ router.get("/", async (req, res) => {
             })
         }
 
-        const { accessToken, refreshToken } = await generateToken(
-            user._id.toString(),
-        )
+        const { accessToken, refreshToken } = await generateToken(user._id.toString())
 
         const userAgent = uap(req.headers["user-agent"])
         const deviceMetadata = `${userAgent.browser.name}, ${userAgent.os.name} ${userAgent.os.version}`
@@ -62,8 +67,7 @@ router.get("/", async (req, res) => {
 
         await user.save()
 
-        const refreshTokenId =
-            user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
+        const refreshTokenId = user.refreshTokens[user.refreshTokens.length - 1]._id.toString()
 
         res.cookie("accessToken", accessToken, {
             maxAge: process.env.ACCESS_TOKEN_COOKIE_AGE,
@@ -82,35 +86,11 @@ router.get("/", async (req, res) => {
             secure: true,
         })
 
-        res.redirect(
-            303,
-            `${process.env.FRONTEND_URL}/auth/google?status=success`,
-        )
+        res.redirect(303, `${process.env.FRONTEND_URL}/auth/google?status=success`)
     } catch (error) {
         console.error("Error logging in with OAuth2 user", error)
-        res.redirect(
-            303,
-            `${process.env.FRONTEND_URL}/auth/google?status=failed`,
-        )
+        res.redirect(303, `${process.env.FRONTEND_URL}/auth/google?status=failed`)
     }
-})
+}
 
-router.post("/request", (req, res) => {
-    const redirectURL = `${process.env.API_URL}/auth/google`
-
-    const oAuth2Client = new OAuth2Client(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        redirectURL,
-    )
-
-    const authorizeUrl = oAuth2Client.generateAuthUrl({
-        access_type: "offline",
-        scope: "https://www.googleapis.com/auth/userinfo.profile email openid ",
-        prompt: "consent",
-    })
-
-    res.json({ url: authorizeUrl })
-})
-
-module.exports = router
+module.exports = { generateGoogleOauthLink, googleOauthCallback }

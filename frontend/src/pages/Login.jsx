@@ -54,7 +54,7 @@ function Login() {
 
     const handleGoogleLogin = () => {
         axiosInstance
-            .post("/auth/google/request")
+            .post("/auth/google/redirect")
             .then((res) => (window.location.href = res.data.url))
             .catch((error) => {
                 console.error("Error checking authentication status:", error)

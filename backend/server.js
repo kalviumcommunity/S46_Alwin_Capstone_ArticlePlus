@@ -1,18 +1,17 @@
 require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
-var cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser")
 
-const { startDB } = require("./db")
-
+const { connectDB, isDBConnected } = require("./db")
 const logger = require("./middlewares/requestLogger")
-const apiRoutes = require("./api")
+const apiRoutes = require("./routes")
 
 const app = express()
 const port = process.env.PORT || 3000
 
-// Start the database connection
-startDB()
+// Connect to the database
+connectDB()
 
 // Middleware
 app.use(
@@ -28,11 +27,8 @@ app.use(logger)
 
 // Routes
 app.get("/db-status", (req, res) => {
-    const isConnected = require("./db").isConnected()
     res.json({
-        "📦 Database connection status": isConnected
-            ? "✅ Connected"
-            : "❌ Not connected",
+        "📦 Database connection status": isDBConnected() ? "✅ Connected" : "❌ Not connected",
     })
 })
 app.use("/", apiRoutes)
