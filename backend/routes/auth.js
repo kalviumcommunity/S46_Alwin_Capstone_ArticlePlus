@@ -3,7 +3,7 @@ const express = require("express")
 const asyncHandler = require("../middlewares/asyncHandler")
 const { verifyToken } = require("../middlewares/verifyToken")
 
-const { signup } = require("../controllers/registrationController")
+const { signup } = require("../controllers/signupController")
 const { login } = require("../controllers/loginController")
 const {
     getUserDetails,
