@@ -1,8 +1,28 @@
 {
-    "plugins": ["prettier-plugin-tailwindcss"],
+    "plugins": [
+        "prettier-plugin-tailwindcss",
+        "@ianvs/prettier-plugin-sort-imports"
+    ],
+    "importOrder": [
+        "^react",
+        "@preact/",
+        "<THIRD_PARTY_MODULES>",
+        "",
+        "@/signals",
+        "^@/helpers/(.*)$",
+        "@/utils",
+        "@/axios",
+        "",
+        "^@/pages/(.*)$",
+        "^@/components/(.*)$",
+        "^[.]"
+    ],
     "tabWidth": 4,
     "singleQuote": false,
     "semi": false,
     "bracketSameLine": true,
-    "arrowParens": "always"
+    "arrowParens": "always",
+    "printWidth": 96,
+    "trailingComma": "all",
+    "jsxBracketSameLine": true
 }

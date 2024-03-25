@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 function TagRibbion() {
     return (
-        <div className="mx-12 flex justify-center border-b border-t p-4 py-2 text-sm font-medium">
+        <div className="px-4 sm:px-8 lg:px-16 flex justify-start border-b py-2 text-xs font-medium text-gray-700">
             <Link className="tag" to="/?tag=latest">
                 Latest
             </Link>

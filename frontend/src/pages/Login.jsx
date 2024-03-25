@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom"
-import { useForm } from "react-hook-form"
-import { useSignals } from "@preact/signals-react/runtime"
-import axiosInstance from "@/axios"
-import { userExists } from "@/signals/user"
-import Loader from "@/components/Loader"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
+import { useSignals } from "@preact/signals-react/runtime"
+
+import { userExists } from "@/signals/user"
+import axiosInstance from "@/axios"
+
+import Loader from "@/components/Loader"
 
 function Login() {
     useSignals()
@@ -94,9 +96,7 @@ function Login() {
                     </>
                 ) : (
                     <>
-                        <form
-                            className="flex flex-col gap-3"
-                            onSubmit={handleSubmit(onSubmit)}>
+                        <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
                             <div className="flex flex-col gap-1">
                                 <label className="font-medium" htmlFor="email">
                                     Email
@@ -120,9 +120,7 @@ function Login() {
                                 )}
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label
-                                    className="font-medium"
-                                    htmlFor="password">
+                                <label className="font-medium" htmlFor="password">
                                     Password
                                 </label>
                                 <input

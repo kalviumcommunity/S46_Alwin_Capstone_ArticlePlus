@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
 import { useSignals } from "@preact/signals-react/runtime"
+
 import { userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
-import { useState } from "react"
+
 import Loader from "@/components/Loader"
 
 function Signup() {
@@ -89,9 +91,7 @@ function Signup() {
                     </>
                 ) : (
                     <>
-                        <form
-                            className="flex flex-col gap-3"
-                            onSubmit={handleSubmit(onSubmit)}>
+                        <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
                             <div className="flex flex-col gap-1">
                                 <label className="font-medium" htmlFor="name">
                                     Full name
@@ -132,9 +132,7 @@ function Signup() {
                                 )}
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label
-                                    className="font-medium"
-                                    htmlFor="password">
+                                <label className="font-medium" htmlFor="password">
                                     Password
                                 </label>
                                 <input
@@ -157,9 +155,7 @@ function Signup() {
                                 )}
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label
-                                    className="font-medium"
-                                    htmlFor="confirmPassword">
+                                <label className="font-medium" htmlFor="confirmPassword">
                                     Confirm Password
                                 </label>
                                 <input
@@ -167,8 +163,7 @@ function Signup() {
                                     type="password"
                                     autoComplete="new-password"
                                     {...register("confirmPassword", {
-                                        required:
-                                            "Please confirm your password",
+                                        required: "Please confirm your password",
                                         validate: (value) =>
                                             value === watch("password") ||
                                             "Passwords do not match",
@@ -193,7 +188,7 @@ function Signup() {
                             <span
                                 className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
                                 onClick={handleGoogleSignup}>
-                                <img src="/assets/icons/google.svg" alt="" />{" "}
+                                <img src="/assets/icons/google.svg" alt="" />
                                 Sign up with Google
                             </span>
                         </div>

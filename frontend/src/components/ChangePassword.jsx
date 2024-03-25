@@ -1,8 +1,10 @@
-import * as Dialog from "@radix-ui/react-dialog"
-import { useForm } from "react-hook-form"
-import axiosInstance from "@/axios"
 import { useState } from "react"
-import Loader from "./Loader"
+import { useForm } from "react-hook-form"
+import * as Dialog from "@radix-ui/react-dialog"
+
+import axiosInstance from "@/axios"
+
+import Loader from "@/components/Loader"
 
 function ChangePassword() {
     const [resetStatus, setResetStatus] = useState()
@@ -53,9 +55,7 @@ function ChangePassword() {
                                 Change password
                             </Dialog.Title>
                             <div className="my-6 mt-4 flex flex-col items-start gap-1">
-                                <span className="text-3xl">
-                                    {resetStatus.icon}
-                                </span>
+                                <span className="text-3xl">{resetStatus.icon}</span>
                                 <span className="text-base font-medium">
                                     {resetStatus.message}
                                 </span>
@@ -78,16 +78,13 @@ function ChangePassword() {
                                 Change password
                             </Dialog.Title>
                             <Dialog.Description className="text-sm text-gray-700">
-                                Choose a strong password and don't reuse it for
-                                other accounts.
+                                Choose a strong password and don't reuse it for other accounts.
                             </Dialog.Description>
                             <form
                                 className="flex flex-col gap-3"
                                 onSubmit={handleSubmit(onSubmit)}>
                                 <div className="flex flex-col gap-1">
-                                    <label
-                                        className="font-medium"
-                                        htmlFor="password">
+                                    <label className="font-medium" htmlFor="password">
                                         Current password
                                     </label>
                                     <input
@@ -110,9 +107,7 @@ function ChangePassword() {
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <label
-                                        className="font-medium"
-                                        htmlFor="password">
+                                    <label className="font-medium" htmlFor="password">
                                         New password
                                     </label>
                                     <input
@@ -135,9 +130,7 @@ function ChangePassword() {
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <label
-                                        className="font-medium"
-                                        htmlFor="confirmPassword">
+                                    <label className="font-medium" htmlFor="confirmPassword">
                                         Confirm new password
                                     </label>
                                     <input
@@ -145,11 +138,9 @@ function ChangePassword() {
                                         type="password"
                                         autoComplete="new-password"
                                         {...register("confirmNewPassword", {
-                                            required:
-                                                "Please confirm your password",
+                                            required: "Please confirm your password",
                                             validate: (value) =>
-                                                value ===
-                                                    watch("newPassword") ||
+                                                value === watch("newPassword") ||
                                                 "Passwords do not match",
                                         })}
                                     />

@@ -3,38 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-    @font-face {
-        font-family: "Roboto Serif";
-        font-weight: 300;
-        src:
-            url("/fonts/RobotoSerif_Thin.woff2") format("woff2"),
-            url("/fonts/RobotoSerif_Thin.woff") format("woff");
-    }
-
-    @font-face {
-        font-family: "Roboto Serif";
-        font-weight: 400;
-        src:
-            url("/fonts/RobotoSerif_Regular.woff2") format("woff2"),
-            url("/fonts/RobotoSerif_Regular.woff") format("woff");
-    }
-
-    @font-face {
-        font-family: "Roboto Serif";
-        font-weight: 400;
-        src:
-            url("/fonts/RobotoSerif_Medium.woff2") format("woff2"),
-            url("/fonts/RobotoSerif_Medium.woff") format("woff");
-    }
-
-    @font-face {
-        font-family: "Roboto Serif";
-        font-weight: 700;
-        src:
-            url("/fonts/RobotoSerif_Bold.woff2") format("woff2"),
-            url("/fonts/RobotoSerif_Bold.woff") format("woff");
-    }
-
     body {
         font-family: "Poppins", sans-serif;
     }
@@ -61,6 +29,6 @@
     }
 
     .tag {
-        @apply px-4 hover:underline;
+        @apply px-4 first:pl-0 hover:underline;
     }
 }

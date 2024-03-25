@@ -1,4 +1,5 @@
 import { effect, signal } from "@preact/signals-react"
+
 import { getCookie } from "@/helpers/cookies"
 
 const isUserLoggedIn = () => {
