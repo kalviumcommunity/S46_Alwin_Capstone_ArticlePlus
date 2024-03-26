@@ -5,6 +5,7 @@ import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
 import Account from "@/pages/Account"
+import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Login from "@/pages/Login"
 import Read from "@/pages/Read"
@@ -57,6 +58,7 @@ function App() {
                     <>
                         <Route index element={<Read />} />
                         <Route path="/account" element={<Account />} />
+                        <Route path="/:slug" element={<Article />} />
                         <Route path="read" element={<Navigate to="/" replace={true} />} />
                         <Route path="login" element={<Navigate to="/read" replace={true} />} />
                         <Route path="signup" element={<Navigate to="/read" replace={true} />} />

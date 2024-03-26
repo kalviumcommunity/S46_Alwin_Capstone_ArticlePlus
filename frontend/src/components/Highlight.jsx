@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 
 import { randomGradient } from "@/utils/ui/randomGradient"
 
@@ -10,7 +11,7 @@ function Highlight({ article }) {
     }, [])
 
     return (
-        <div className="flex" style={{ background: gradient }}>
+        <Link to={`${article.slug}`} className="flex" style={{ background: gradient }}>
             <div className="group hover:cursor-pointer flex flex-col sm:flex-row gap-4 px-4 bg-gradient-to-t from-white to-transparent pt-20 pb-10">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
@@ -27,11 +28,11 @@ function Highlight({ article }) {
                 </div>
                 <img
                     className="aspect-[4/3] rounded-sm object-cover w-2/3 sm:w-1/2"
-                    src={article.image}
+                    src={article.image.url}
                     alt=""
                 />
             </div>
-        </div>
+        </Link>
     )
 }
 
