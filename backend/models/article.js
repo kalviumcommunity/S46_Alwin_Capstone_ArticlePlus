@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-// Define the content block schema separately
+// Content block schema
 const contentBlockSchema = new mongoose.Schema({
     type: { type: String, required: true },
     text: { type: String },
@@ -11,7 +11,7 @@ const contentBlockSchema = new mongoose.Schema({
     items: { type: [String], default: undefined },
 })
 
-// Define the article schema
+// Article schema
 const articleSchema = new mongoose.Schema({
     title: { type: String, required: true },
     image: { type: String },

@@ -4,10 +4,9 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                serif: '"Roboto Serif", serif;',
                 poppins: '"Poppins", sans-serif;',
+                serif: `"Source Serif 4", serif;`,
             },
         },
     },
-    plugins: [],
 }

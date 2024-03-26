@@ -1,12 +1,14 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
 import { useSignals } from "@preact/signals-react/runtime"
+
 import { userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
-import { useState } from "react"
+
 import Loader from "@/components/Loader"
 
-function Signup() {
+function Login() {
     useSignals()
 
     const [isLoading, setIsLoading] = useState(false)
@@ -15,21 +17,26 @@ function Signup() {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
         reset,
     } = useForm()
 
-    const handleSignup = (payload) => {
+    const handleLogin = (payload) => {
         setIsLoading(true)
         setActionStatus("")
 
         axiosInstance
-            .post("auth/signup", payload)
+            .post("auth/login", payload)
             .then((res) => {
                 userExists.value = true
             })
-            .catch((error) => setActionStatus(error.response.data))
+            .catch((error) => {
+                if (error.response.data) {
+                    setActionStatus(error.response.data)
+                } else {
+                    setActionStatus({ message: "Sorry, an error occurred" })
+                }
+            })
             .finally(() => {
                 setIsLoading(false)
                 reset()
@@ -42,12 +49,12 @@ function Signup() {
     }
 
     const onSubmit = (data) => {
-        handleSignup(data)
+        handleLogin(data)
     }
 
-    const handleGoogleSignup = () => {
+    const handleGoogleLogin = () => {
         axiosInstance
-            .post("/auth/google/request")
+            .post("/auth/google/redirect")
             .then((res) => (window.location.href = res.data.url))
             .catch((error) => {
                 console.error("Error checking authentication status:", error)
@@ -55,14 +62,14 @@ function Signup() {
     }
 
     return (
-        <div className="sm:py-26 mx-4 flex flex-col items-center gap-4  border-b pb-16 pt-10 sm:mx-16 sm:gap-6">
-            <div className="flex flex-col gap-3 sm:w-96">
-                <h1 className="mb-2 mr-auto text-4xl font-semibold">Signup</h1>
+        <div className="sm:py-26 mx-4 flex flex-col items-center gap-4 border-b pb-16 pt-10 sm:mx-16 sm:gap-6">
+            <div className="flex w-full flex-col gap-3 sm:w-96">
+                <h1 className="mb-2 mr-auto text-4xl font-semibold">Login</h1>
                 {isLoading ? (
                     <Loader />
                 ) : actionStatus ? (
                     <>
-                        <div className="mb-10 mt-8 flex flex-col items-start gap-1">
+                        <div className="mb-10 mt-8 flex flex-col items-start">
                             <span className="text-base font-medium underline decoration-rose-500 decoration-wavy">
                                 {actionStatus.email}
                             </span>
@@ -72,43 +79,24 @@ function Signup() {
                             <button
                                 className="mt-4 rounded-full bg-rose-500 px-6 py-1 font-semibold text-white"
                                 onClick={resetState}>
-                                Signup again
+                                Login again
                             </button>
                         </div>
                         <hr className="my-2" />
-                        <div className="flex justify-start gap-4 py-2">
+                        <div className="flex justify-start gap-4 py-1">
                             <span className="text-base">
-                                Already have an account?&nbsp;
+                                Doesn't have an accout?&nbsp;
                                 <Link
                                     className="font-semibold text-blue-700 underline"
-                                    to="/login">
-                                    Login
+                                    to="/signup">
+                                    Signup
                                 </Link>
                             </span>
                         </div>
                     </>
                 ) : (
                     <>
-                        <form
-                            className="flex flex-col gap-3"
-                            onSubmit={handleSubmit(onSubmit)}>
-                            <div className="flex flex-col gap-1">
-                                <label className="font-medium" htmlFor="name">
-                                    Full name
-                                </label>
-                                <input
-                                    className={`input ${errors.name ? "border-red-500" : ""}`}
-                                    type="text"
-                                    {...register("name", {
-                                        required: "Full name is required",
-                                    })}
-                                />
-                                {errors.fullname && (
-                                    <span className="text-sm text-red-500">
-                                        {errors.fullname.message}
-                                    </span>
-                                )}
-                            </div>
+                        <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
                             <div className="flex flex-col gap-1">
                                 <label className="font-medium" htmlFor="email">
                                     Email
@@ -132,15 +120,13 @@ function Signup() {
                                 )}
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label
-                                    className="font-medium"
-                                    htmlFor="password">
+                                <label className="font-medium" htmlFor="password">
                                     Password
                                 </label>
                                 <input
                                     className={`input ${errors.password ? "border-red-500" : ""}`}
                                     type="password"
-                                    autoComplete="new-password"
+                                    autoComplete="current-password"
                                     {...register("password", {
                                         required: "Password is required",
                                         minLength: {
@@ -156,35 +142,11 @@ function Signup() {
                                     </span>
                                 )}
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <label
-                                    className="font-medium"
-                                    htmlFor="confirmPassword">
-                                    Confirm Password
-                                </label>
-                                <input
-                                    className={`input ${errors.confirmPassword ? "border-red-500" : ""}`}
-                                    type="password"
-                                    autoComplete="new-password"
-                                    {...register("confirmPassword", {
-                                        required:
-                                            "Please confirm your password",
-                                        validate: (value) =>
-                                            value === watch("password") ||
-                                            "Passwords do not match",
-                                    })}
-                                />
-                                {errors.confirmPassword && (
-                                    <span className="text-sm text-red-500">
-                                        {errors.confirmPassword.message}
-                                    </span>
-                                )}
-                            </div>
                             <div className="my-3">
                                 <button
                                     type="submit"
                                     className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white underline decoration-white decoration-wavy">
-                                    Signup
+                                    Login
                                 </button>
                             </div>
                         </form>
@@ -192,18 +154,21 @@ function Signup() {
                         <div>
                             <span
                                 className="flex justify-center gap-2 rounded-full border-2 border-black px-4 py-2 font-semibold shadow hover:cursor-pointer"
-                                onClick={handleGoogleSignup}>
-                                <img src="/assets/icons/google.svg" alt="" />{" "}
-                                Sign up with Google
+                                onClick={handleGoogleLogin}>
+                                <img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                                    alt=""
+                                />{" "}
+                                Login with Google
                             </span>
                         </div>
-                        <div className="flex justify-center gap-4 py-2">
+                        <div className="flex justify-center gap-4 py-1">
                             <span className="text-base">
-                                Already have an account?&nbsp;
+                                Doesn't have an accout?&nbsp;
                                 <Link
                                     className="font-semibold text-blue-700 underline"
-                                    to="/login">
-                                    Login
+                                    to="/signup">
+                                    Signup
                                 </Link>
                             </span>
                         </div>
@@ -214,4 +179,4 @@ function Signup() {
     )
 }
 
-export default Signup
+export default Login

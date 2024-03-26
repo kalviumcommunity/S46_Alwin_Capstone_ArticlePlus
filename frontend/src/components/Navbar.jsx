@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react"
-import { useSignals } from "@preact/signals-react/runtime"
-import { useSignalEffect } from "@preact/signals-react"
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { getCookie, setCookie } from "@/helpers/cookies"
+import { useSignalEffect } from "@preact/signals-react"
+import { useSignals } from "@preact/signals-react/runtime"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+
 import { userDetails, userExists } from "@/signals/user"
+import { getCookie, setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
 function Navbar() {
@@ -43,16 +44,14 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 z-30 flex flex-row justify-between bg-white ${
-                scrolled
-                    ? "px-4 py-3 sm:px-6 lg:px-12"
-                    : "px-4 py-4 sm:px-8 lg:px-16"
+            className={`sticky top-0 z-30 flex flex-row justify-between border-b items-center bg-white min-h-16 py-3 ${
+                scrolled ? "px-4 sm:px-6 lg:px-12" : "px-4 sm:px-8 lg:px-16"
             }`}
             id="navbar">
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
                 <>
-                    <img className="h-6" src="./logo.svg" alt="" />
-                    <span className="pt-[0.1rem] font-serif text-2xl font-semibold leading-6">
+                    <img className="h-5" src="./logo.svg" alt="" />
+                    <span className="pt-[0.1rem] font-serif text-2xl font-bold leading-6">
                         Article+
                     </span>
                 </>
@@ -63,13 +62,13 @@ function Navbar() {
                         <div className="flex items-center gap-2 rounded-full border hover:cursor-pointer hover:bg-gray-50 ">
                             {user.picture ? (
                                 <img
-                                    className="h-9 w-9 rounded-full"
+                                    className="h-8 w-8 rounded-full"
                                     src={`${user.picture}`}
                                     alt=""
                                 />
                             ) : (
                                 <img
-                                    className="h-9 w-9 rounded-full"
+                                    className="h-8 w-8 rounded-full"
                                     src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
                                     alt=""
                                 />
@@ -78,24 +77,27 @@ function Navbar() {
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                            className="DropdownMenuContent z-50 min-w-48 rounded-md border-2 bg-white"
+                            className="DropdownMenuContent z-50 min-w-52 rounded-md border-2 bg-white"
                             align="end"
                             sideOffset={5}>
                             <div className="mx-3 my-2 flex flex-col px-2 py-1">
                                 <span className="font-medium">{user.name}</span>
-                                <span className="text-sm text-gray-600">
-                                    {user.email}
-                                </span>
+                                <span className="text-sm text-gray-600">{user.email}</span>
                             </div>
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <Link to="/account">
-                                <DropdownMenu.Item className="dropdown-item">
+                                <DropdownMenu.Item className="dropdown-item mb-0">
                                     Account & Settings
+                                </DropdownMenu.Item>
+                            </Link>
+                            <Link to="/creator">
+                                <DropdownMenu.Item className="dropdown-item text-black hover:text-white hover:bg-black">
+                                    {user && user.creator ? "Dashboard" : "Become a Creator 🔦"}
                                 </DropdownMenu.Item>
                             </Link>
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <DropdownMenu.Item
-                                className="dropdown-item bg-red-50 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
+                                className="dropdown-item bg-red-100 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
                                 onClick={handleLogout}>
                                 Log out
                             </DropdownMenu.Item>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
-import Loader from "@/components/Loader"
 import { Link, useSearchParams } from "react-router-dom"
+
 import { userExists } from "@/signals/user"
+
+import Loader from "@/components/Loader"
 
 function AuthGoogle() {
     const [loader, setLoader] = useState(true)
