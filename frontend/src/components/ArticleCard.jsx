@@ -14,7 +14,8 @@ export const ArticleCard = ({ article }) => {
                     className={`${article.image.bg ? "object-cover" : "object-contain"} h-56 w-full rounded-sm `}
                     style={{ backdropFilter: "blur(50px)" }}
                     src={article.image.url}
-                    alt=""
+                    loading="lazy"
+                    alt={article.image.caption}
                 />
             </div>
 

@@ -29,7 +29,8 @@ function Highlight({ article }) {
                 <img
                     className="aspect-[4/3] rounded-sm object-cover w-2/3 sm:w-1/2"
                     src={article.image.url}
-                    alt=""
+                    alt={article.image.caption}
+                    loading="lazy"
                 />
             </div>
         </Link>

@@ -46,7 +46,8 @@ function Article() {
                             <img
                                 className="w-full rounded-sm md:w-1/3"
                                 src={article.image.url}
-                                alt="Article Image"
+                                alt={article.image.caption}
+                                loading="lazy"
                             />
                         </>
                     ) : (
@@ -54,12 +55,16 @@ function Article() {
                             <img
                                 className="w-full rounded-sm md:w-1/3"
                                 src={article.image.url}
-                                alt="Article Image"
+                                alt={article.image.caption}
+                                loading="lazy"
                             />
                             <div className="flex flex-col text-center">
-                                <span className="text-rose-500 uppercase font-serif mb-2">
+                                <Link
+                                    to={`/?tag=${article.category}`}
+                                    className="hover:underline text-rose-500 uppercase font-serif mb-2">
                                     {article.category}
-                                </span>
+                                </Link>
+                                c
                                 <h1 className="text-4xl font-semibold mb-4 font-serif">
                                     {article.title}
                                 </h1>
@@ -96,7 +101,12 @@ function Article() {
                             )}
                             {block.type === "img" && (
                                 <div className="space-y-2">
-                                    <img className="h-full" src={block.url} alt="" />
+                                    <img
+                                        className="h-full"
+                                        src={block.url}
+                                        alt={block.caption}
+                                        loading="lazy"
+                                    />
                                     <div className="space-x-2 leading-5 text-sm">
                                         <span>{block.caption}</span>
                                         <span className="text-gray-500">{block.credit}</span>
@@ -141,7 +151,8 @@ function Article() {
                         <img
                             className="w-full object-cover h-full"
                             src={article.image.url}
-                            alt="Article Image"
+                            alt={article.image.caption}
+                            loading="lazy"
                         />
                     </div>
                 </div>
@@ -161,7 +172,12 @@ function Article() {
                             )}
                             {block.type === "img" && (
                                 <div className="space-y-2">
-                                    <img className="h-full" src={block.url} alt="" />
+                                    <img
+                                        className="h-full"
+                                        src={block.url}
+                                        alt={block.caption}
+                                        loading="lazy"
+                                    />
                                     <div className="space-x-2 leading-5 text-sm">
                                         <span>{block.caption}</span>
                                         <span className="text-gray-500">{block.credit}</span>
