@@ -9,7 +9,7 @@ import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Creator from "@/pages/Creator"
 import Login from "@/pages/Login"
-import Organisation from "@/pages/Organisation"
+import Organization from "@/pages/Organization"
 import Read from "@/pages/Read"
 import Signup from "@/pages/Signup"
 import Footer from "@/components/Footer"
@@ -62,8 +62,8 @@ function App() {
                         <Route path="/account" element={<Account />} />
                         <Route path="/:slug" element={<Article />} />
                         <Route path="/creator/:creator" element={<Creator />} />
-                        <Route path="/organisation/:id/:contributor" element={<Creator />} />
-                        <Route path="/organisation/:id" element={<Organisation />} />
+                        <Route path="/organization/:id/:contributor" element={<Creator />} />
+                        <Route path="/organization/:id" element={<Organization />} />
                         <Route path="/read" element={<Navigate to="/" replace={true} />} />
                         <Route path="/login" element={<Navigate to="/read" replace={true} />} />
                         <Route

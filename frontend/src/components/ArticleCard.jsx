@@ -37,7 +37,7 @@ export const ArticleCard = ({ article }) => {
                         </>
                     ) : (
                         <span className="text-sm font-semibold">
-                            {article.author.organisation.name} • {article.author.name}
+                            {article.author.organization.name} • {article.author.name}
                         </span>
                     )}
                 </div>

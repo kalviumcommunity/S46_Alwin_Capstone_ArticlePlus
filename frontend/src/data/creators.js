@@ -18,8 +18,8 @@ export const creators = [
         verified: true,
         description:
             "David D Kirkpatrick is an investigative journalist uncovering stories that matter.",
-        type: "organisation",
-        organisation: {
+        type: "organization",
+        organization: {
             name: "New yorker",
             icon: "https://source.unsplash.com/48x48",
             id: "new-yorker",
@@ -43,8 +43,8 @@ export const creators = [
         verified: true,
         description:
             "Paige Williams is an investigative journalist with a keen eye for detail.",
-        type: "organisation",
-        organisation: {
+        type: "organization",
+        organization: {
             name: "New yorker",
             id: "new-yorker",
             icon: "https://source.unsplash.com/48x48",

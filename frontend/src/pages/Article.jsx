@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 
+import { convertCategoryFormat } from "@/utils/ui/convertCategoryFormat"
+
 import Loader from "@/components/Loader"
 
 import { articles } from "@/data/articles"
@@ -14,14 +16,6 @@ function Article() {
         window.scrollTo(0, 0)
         setArticle(articles.find((article) => article.slug === slug))
     }, [slug])
-
-    const convertCategoryFormat = (tag) => {
-        const words = tag.split("-")
-        const capitalizedTag = words
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-        return capitalizedTag
-    }
 
     if (article && article.display === "header") {
         return (
@@ -50,14 +44,14 @@ function Article() {
                             ) : (
                                 <div className="flex items-center gap-1.5 ">
                                     <Link
-                                        to={`/organisation/${article.author.organisation.id}`}
+                                        to={`/organization/${article.author.organization.id}`}
                                         className="text-sm font-semibold leading-4 hover:underline">
-                                        {article.author.organisation.name}
+                                        {article.author.organization.name}
                                     </Link>
                                     <span>•</span>
                                     <Link
                                         className="text-sm font-semibold leading-4 hover:underline"
-                                        to={`/organisation/${article.author.organisation.id}/${article.author.id}`}>
+                                        to={`/organization/${article.author.organization.id}/${article.author.id}`}>
                                         <span>{article.author.name}</span>
                                     </Link>
                                 </div>
@@ -135,14 +129,14 @@ function Article() {
                             ) : (
                                 <div className="flex items-center gap-1.5 ">
                                     <Link
-                                        to={`/organisation/${article.author.organisation.id}`}
+                                        to={`/organization/${article.author.organization.id}`}
                                         className="text-sm font-semibold leading-4 hover:underline">
-                                        {article.author.organisation.name}
+                                        {article.author.organization.name}
                                     </Link>
                                     <span>•</span>
                                     <Link
                                         className="text-sm font-semibold leading-4 hover:underline"
-                                        to={`/organisation/${article.author.organisation.id}/${article.author.id}`}>
+                                        to={`/organization/${article.author.organization.id}/${article.author.id}`}>
                                         <span>{article.author.name}</span>
                                     </Link>
                                 </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
 import { randomGradient } from "@/utils/ui/randomGradient"
@@ -34,14 +34,14 @@ function Highlight({ article }) {
                     ) : (
                         <div className="flex items-center gap-1.5 ">
                             <Link
-                                to={`/organisation/${article.author.organisation.id}`}
+                                to={`/organization/${article.author.organization.id}`}
                                 className="text-sm font-semibold leading-4 hover:underline">
-                                {article.author.organisation.name}
+                                {article.author.organization.name}
                             </Link>
                             <span>•</span>
                             <Link
                                 className="text-sm font-semibold leading-4 hover:underline"
-                                to={`/organisation/${article.author.organisation.id}/${article.author.id}`}>
+                                to={`/organization/${article.author.organization.id}/${article.author.id}`}>
                                 <span>{article.author.name}</span>
                             </Link>
                         </div>

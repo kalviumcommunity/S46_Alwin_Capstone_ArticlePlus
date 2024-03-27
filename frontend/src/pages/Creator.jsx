@@ -64,16 +64,16 @@ function Creator() {
                                 ) : (
                                     <div>
                                         <span className="text-gray-700 flex gap-3 items-center">
-                                            Organisation
+                                            Organization
                                             <Link
-                                                to={`/organisation/${creator.organisation.id}`}
+                                                to={`/organization/${creator.organization.id}`}
                                                 className="bg-white shadow-sm py-1 pl-1 pr-3.5 rounded-full border flex items-center gap-2 hover:cursor-pointer hover:underline font-medium text-black">
                                                 <img
                                                     className="h-8 w-8 rounded-full"
-                                                    src={creator.organisation.icon}
+                                                    src={creator.organization.icon}
                                                     alt=""
                                                 />
-                                                {creator.organisation.name}
+                                                {creator.organization.name}
                                             </Link>
                                         </span>
                                     </div>
@@ -107,7 +107,7 @@ function Creator() {
                             <Tabs.Content value="for-members"></Tabs.Content>
                         </Tabs.Root>
                     )}
-                    {creator.type === "organisation" && (
+                    {creator.type === "organization" && (
                         <>
                             <hr />
                             <div className="flex flex-col gap-8 pt-6 px-4 lg:w-2/3">

@@ -53,8 +53,8 @@ export const articles = [
         author: {
             name: "David D. Kirkpatrick",
             id: "david-d-kirkpatrick",
-            type: "organisation",
-            organisation: {
+            type: "organization",
+            organization: {
                 name: "New yorker",
                 id: "new-yorker",
             },
@@ -147,8 +147,8 @@ export const articles = [
         author: {
             name: "Paige Williams",
             id: "paige-williams",
-            type: "organisation",
-            organisation: {
+            type: "organization",
+            organization: {
                 name: "New yorker",
                 id: "new-yorker",
             },

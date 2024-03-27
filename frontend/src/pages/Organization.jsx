@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import * as Tabs from "@radix-ui/react-tabs"
 
 import { randomGradient } from "@/utils/ui/randomGradient"
@@ -7,35 +7,35 @@ import { randomGradient } from "@/utils/ui/randomGradient"
 import { ArticleList } from "@/components/ArticleList"
 
 import { articles as allArticles } from "@/data/articles"
-import { organisations } from "@/data/organisations"
+import { organizations } from "@/data/organizations"
 
-function Organisation() {
+function Organization() {
     const { id } = useParams()
 
     const [gradient, setGradient] = useState("")
-    const [organisation, setOrgansisation] = useState()
+    const [organization, setOrgansisation] = useState()
     const [articles, setArticles] = useState()
 
     useEffect(() => {
         randomGradient(setGradient)
-        setOrgansisation(organisations.find((organisation) => organisation.id === id))
+        setOrgansisation(organizations.find((organization) => organization.id === id))
         setArticles(
             allArticles.filter(
                 (article) =>
-                    article.author.type === "organisation" &&
-                    article.author.organisation.id === id,
+                    article.author.type === "organization" &&
+                    article.author.organization.id === id,
             ),
         )
     }, [id])
 
-    if (organisation && articles) {
+    if (organization && articles) {
         return (
             <div>
                 <div className="pt-16 w-full justify-end" style={{ background: gradient }}>
                     <div className="flex flex-col gap-4 bg-gradient-to-t from-white from-40% to-transparent">
                         <img
                             className="h-20 w-fit rounded-full mx-4 sm:mx-8 lg:mx-16 shadow"
-                            src={organisation.image}
+                            src={organization.image}
                             alt=""
                         />
                         <div className="flex flex-col sm:flex-row pb-6 gap-6 lg:gap-8 px-4 sm:px-8 lg:px-16">
@@ -43,9 +43,9 @@ function Organisation() {
                                 <div className="w-max  flex flex-col">
                                     <div className="flex gap-2 items-center">
                                         <h1 className="text-2xl font-bold w-max">
-                                            {organisation.name}
+                                            {organization.name}
                                         </h1>
-                                        {organisation.verified && (
+                                        {organization.verified && (
                                             <img
                                                 className="h-5 w-5"
                                                 src="/assets/icons/verified.svg"
@@ -53,12 +53,12 @@ function Organisation() {
                                             />
                                         )}
                                     </div>
-                                    <span>{organisation.followers} followers</span>
+                                    <span>{organization.followers} followers</span>
                                 </div>
                             </div>
                             <div className="flex flex-col gap-4 justify-end">
                                 <span className="lg:w-2/3 pt-1">
-                                    {organisation.description}
+                                    {organization.description}
                                 </span>
                                 <div className="flex flex-col gap-3 md:flex-row md:items-center">
                                     <button className="w-fit bg-blue-500 py-1.5 px-8 text-base border-black rounded-full text-white font-medium">
@@ -99,4 +99,4 @@ function Organisation() {
     }
 }
 
-export default Organisation
+export default Organization
