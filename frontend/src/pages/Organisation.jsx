@@ -6,22 +6,29 @@ import { randomGradient } from "@/utils/ui/randomGradient"
 
 import { ArticleList } from "@/components/ArticleList"
 
-import { articles } from "@/data/articles"
+import { articles as allArticles } from "@/data/articles"
 import { organisations } from "@/data/organisations"
 
 function Organisation() {
     const { id } = useParams()
-    console.log(id)
 
     const [gradient, setGradient] = useState("")
     const [organisation, setOrgansisation] = useState()
+    const [articles, setArticles] = useState()
 
     useEffect(() => {
         randomGradient(setGradient)
         setOrgansisation(organisations.find((organisation) => organisation.id === id))
-    }, [])
+        setArticles(
+            allArticles.filter(
+                (article) =>
+                    article.author.type === "organisation" &&
+                    article.author.organisation.id === id,
+            ),
+        )
+    }, [id])
 
-    if (organisation) {
+    if (organisation && articles) {
         return (
             <div>
                 <div className="pt-16 w-full justify-end" style={{ background: gradient }}>
@@ -66,42 +73,26 @@ function Organisation() {
                     </div>
                 </div>
                 <div className="sm:px-8 lg:px-16 pt-2 pb-20">
-                    {organisation.type === "individual" && (
-                        <Tabs.Root
-                            className="flex flex-col gap-2"
-                            defaultValue="for-subscribers">
-                            <Tabs.List
-                                className="flex flex-1 flex-row items-center gap-1 border-b sticky top-12 lg:top-14 pt-1 bg-white z-50"
-                                aria-label="organisation tabs">
-                                <Tabs.Trigger
-                                    className="organisation-tab"
-                                    value="for-subscribers">
-                                    For subscribers
-                                </Tabs.Trigger>
-                                <Tabs.Trigger className="organisation-tab" value="for-members">
-                                    For members
-                                </Tabs.Trigger>
-                            </Tabs.List>
-                            <Tabs.Content
-                                className="flex flex-col gap-8 pt-6 px-4 lg:w-2/3"
-                                value="for-subscribers">
-                                {articles.map((article, index) => (
-                                    <ArticleList article={article} key={index} />
-                                ))}
-                            </Tabs.Content>
-                            <Tabs.Content value="for-members"></Tabs.Content>
-                        </Tabs.Root>
-                    )}
-                    {organisation.type === "organisation" && (
-                        <>
-                            <hr />
-                            <div className="flex flex-col gap-8 pt-6 px-4 lg:w-2/3">
-                                {articles.map((article, index) => (
-                                    <ArticleList article={article} key={index} />
-                                ))}
-                            </div>
-                        </>
-                    )}
+                    <Tabs.Root className="flex flex-col gap-2" defaultValue="for-subscribers">
+                        <Tabs.List
+                            className="flex flex-1 flex-row items-center gap-1 border-b sticky top-12 lg:top-14 pt-1 bg-white z-50"
+                            aria-label="Creator tabs">
+                            <Tabs.Trigger className="creator-tab" value="for-subscribers">
+                                For subscribers
+                            </Tabs.Trigger>
+                            <Tabs.Trigger className="creator-tab" value="for-members">
+                                For members
+                            </Tabs.Trigger>
+                        </Tabs.List>
+                        <Tabs.Content
+                            className="flex flex-col gap-8 pt-6 px-4 lg:w-2/3"
+                            value="for-subscribers">
+                            {articles.map((article, index) => (
+                                <ArticleList article={article} key={index} />
+                            ))}
+                        </Tabs.Content>
+                        <Tabs.Content value="for-members"></Tabs.Content>
+                    </Tabs.Root>
                 </div>
             </div>
         )

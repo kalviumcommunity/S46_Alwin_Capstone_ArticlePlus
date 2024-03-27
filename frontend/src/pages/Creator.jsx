@@ -6,25 +6,21 @@ import { randomGradient } from "@/utils/ui/randomGradient"
 
 import { ArticleList } from "@/components/ArticleList"
 
-import { articles } from "@/data/articles"
+import { articles as allArticles } from "@/data/articles"
 import { creators } from "@/data/creators"
 
 function Creator() {
     const { creator: id, contributor } = useParams()
-
     const [gradient, setGradient] = useState("")
     const [creator, setCreator] = useState()
+    const [articles, setArticles] = useState()
 
     useEffect(() => {
         randomGradient(setGradient)
-        if (id) {
-            console.log(id)
-            setCreator(creators.find((creator) => creator.id === id))
-        } else {
-            console.log(contributor)
-            setCreator(creators.find((creator) => creator.id === contributor))
-        }
-    }, [])
+        const creatorId = id || contributor
+        setCreator(creators.find((creator) => creator.id === creatorId))
+        setArticles(allArticles.filter((article) => article.author.id === creatorId))
+    }, [id, contributor])
 
     if (creator) {
         return (
@@ -38,7 +34,7 @@ function Creator() {
                         />
                         <div className="flex flex-col sm:flex-row pb-6 gap-6 lg:gap-8 px-4 sm:px-8 lg:px-16">
                             <div className="flex">
-                                <div className="w-max  flex flex-col">
+                                <div className="w-max flex flex-col">
                                     <div className="flex gap-2 items-center">
                                         <h1 className="text-2xl font-bold w-max">
                                             {creator.name}
@@ -62,7 +58,7 @@ function Creator() {
                                             Be a member
                                         </button>
                                         <span className="font-medium text-sm">
-                                            Starting at $10 /per month
+                                            Starting at $10/month
                                         </span>
                                     </div>
                                 ) : (

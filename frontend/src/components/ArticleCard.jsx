@@ -18,7 +18,6 @@ export const ArticleCard = ({ article }) => {
                     alt={article.image.caption}
                 />
             </div>
-
             <div className="flex flex-col justify-center gap-2">
                 <span className="font-serif text-lg font-semibold leading-6 group-hover:underline group-hover:underline-offset-4">
                     {article.title}
@@ -37,15 +36,9 @@ export const ArticleCard = ({ article }) => {
                             </span>
                         </>
                     ) : (
-                        <div>
-                            <span className="text-sm font-semibold leading-4">
-                                {article.author.organisation.name}
-                            </span>
-                            <span> • </span>
-                            <span className="text-sm font-normal leading-4">
-                                {article.author.name}
-                            </span>
-                        </div>
+                        <span className="text-sm font-semibold">
+                            {article.author.organisation.name} • {article.author.name}
+                        </span>
                     )}
                 </div>
             </div>

@@ -29,15 +29,21 @@ export const ArticleList = ({ article }) => {
                 <span className="line-clamp-4 text-sm font-normal text-gray-600 font-serif mt-2">
                     {article.subtitle}
                 </span>
-                <div className="mt-1 flex items-end justify-between">
-                    <span className="text-sm font-semibold leading-4">
-                        {article.author.type === "individual"
-                            ? article.author.name
-                            : `${article.author.organisation.name} • ${article.author.name}`}
-                    </span>
-                    <span className="text-sm leading-4 text-gray-500">
-                        {article.views} views
-                    </span>
+                <div className="mt-1 flex items-center justify-between">
+                    {article.author.type === "individual" ? (
+                        <>
+                            <span className="text-sm font-semibold leading-4">
+                                {article.author.name}
+                            </span>
+                            <span className="text-sm leading-4 text-gray-500">
+                                {article.views} views
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-sm font-semibold">
+                            {article.author.organisation.name} • {article.author.name}
+                        </span>
+                    )}
                 </div>
             </div>
         </Link>

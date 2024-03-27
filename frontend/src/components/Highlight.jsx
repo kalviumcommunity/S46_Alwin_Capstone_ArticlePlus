@@ -22,9 +22,30 @@ function Highlight({ article }) {
                             {article.subtitle}
                         </span>
                     </div>
-                    <span className="text-base font-semibold leading-4">
-                        {article.author.name}
-                    </span>
+                    {article.author.type === "individual" ? (
+                        <>
+                            <span className="text-base font-semibold leading-4">
+                                {article.author.name}
+                            </span>
+                            <span className="text-base leading-4 text-gray-500">
+                                {article.views} views
+                            </span>
+                        </>
+                    ) : (
+                        <div className="flex items-center gap-1.5 ">
+                            <Link
+                                to={`/organisation/${article.author.organisation.id}`}
+                                className="text-sm font-semibold leading-4 hover:underline">
+                                {article.author.organisation.name}
+                            </Link>
+                            <span>•</span>
+                            <Link
+                                className="text-sm font-semibold leading-4 hover:underline"
+                                to={`/organisation/${article.author.organisation.id}/${article.author.id}`}>
+                                <span>{article.author.name}</span>
+                            </Link>
+                        </div>
+                    )}
                 </div>
                 <img
                     className="aspect-[4/3] rounded-sm object-cover w-2/3 sm:w-1/2"
