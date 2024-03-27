@@ -20,7 +20,8 @@ function Navbar() {
     useSignalEffect(() => setUser(userDetails.value))
 
     useEffect(() => {
-        setIsHomePage(location.pathname === "/")
+        setIsHomePage(true)
+        // setIsHomePage(location.pathname === "/")
 
         const handleScroll = () => {
             const isScrolled = window.scrollY > 0

@@ -27,12 +27,26 @@ export const ArticleCard = ({ article }) => {
                     {article.subtitle}
                 </span>
                 <div className="mt-1 flex items-end justify-between">
-                    <span className="text-sm font-semibold leading-4">
-                        {article.author.name}
-                    </span>
-                    <span className="text-sm leading-4 text-gray-500">
-                        {article.views} views
-                    </span>
+                    {article.author.type === "individual" ? (
+                        <>
+                            <span className="text-sm font-semibold leading-4">
+                                {article.author.name}
+                            </span>
+                            <span className="text-sm leading-4 text-gray-500">
+                                {article.views} views
+                            </span>
+                        </>
+                    ) : (
+                        <div>
+                            <span className="text-sm font-semibold leading-4">
+                                {article.author.organisation.name}
+                            </span>
+                            <span> • </span>
+                            <span className="text-sm font-normal leading-4">
+                                {article.author.name}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
         </Link>

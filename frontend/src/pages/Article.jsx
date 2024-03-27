@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { articles } from "@/articles"
 
 import Loader from "@/components/Loader"
+
+import { articles } from "@/data/articles"
 
 function Article() {
     const { slug } = useParams()
@@ -14,76 +15,64 @@ function Article() {
         setArticle(articles.find((article) => article.slug === slug))
     }, [slug])
 
+    const convertCategoryFormat = (tag) => {
+        const words = tag.split("-")
+        const capitalizedTag = words
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
+        return capitalizedTag
+    }
+
     if (article && article.display === "header") {
         return (
             <div className="flex flex-col">
-                <div className="flex flex-col items-center justify-center gap-10 py-8 px-4 border-b sm:gap-10 md:px-16 lg:px-32 md:flex-row">
-                    {article.header === "reverse" ? (
-                        <>
-                            <div className="flex flex-col text-center">
+                <div
+                    className={`flex flex-col items-center justify-center gap-10 py-8 px-4 border-b sm:gap-10 md:px-16 lg:px-32 md:flex-row ${article.header === "reverse" ? "md:flex-row" : "md:flex-row-reverse"}`}>
+                    <div className="flex flex-col text-center">
+                        <Link
+                            to={`/?tag=${article.category}`}
+                            className="hover:underline text-rose-500 uppercase font-serif mb-2">
+                            {convertCategoryFormat(article.category)}
+                        </Link>
+                        <h1 className="text-4xl font-semibold mb-4 font-serif">
+                            {article.title}
+                        </h1>
+                        <p className="text-base text-gray-800 mb-4 italic">
+                            {article.subtitle}
+                        </p>
+                        <div className="flex flex-col items-center">
+                            {article.author.type === "individual" ? (
                                 <Link
-                                    to={`/?tag=${article.category}`}
-                                    className="hover:underline text-rose-500 uppercase font-serif mb-2">
-                                    {article.category}
+                                    to={`/creator/${article.author.id}`}
+                                    className="text-gray-800 text-sm font-semibold hover:underline">
+                                    {article.author.name}
                                 </Link>
-                                <h1 className="text-4xl font-semibold mb-4 font-serif">
-                                    {article.title}
-                                </h1>
-                                <p className="text-base text-gray-800 mb-4 italic">
-                                    {article.subtitle}
-                                </p>
-                                <div className="flex flex-col items-center">
+                            ) : (
+                                <div className="flex items-center gap-1.5 ">
                                     <Link
-                                        to={`/creator/${article.author.id}`}
-                                        className="text-gray-800 text-sm font-semibold hover:underline">
-                                        {article.author.name}
+                                        to={`/organisation/${article.author.organisation.id}`}
+                                        className="text-sm font-semibold leading-4 hover:underline">
+                                        {article.author.organisation.name}
                                     </Link>
-                                    <p className="text-gray-500 text-xs font-medium">
-                                        {article.timestamp}
-                                    </p>
-                                </div>
-                            </div>
-                            <img
-                                className="w-full rounded-sm md:w-1/3"
-                                src={article.image.url}
-                                alt={article.image.caption}
-                                loading="lazy"
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <img
-                                className="w-full rounded-sm md:w-1/3"
-                                src={article.image.url}
-                                alt={article.image.caption}
-                                loading="lazy"
-                            />
-                            <div className="flex flex-col text-center">
-                                <Link
-                                    to={`/?tag=${article.category}`}
-                                    className="hover:underline text-rose-500 uppercase font-serif mb-2">
-                                    {article.category}
-                                </Link>
-                                c
-                                <h1 className="text-4xl font-semibold mb-4 font-serif">
-                                    {article.title}
-                                </h1>
-                                <p className="text-base text-gray-800 mb-4 italic">
-                                    {article.subtitle}
-                                </p>
-                                <div className="flex flex-col items-center">
+                                    <span>•</span>
                                     <Link
-                                        to={`/creator/${article.author.id}`}
-                                        className="text-gray-800 text-sm font-semibold hover:underline">
-                                        {article.author.name}
+                                        className="text-sm font-semibold leading-4 hover:underline"
+                                        to={`/organisation/${article.author.organisation.id}/${article.author.id}`}>
+                                        <span>{article.author.name}</span>
                                     </Link>
-                                    <p className="text-gray-500 text-xs font-medium">
-                                        {article.timestamp}
-                                    </p>
                                 </div>
-                            </div>
-                        </>
-                    )}
+                            )}
+                            <p className="text-gray-500 text-sm mt-0.5 font-normal">
+                                {article.timestamp}
+                            </p>
+                        </div>
+                    </div>
+                    <img
+                        className="w-full rounded-sm md:w-1/3"
+                        src={article.image.url}
+                        alt={article.image.caption}
+                        loading="lazy"
+                    />
                 </div>
 
                 <div className="px-4 space-x-2 pt-3 text-sm md:px-16 lg:px-32">
@@ -128,7 +117,7 @@ function Article() {
                         <Link
                             to={`/?tag=${article.category}`}
                             className="hover:underline text-rose-500 uppercase font-serif mb-2">
-                            {article.category}
+                            {convertCategoryFormat(article.category)}
                         </Link>
                         <h1 className="text-4xl font-semibold mb-4 font-serif">
                             {article.title}
@@ -137,12 +126,28 @@ function Article() {
                             {article.subtitle}
                         </p>
                         <div className="flex flex-col items-center">
-                            <Link
-                                to={`/creator/${article.author.id}`}
-                                className="text-gray-800 text-sm font-semibold hover:underline">
-                                {article.author.name}
-                            </Link>
-                            <p className="text-gray-500 text-xs font-medium">
+                            {article.author.type === "individual" ? (
+                                <Link
+                                    to={`/creator/${article.author.id}`}
+                                    className="text-gray-800 text-sm font-semibold hover:underline">
+                                    {article.author.name}
+                                </Link>
+                            ) : (
+                                <div className="flex items-center gap-1.5 ">
+                                    <Link
+                                        to={`/organisation/${article.author.organisation.id}`}
+                                        className="text-sm font-semibold leading-4 hover:underline">
+                                        {article.author.organisation.name}
+                                    </Link>
+                                    <span>•</span>
+                                    <Link
+                                        className="text-sm font-semibold leading-4 hover:underline"
+                                        to={`/organisation/${article.author.organisation.id}/${article.author.id}`}>
+                                        <span>{article.author.name}</span>
+                                    </Link>
+                                </div>
+                            )}
+                            <p className="text-gray-500 text-sm mt-0.5 font-normal">
                                 {article.timestamp}
                             </p>
                         </div>

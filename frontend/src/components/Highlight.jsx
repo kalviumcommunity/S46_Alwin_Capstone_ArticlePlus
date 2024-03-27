@@ -11,7 +11,7 @@ function Highlight({ article }) {
     }, [])
 
     return (
-        <Link to={`${article.slug}`} className="flex" style={{ background: gradient }}>
+        <Link to={`/${article.slug}`} className="flex" style={{ background: gradient }}>
             <div className="group hover:cursor-pointer flex flex-col sm:flex-row gap-4 px-4 bg-gradient-to-t from-white to-transparent pt-20 pb-10">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
