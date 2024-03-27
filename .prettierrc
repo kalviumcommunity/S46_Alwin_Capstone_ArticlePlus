@@ -23,6 +23,5 @@
     "bracketSameLine": true,
     "arrowParens": "always",
     "printWidth": 96,
-    "trailingComma": "all",
-    "jsxBracketSameLine": true
+    "trailingComma": "all"
 }

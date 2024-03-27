@@ -1,7 +1,7 @@
 function Loader() {
     return (
         <div className="flex h-96 items-center justify-center">
-            <div role="status" className="mb-10">
+            <div role="status" className="m-5">
                 <svg
                     aria-hidden="true"
                     className="inline h-10 w-10 animate-spin fill-rose-500 text-rose-50"
