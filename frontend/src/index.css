@@ -31,4 +31,8 @@
     .tag {
         @apply px-4 first:pl-0 hover:underline;
     }
+
+    .creator-tab {
+        @apply px-4 py-2 text-sm underline-offset-[14px] hover:bg-gray-50 [&[data-state='active']]:font-medium [&[data-state='active']]:underline;
+    }
 }

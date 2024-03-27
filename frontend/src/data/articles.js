@@ -12,7 +12,7 @@ export const articles = [
             type: "individual",
         },
         timestamp: "March 24, 2024",
-        category: "Culture Desk",
+        category: "culture-desk",
         image: {
             url: "https://media.newyorker.com/photos/65fc513fa938d6709b3d8be7/master/w_1920,c_limit/WonderCityOfTheWorld_p067a_web.jpg",
             credit: "Courtesy Poster Photo Archives, Posters Please Inc., N.Y.C.",
@@ -53,14 +53,14 @@ export const articles = [
         author: {
             name: "David D. Kirkpatrick",
             id: "david-d-kirkpatrick",
-            type: "organisation",
-            organsiation: {
+            type: "organization",
+            organization: {
                 name: "New yorker",
                 id: "new-yorker",
             },
         },
         timestamp: "October 2, 2023",
-        category: "Society",
+        category: "society",
         image: {
             url: "https://media.newyorker.com/photos/6515db190594858673379e91/master/w_1920,c_limit/231009_r43127.jpg",
             credit: "Courtesy Poster Photo Archives, Posters Please Inc., N.Y.C.",
@@ -102,14 +102,10 @@ export const articles = [
         author: {
             name: "Jay Caspian Kang",
             id: "jay-caspian-kang",
-            type: "organisation",
-            organsiation: {
-                name: "New yorker",
-                id: "new-yorker",
-            },
+            type: "individual",
         },
         timestamp: "March 22, 2024",
-        category: "Society",
+        category: "society",
         image: {
             url: "https://media.newyorker.com/photos/65fe046cbf325d4728e66eeb/2:2/w_1920,c_limit/01_final_2.jpg",
             credit: "Illustration by Till Lauer",
@@ -151,14 +147,14 @@ export const articles = [
         author: {
             name: "Paige Williams",
             id: "paige-williams",
-            type: "organisation",
-            organsiation: {
+            type: "organization",
+            organization: {
                 name: "New yorker",
                 id: "new-yorker",
             },
         },
         timestamp: "March 18, 2024",
-        category: "Journal",
+        category: "journal",
         image: {
             url: "https://media.newyorker.com/photos/65f2135ebf04e4ed39ab6b01/master/w_1920,c_limit/r43943.png",
             caption:

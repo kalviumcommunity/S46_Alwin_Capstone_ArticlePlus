@@ -7,7 +7,9 @@ import axiosInstance from "@/axios"
 import Account from "@/pages/Account"
 import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
+import Creator from "@/pages/Creator"
 import Login from "@/pages/Login"
+import Organization from "@/pages/Organization"
 import Read from "@/pages/Read"
 import Signup from "@/pages/Signup"
 import Footer from "@/components/Footer"
@@ -59,21 +61,28 @@ function App() {
                         <Route index element={<Read />} />
                         <Route path="/account" element={<Account />} />
                         <Route path="/:slug" element={<Article />} />
-                        <Route path="read" element={<Navigate to="/" replace={true} />} />
-                        <Route path="login" element={<Navigate to="/read" replace={true} />} />
-                        <Route path="signup" element={<Navigate to="/read" replace={true} />} />
+                        <Route path="/creator/:creator" element={<Creator />} />
+                        <Route path="/organization/:id/:contributor" element={<Creator />} />
+                        <Route path="/organization/:id" element={<Organization />} />
+                        <Route path="/read" element={<Navigate to="/" replace={true} />} />
+                        <Route path="/login" element={<Navigate to="/read" replace={true} />} />
+                        <Route
+                            path="/signup"
+                            element={<Navigate to="/read" replace={true} />}
+                        />
                         <Route
                             path="auth/google"
                             element={<Navigate to="/" replace={true} />}
                         />
+                        <Route path="*" element={<Navigate to="/" replace={true} />} />
                     </>
                 ) : (
                     <>
                         <Route index element={<Hero />} />
-                        <Route path="signup" element={<Signup />} />
-                        <Route path="login" element={<Login />} />
-                        <Route path="auth/google" element={<AuthGoogle />} />
-                        <Route path="read" element={<Navigate to="/login" replace={true} />} />
+                        <Route path="/signup" element={<Signup />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/auth/google" element={<AuthGoogle />} />
+                        <Route path="/read" element={<Navigate to="/login" replace={true} />} />
                         <Route path="*" element={<Navigate to="/" replace={true} />} />
                     </>
                 )}

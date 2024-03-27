@@ -1,11 +1,12 @@
 import { useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import { useSignals } from "@preact/signals-react/runtime"
-import { articles } from "@/articles"
 
 import { ArticleCard } from "@/components/ArticleCard"
 import Highlight from "@/components/Highlight"
 import TagRibbion from "@/components/TagRibbion"
+
+import { articles } from "@/data/articles"
 
 function Read() {
     useSignals()
