@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useSignalEffect } from "@preact/signals-react"
 import { useSignals } from "@preact/signals-react/runtime"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
@@ -11,17 +11,12 @@ import axiosInstance from "@/axios"
 function Navbar() {
     useSignals()
 
-    const [isHomePage, setIsHomePage] = useState(false)
     const [scrolled, setScrolled] = useState(false)
     const [user, setUser] = useState()
-
-    const location = useLocation()
 
     useSignalEffect(() => setUser(userDetails.value))
 
     useEffect(() => {
-        setIsHomePage(location.pathname === "/")
-
         const handleScroll = () => {
             const isScrolled = window.scrollY > 0
             setScrolled(isScrolled)
@@ -32,7 +27,7 @@ function Navbar() {
         return () => {
             window.removeEventListener("scroll", handleScroll)
         }
-    }, [location.pathname])
+    }, [])
 
     const handleLogout = () => {
         const refreshTokenId = getCookie("refreshTokenId")
@@ -51,7 +46,7 @@ function Navbar() {
         <div
             className={`sticky top-0 z-30 flex flex-row justify-between border-b items-center bg-white sm:min-h-14 ${
                 scrolled ? "px-4 py-2.5 sm:px-6 lg:px-12" : "px-4 py-3 sm:px-8 lg:px-16"
-            } ${!isHomePage && "shadow"}`}
+            }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-2">
                 <>

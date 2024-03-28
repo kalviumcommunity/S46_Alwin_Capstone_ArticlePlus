@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
 import { randomGradient } from "@/utils/ui/randomGradient"
@@ -11,7 +11,7 @@ function Highlight({ article }) {
     }, [])
 
     return (
-        <Link to={`${article.slug}`} className="flex" style={{ background: gradient }}>
+        <Link to={`/${article.slug}`} className="flex" style={{ background: gradient }}>
             <div className="group hover:cursor-pointer flex flex-col sm:flex-row gap-4 px-4 bg-gradient-to-t from-white to-transparent pt-20 pb-10">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
@@ -22,9 +22,30 @@ function Highlight({ article }) {
                             {article.subtitle}
                         </span>
                     </div>
-                    <span className="text-base font-semibold leading-4">
-                        {article.author.name}
-                    </span>
+                    {article.author.type === "individual" ? (
+                        <>
+                            <span className="text-base font-semibold leading-4">
+                                {article.author.name}
+                            </span>
+                            <span className="text-base leading-4 text-gray-500">
+                                {article.views} views
+                            </span>
+                        </>
+                    ) : (
+                        <div className="flex items-center gap-1.5 ">
+                            <Link
+                                to={`/organization/${article.author.organization.id}`}
+                                className="text-sm font-semibold leading-4 hover:underline">
+                                {article.author.organization.name}
+                            </Link>
+                            <span>•</span>
+                            <Link
+                                className="text-sm font-semibold leading-4 hover:underline"
+                                to={`/organization/${article.author.organization.id}/${article.author.id}`}>
+                                <span>{article.author.name}</span>
+                            </Link>
+                        </div>
+                    )}
                 </div>
                 <img
                     className="aspect-[4/3] rounded-sm object-cover w-2/3 sm:w-1/2"
