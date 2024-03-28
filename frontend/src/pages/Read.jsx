@@ -22,7 +22,7 @@ function Read() {
             <TagRibbion />
             <div className="flex-col pb-10">
                 <div className="wrapper flex flex-col gap-3 py-6">
-                    <span className="font-serif text-2xl font-semibold mb-1">Latest</span>
+                    <span className="mb-1 font-serif text-2xl font-semibold">Latest</span>
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {articles.map((article, index) => (
                             <ArticleCard article={article} key={index} />
@@ -38,7 +38,7 @@ function Read() {
                     </div>
                 </div>
                 <div className="wrapper flex flex-col gap-3 py-6">
-                    <span className="font-serif text-2xl font-semibold mb-1">Technology</span>
+                    <span className="mb-1 font-serif text-2xl font-semibold">Technology</span>
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
                         {articles.slice(0, 3).map((article, index) => (
                             <ArticleCard key={index} article={article} />

@@ -21,24 +21,24 @@ function Article() {
         return (
             <div className="flex flex-col">
                 <div
-                    className={`flex flex-col items-center justify-center gap-10 py-8 px-4 border-b sm:gap-10 md:px-16 lg:px-32 md:flex-row ${article.header === "reverse" ? "md:flex-row" : "md:flex-row-reverse"}`}>
+                    className={`flex flex-col items-center justify-center gap-10 border-b px-4 py-8 sm:gap-10 md:flex-row md:px-16 lg:px-32 ${article.header === "reverse" ? "md:flex-row" : "md:flex-row-reverse"}`}>
                     <div className="flex flex-col text-center">
                         <Link
                             to={`/?tag=${article.category}`}
-                            className="hover:underline text-rose-500 uppercase font-serif mb-2">
+                            className="mb-2 font-serif uppercase text-rose-500 hover:underline">
                             {convertCategoryFormat(article.category)}
                         </Link>
-                        <h1 className="text-4xl font-semibold mb-4 font-serif">
+                        <h1 className="mb-4 font-serif text-4xl font-semibold">
                             {article.title}
                         </h1>
-                        <p className="text-base text-gray-800 mb-4 italic">
+                        <p className="mb-4 text-base italic text-gray-800">
                             {article.subtitle}
                         </p>
                         <div className="flex flex-col items-center">
                             {article.author.type === "individual" ? (
                                 <Link
                                     to={`/creator/${article.author.id}`}
-                                    className="text-gray-800 text-sm font-semibold hover:underline">
+                                    className="text-sm font-semibold text-gray-800 hover:underline">
                                     {article.author.name}
                                 </Link>
                             ) : (
@@ -56,7 +56,7 @@ function Article() {
                                     </Link>
                                 </div>
                             )}
-                            <p className="text-gray-500 text-sm mt-0.5 font-normal">
+                            <p className="mt-0.5 text-sm font-normal text-gray-500">
                                 {article.timestamp}
                             </p>
                         </div>
@@ -69,16 +69,16 @@ function Article() {
                     />
                 </div>
 
-                <div className="px-4 space-x-2 pt-3 text-sm md:px-16 lg:px-32">
+                <div className="space-x-2 px-4 pt-3 text-sm md:px-16 lg:px-32">
                     <span>{article.image.caption}</span>
                     <span className="text-gray-500">{article.image.credit}</span>
                 </div>
 
-                <div className="flex flex-col max-w-xl m-auto pt-12 px-5">
+                <div className="m-auto flex max-w-xl flex-col px-5 pt-12">
                     {article.content.map((block, index) => (
                         <div key={index} className="mb-6">
                             {block.type === "text" && (
-                                <p className="text-black leading-relaxed font-serif text-lg">
+                                <p className="font-serif text-lg leading-relaxed text-black">
                                     {block.text}
                                 </p>
                             )}
@@ -90,7 +90,7 @@ function Article() {
                                         alt={block.caption}
                                         loading="lazy"
                                     />
-                                    <div className="space-x-2 leading-5 text-sm">
+                                    <div className="space-x-2 text-sm leading-5">
                                         <span>{block.caption}</span>
                                         <span className="text-gray-500">{block.credit}</span>
                                     </div>
@@ -106,24 +106,24 @@ function Article() {
     if (article && article.display === "square") {
         return (
             <div className="flex flex-col">
-                <div className="grid grid-cols-2 h-2/3 items-center justify-center border-b">
-                    <div className="flex flex-1 flex-col text-center px-16">
+                <div className="grid h-2/3 grid-cols-2 items-center justify-center border-b">
+                    <div className="flex flex-1 flex-col px-16 text-center">
                         <Link
                             to={`/?tag=${article.category}`}
-                            className="hover:underline text-rose-500 uppercase font-serif mb-2">
+                            className="mb-2 font-serif uppercase text-rose-500 hover:underline">
                             {convertCategoryFormat(article.category)}
                         </Link>
-                        <h1 className="text-4xl font-semibold mb-4 font-serif">
+                        <h1 className="mb-4 font-serif text-4xl font-semibold">
                             {article.title}
                         </h1>
-                        <p className="text-base text-gray-800 mb-4 italic">
+                        <p className="mb-4 text-base italic text-gray-800">
                             {article.subtitle}
                         </p>
                         <div className="flex flex-col items-center">
                             {article.author.type === "individual" ? (
                                 <Link
                                     to={`/creator/${article.author.id}`}
-                                    className="text-gray-800 text-sm font-semibold hover:underline">
+                                    className="text-sm font-semibold text-gray-800 hover:underline">
                                     {article.author.name}
                                 </Link>
                             ) : (
@@ -141,14 +141,14 @@ function Article() {
                                     </Link>
                                 </div>
                             )}
-                            <p className="text-gray-500 text-sm mt-0.5 font-normal">
+                            <p className="mt-0.5 text-sm font-normal text-gray-500">
                                 {article.timestamp}
                             </p>
                         </div>
                     </div>
-                    <div className="h-[80vh] rounded-sm overflow-hidden flex items-center justify-center">
+                    <div className="flex h-[80vh] items-center justify-center overflow-hidden rounded-sm">
                         <img
-                            className="w-full object-cover h-full"
+                            className="h-full w-full object-cover"
                             src={article.image.url}
                             alt={article.image.caption}
                             loading="lazy"
@@ -156,16 +156,16 @@ function Article() {
                     </div>
                 </div>
 
-                <div className="px-4 space-x-2 pt-3 text-sm md:px-16 lg:px-32">
+                <div className="space-x-2 px-4 pt-3 text-sm md:px-16 lg:px-32">
                     <span>{article.image.caption}</span>
                     <span className="text-gray-500">{article.image.credit}</span>
                 </div>
 
-                <div className="flex flex-col max-w-xl m-auto pt-12 px-5">
+                <div className="m-auto flex max-w-xl flex-col px-5 pt-12">
                     {article.content.map((block, index) => (
                         <div key={index} className="mb-6">
                             {block.type === "text" && (
-                                <p className="text-black leading-relaxed font-serif text-lg">
+                                <p className="font-serif text-lg leading-relaxed text-black">
                                     {block.text}
                                 </p>
                             )}
@@ -177,7 +177,7 @@ function Article() {
                                         alt={block.caption}
                                         loading="lazy"
                                     />
-                                    <div className="space-x-2 leading-5 text-sm">
+                                    <div className="space-x-2 text-sm leading-5">
                                         <span>{block.caption}</span>
                                         <span className="text-gray-500">{block.credit}</span>
                                     </div>

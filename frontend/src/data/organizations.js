@@ -9,5 +9,24 @@ export const organizations = [
         followers: 123,
         verified: true,
         type: "organization",
+        subscription: [
+            {
+                name: "Premium",
+                features: [
+                    "One week of early access for every new post",
+                    "One Exclusive content every week",
+                ],
+                pricing: [
+                    {
+                        type: "monthly",
+                        price: 10,
+                    },
+                    {
+                        type: "yearly",
+                        price: 100,
+                    },
+                ],
+            },
+        ],
     },
 ]

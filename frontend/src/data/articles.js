@@ -4,6 +4,7 @@ export const articles = [
         display: "header",
         header: "default",
         title: "New York City Travel Posters Through the Decades",
+        views: "3.2k",
         subtitle:
             "Images from a century past showcase colorful dreams of a magnetic metropolis.",
         author: {
@@ -97,6 +98,7 @@ export const articles = [
         slug: "the-misguided-attempt-to-control-tikTok",
         display: "square",
         title: "The Misguided Attempt to Control TikTok",
+        views: "1.2k",
         subtitle:
             "The freedom to use social media is a First Amendment right, even if it’s one we should all avail ourselves of less often.",
         author: {

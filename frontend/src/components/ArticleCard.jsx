@@ -22,7 +22,7 @@ export const ArticleCard = ({ article }) => {
                 <span className="font-serif text-lg font-semibold leading-6 group-hover:underline group-hover:underline-offset-4">
                     {article.title}
                 </span>
-                <span className="line-clamp-4 text-sm font-normal text-gray-600 font-serif f">
+                <span className="f line-clamp-4 font-serif text-sm font-normal text-gray-800">
                     {article.subtitle}
                 </span>
                 <div className="mt-1 flex items-end justify-between">
@@ -31,7 +31,7 @@ export const ArticleCard = ({ article }) => {
                             <span className="text-sm font-semibold leading-4">
                                 {article.author.name}
                             </span>
-                            <span className="text-sm leading-4 text-gray-500">
+                            <span className="text-sm leading-4 text-gray-800">
                                 {article.views} views
                             </span>
                         </>

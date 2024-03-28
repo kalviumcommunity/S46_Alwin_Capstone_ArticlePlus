@@ -44,7 +44,7 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 z-30 flex flex-row justify-between border-b items-center bg-white sm:min-h-14 ${
+            className={`sticky top-0 z-30 flex flex-row items-center justify-between border-b bg-white sm:min-h-14 ${
                 scrolled ? "px-4 py-2.5 sm:px-6 lg:px-12" : "px-4 py-3 sm:px-8 lg:px-16"
             }`}
             id="navbar">
@@ -91,7 +91,7 @@ function Navbar() {
                                 </DropdownMenu.Item>
                             </Link>
                             <Link to="/creator">
-                                <DropdownMenu.Item className="dropdown-item text-black hover:text-white hover:bg-black">
+                                <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
                                     {user && user.creator ? "Dashboard" : "Become a Creator 🔦"}
                                 </DropdownMenu.Item>
                             </Link>
