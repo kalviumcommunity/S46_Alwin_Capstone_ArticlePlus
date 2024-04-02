@@ -112,7 +112,7 @@ function Creator() {
                         <Tabs.Root className="flex flex-col gap-2" defaultValue="for-followers">
                             <Tabs.List
                                 className="sticky top-12 z-40 flex flex-1 flex-row items-center gap-1 border-b bg-white pt-1 lg:top-14"
-                                aria-label="Creator tabs">
+                                aria-label="creator tabs">
                                 <Tabs.Trigger className="creator-tab" value="for-followers">
                                     For followers
                                 </Tabs.Trigger>

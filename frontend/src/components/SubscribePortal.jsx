@@ -191,10 +191,10 @@ function SubscribePortal({ details }) {
                     />
                 )}
             </Dialog.Content>
-            <Dialog.Close asChild>
+            <Dialog.Close asChild aria-label="close" className="z-50 hover:cursor-pointer">
                 <img
                     src="/assets/icons/close.svg"
-                    className="fixed right-4 top-4 z-50 rounded-full border-2 bg-white p-1 hover:cursor-pointer sm:right-5 sm:top-5"
+                    className="fixed right-5 top-5 rounded-full bg-white p-1.5 shadow-lg sm:right-5 sm:top-5"
                 />
             </Dialog.Close>
         </Dialog.Portal>
