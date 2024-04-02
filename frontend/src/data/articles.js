@@ -191,4 +191,57 @@ export const articles = [
             },
         ],
     },
+    {
+        slug: "elite-college-admissions-have-turned-students-into-brands",
+        display: "square",
+        title: "Elite College Admissions Have Turned Students Into Brands",
+        subtitle:
+            "In Los Angeles, a task force of detectives is battling organized retail theft, in which boosted goods often end up for sale online—or commingled on store shelves with legitimate items.",
+        author: {
+            name: "Sarah Bernstein",
+            id: "sarah-bernstein",
+            type: "organization",
+            organization: {
+                name: "The New York Times",
+                id: "the-new-york-times",
+            },
+        },
+        timestamp: "March 31, 2024",
+        category: "opinion",
+        image: {
+            url: "https://static01.nyt.com/images/2024/03/31/opinion/31bernstein/31bernstein-superJumbo.png?quality=75&auto=webp",
+            credit: "Janet Mac",
+            bg: "cover",
+        },
+        content: [
+            {
+                type: "text",
+                text: "“I just can’t think of anything,” my student said.",
+            },
+            {
+                type: "text",
+                text: "After 10 years of teaching college essay writing, I was familiar with this reply. For some reason, when you’re asked to recount an important experience from your life, it is common to forget everything that has ever happened to you. It’s a long-form version of the anxiety that takes hold at a corporate retreat when you’re invited to say “one interesting thing about yourself,” and you suddenly believe that you are the most boring person in the entire world. Once during a version of this icebreaker, a man volunteered that he had only one kidney, and I remember feeling incredibly jealous of him.",
+            },
+            {
+                type: "text",
+                text: "I tried to jog this student’s memory. What about his love of music? Or his experience learning English? Or that time on a summer camping trip when he and his friends had nearly drowned? “I don’t know,” he sighed. “That all seems kind of cliché.",
+            },
+            {
+                type: "text",
+                text: "Applying to college has always been about standing out. When I teach college essay workshops and coach applicants one on one, I see my role as helping students to capture their voice and their way of processing the world, things that are, by definition, unique to each individual. Still, many of my students (and their parents) worry that as getting into college becomes increasingly competitive, this won’t be enough to set them apart",
+            },
+            {
+                type: "text",
+                text: "Their anxiety in understandable. On Thursday, in a tradition known as “Ivy Day,” all eight Ivy League schools released their regular admission decisions. Top colleges often issue statements about how impressive (and competitive) their applicant pools were this cycle. The intention is to flatter accepted students and assuage rejected ones, but for those who have not yet applied to college, these statements reinforce the fear that there is an ever-expanding cohort of applicants with straight A’s and perfect SATs and harrowing camping trip stories all competing with one another for a vanishingly small number of spots.",
+            },
+            {
+                type: "text",
+                text: "This scarcity has led to a boom in the college consulting industry, now estimated to be a $2.9 billion business. In recent years, many of these advisers and companies have begun to promote the idea of personal branding — a way for teenagers to distinguish themselves by becoming as clear and memorable as a good tagline.",
+            },
+            {
+                type: "text",
+                text: "While this approach often leads to a strong application, students who brand themselves too early or too definitively risk missing out on the kind of exploration that will prepare them for adult life.",
+            },
+        ],
+    },
 ]

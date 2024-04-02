@@ -26,9 +26,7 @@ function Creator() {
 
     const handleFollowClick = () => {
         setIsFollowing()
-        setTimeout(() => {
-            setIsFollowing(!isFollowing)
-        }, 1000)
+        setIsFollowing(!isFollowing)
     }
 
     if (creator) {
@@ -100,7 +98,7 @@ function Creator() {
                                                 Subscriber
                                             </button>
                                             <span className="text-sm font-medium leading-4">
-                                                Starting at $10/month
+                                                Starting at ₹299/month
                                             </span>
                                         </div>
                                     )}

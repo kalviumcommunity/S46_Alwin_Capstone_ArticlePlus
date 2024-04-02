@@ -34,16 +34,12 @@ function Organization() {
 
     const handleFollow = () => {
         setIsFollowing()
-        setTimeout(() => {
-            setIsFollowing(!isFollowing)
-        }, 1000)
+        setIsFollowing(!isFollowing)
     }
 
     const handleSubscribe = () => {
         setIsSubscribed()
-        setTimeout(() => {
-            setIsSubscribed(!isSubscribed)
-        }, 1000)
+        setIsSubscribed(!isSubscribed)
     }
 
     if (organization && articles) {
@@ -154,7 +150,9 @@ function Organization() {
                                             <SubscribePortal details={organization} />
                                         </Dialog.Root>
                                         <span className="text-sm font-medium leading-4">
-                                            Starting at $10 /per month
+                                            Starting at ₹
+                                            {organization.subscriptions[0].pricing[0].price}
+                                            /per month
                                         </span>
                                     </div>
                                 </div>
