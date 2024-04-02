@@ -9,6 +9,7 @@ import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Creator from "@/pages/Creator"
 import Login from "@/pages/Login"
+import OnboardingCreator from "@/pages/OnboardingCreator2"
 import Organization from "@/pages/Organization"
 import Read from "@/pages/Read"
 import Signup from "@/pages/Signup"
@@ -64,6 +65,7 @@ function App() {
                         <Route path="/creator/:creator" element={<Creator />} />
                         <Route path="/organization/:id/:contributor" element={<Creator />} />
                         <Route path="/organization/:id" element={<Organization />} />
+                        <Route path="/onboarding" element={<OnboardingCreator />} />
                         <Route path="/read" element={<Navigate to="/" replace={true} />} />
                         <Route path="/login" element={<Navigate to="/read" replace={true} />} />
                         <Route

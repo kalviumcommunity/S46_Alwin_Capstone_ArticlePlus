@@ -90,11 +90,20 @@ function Navbar() {
                                     Account & Settings
                                 </DropdownMenu.Item>
                             </Link>
-                            <Link to="/creator">
-                                <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
-                                    {user && user.creator ? "Dashboard" : "Become a Creator 🔦"}
-                                </DropdownMenu.Item>
-                            </Link>
+                            {user && user.creator ? (
+                                <Link to="/dasboard">
+                                    <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
+                                        Dashboard
+                                    </DropdownMenu.Item>
+                                </Link>
+                            ) : (
+                                <Link to="/onboarding">
+                                    <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
+                                        Become a Creator 🔦
+                                    </DropdownMenu.Item>
+                                </Link>
+                            )}
+
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <DropdownMenu.Item
                                 className="dropdown-item bg-red-100 font-semibold text-red-500 hover:bg-red-500 hover:text-white"
