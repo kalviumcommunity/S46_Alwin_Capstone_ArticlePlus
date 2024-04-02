@@ -54,7 +54,7 @@ function Account() {
                 defaultValue="tab1">
                 <Tabs.List
                     className="flex flex-1 flex-row items-start gap-2 px-2 py-2 sm:mr-2 sm:max-w-56 sm:flex-col sm:px-4 sm:py-0"
-                    aria-label="Manage your account">
+                    aria-label="manage your account">
                     <Tabs.Trigger
                         className="w-fit border-b-2 border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-slate-50 sm:w-full sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-200 [&[data-state='active']]:bg-gray-50 [&[data-state='active']]:text-black"
                         value="tab1">

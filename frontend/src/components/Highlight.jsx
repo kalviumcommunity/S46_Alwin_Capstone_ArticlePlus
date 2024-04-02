@@ -12,13 +12,13 @@ function Highlight({ article }) {
 
     return (
         <Link to={`/${article.slug}`} className="flex" style={{ background: gradient }}>
-            <div className="group hover:cursor-pointer flex flex-col sm:flex-row gap-4 px-4 bg-gradient-to-t from-white to-transparent pt-20 pb-10">
+            <div className="group flex flex-col gap-4 bg-gradient-to-t from-white to-transparent px-4 pb-10 pt-20 hover:cursor-pointer sm:flex-row">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
                         <span className="font-serif text-3xl font-medium group-hover:underline group-hover:underline-offset-4 sm:text-2xl lg:text-3xl">
                             {article.title}
                         </span>
-                        <span className="font-serif line-clamp-4 text-base font-normal text-gray-700">
+                        <span className="line-clamp-4 font-serif text-base font-normal text-gray-700">
                             {article.subtitle}
                         </span>
                     </div>
@@ -48,7 +48,7 @@ function Highlight({ article }) {
                     )}
                 </div>
                 <img
-                    className="aspect-[4/3] rounded-sm object-cover w-2/3 sm:w-1/2"
+                    className="aspect-[4/3] w-2/3 rounded-sm object-cover sm:w-1/2"
                     src={article.image.url}
                     alt={article.image.caption}
                     loading="lazy"

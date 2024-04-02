@@ -39,7 +39,7 @@ export function Session({ session }) {
     }
 
     return (
-        <div className="grid w-full auto-rows-auto grid-cols-2 items-center gap-2 px-2 py-5 md:grid-cols-4 md:gap-0 lg:grid-cols-3 lg:py-3">
+        <div className="grid w-full auto-rows-auto grid-cols-2 items-center gap-y-3 px-2 py-5 md:grid-cols-4 md:gap-0 lg:grid-cols-3 lg:py-3">
             <div className="col-span-2 lg:col-span-1">
                 <span>{session.deviceInfo.deviceMetadata}</span>
                 {session._id === getCookie("refreshTokenId") && (
@@ -50,8 +50,8 @@ export function Session({ session }) {
                 )}
             </div>
             <span className="flex flex-col text-sm text-gray-800">
-                <span className="font-medium md:hidden">First login</span>
-                <div className="flex items-center gap-2 md:flex-col md:items-start md:gap-0">
+                <span className="font-semibold md:hidden">First login</span>
+                <div className="flex flex-col items-start gap-0">
                     <span className="text-base font-normal">
                         {new Date(session.createdAt).toLocaleString("en-US", {
                             timeZone: timeZone,
@@ -66,7 +66,7 @@ export function Session({ session }) {
                     </span>
                 </div>
             </span>
-            <div className="mt-auto flex justify-end sm:mt-0 lg:justify-start">
+            <div className="flex justify-end md:col-start-4 md:col-end-5 lg:col-start-3 lg:col-end-4 lg:justify-start">
                 <Dialog.Root>
                     <Dialog.Trigger className="w-fit rounded-full bg-red-50 px-5 py-1 font-medium text-red-500 hover:bg-red-500 hover:text-white">
                         Log out
@@ -110,7 +110,7 @@ export function Session({ session }) {
                                         minutes after log out.
                                     </Dialog.Description>
                                     <div className="flex flex-col gap-4">
-                                        <div className="col-span-2 lg:col-span-1">
+                                        <div>
                                             <span>{session.deviceInfo.deviceMetadata}</span>
                                             {session._id === getCookie("refreshTokenId") && (
                                                 <span className="flex items-center gap-1 text-sm font-normal text-gray-700">
