@@ -15,6 +15,14 @@
         0.1s color ease-in-out;
 }
 
+:root {
+    --color-rose-500: #f43f5e;
+}
+
+input[type="radio"] {
+    accent-color: var(--color-rose-500) !important;
+}
+
 @layer components {
     .wrapper {
         @apply flex flex-col gap-8 px-4 py-4 sm:flex-row sm:px-8 lg:px-16;
@@ -22,6 +30,10 @@
 
     .input {
         @apply w-full rounded-xl border-2 bg-gray-50 px-4 py-2 focus:outline-none;
+    }
+
+    .on-input {
+        @apply w-24 rounded-xl border-2 bg-gray-50 px-4 py-2 focus:outline-none;
     }
 
     .dropdown-item {

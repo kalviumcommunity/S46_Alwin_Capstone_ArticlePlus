@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 import * as Tabs from "@radix-ui/react-tabs"
 
@@ -10,14 +11,24 @@ import { Session } from "@/components/Session"
 
 function Account() {
     useSignals()
+    const location = useLocation()
 
     const [user, setUser] = useState(userDetails.value)
     const [gradient, setGradient] = useState("")
+    const [activeTab, setActiveTab] = useState("account")
 
     useSignalEffect(() => {
         randomGradient(setGradient)
         setUser(userDetails.value)
     })
+
+    useEffect(() => {
+        if (location.pathname.includes("/account/subscriptions")) {
+            setActiveTab("subscriptions")
+        } else {
+            setActiveTab("account")
+        }
+    }, [location.pathname])
 
     return (
         <div className="flex flex-col pb-10 pt-0">
@@ -46,29 +57,32 @@ function Account() {
                             </span>
                         </div>
                     </div>
-                    <div className="flex-1 font-medium">0 active memberships</div>
+                    <div className="flex-1 font-medium">0 active subscriptions</div>
                 </div>
             </div>
             <Tabs.Root
-                className="flex flex-col gap-2 divide-x py-2 sm:flex-row sm:gap-0 sm:px-8 sm:py-10 lg:px-16"
-                defaultValue="tab1">
+                className="flex flex-col gap-4 divide-x py-2 sm:flex-row sm:gap-0 sm:px-8 sm:py-10 lg:px-16"
+                value={activeTab}
+                onValueChange={setActiveTab}>
                 <Tabs.List
-                    className="flex flex-1 flex-row items-start gap-2 px-2 py-2 sm:mr-2 sm:max-w-56 sm:flex-col sm:px-4 sm:py-0"
+                    className="sticky top-12 flex flex-1 flex-row items-start gap-2 border-b bg-white px-2 py-2 pb-0 pt-3 sm:mr-2 sm:max-w-56 sm:flex-col sm:px-4 sm:py-0"
                     aria-label="manage your account">
                     <Tabs.Trigger
-                        className="w-fit border-b-2 border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-slate-50 sm:w-full sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-200 [&[data-state='active']]:bg-gray-50 [&[data-state='active']]:text-black"
-                        value="tab1">
-                        Account
+                        className="w-fit border-b-2 border-white px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-slate-50 sm:w-full sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-slate-800 [&[data-state='active']]:bg-slate-50 [&[data-state='active']]:text-black"
+                        value="account"
+                        asChild>
+                        <Link to="/account">Account</Link>
                     </Tabs.Trigger>
                     <Tabs.Trigger
-                        className="w-fit border-b-2 border-white  px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-slate-50 sm:w-full sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:bg-gray-50 [&[data-state='active']]:text-black"
-                        value="tab2">
-                        Purchases and memberships
+                        className="w-fit border-b-2 border-white px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-slate-50 sm:w-full sm:text-base [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-slate-800 [&[data-state='active']]:bg-slate-50 [&[data-state='active']]:text-black"
+                        value="subscriptions"
+                        asChild>
+                        <Link to="/account/subscriptions">Subscriptions and payments</Link>
                     </Tabs.Trigger>
                 </Tabs.List>
                 <div className="flex-auto px-4 sm:pl-4">
-                    <Tabs.Content value="tab1" className="flex flex-col gap-2">
-                        <div className="my-2 flex flex-col gap-3 sm:mx-4">
+                    <Tabs.Content value="account" className="flex flex-col gap-2">
+                        <div className="my-2 flex flex-col gap-2 sm:mx-4">
                             <span className="text-2xl font-semibold">Authentication</span>
                             <div className="grid auto-cols-auto divide-y">
                                 <div className="flex flex-1 items-center gap-4 py-4 sm:gap-0">
@@ -119,9 +133,9 @@ function Account() {
                             <span className="text-sm">*OS version maynot be accurate</span>
                         </div>
                     </Tabs.Content>
-                    <Tabs.Content value="tab2">
+                    <Tabs.Content value="subscriptions">
                         <div className="my-2 flex flex-col gap-2 sm:mx-4">
-                            <span className="mb-2 text-2xl font-semibold">Memberships</span>
+                            <span className="mb-2 text-2xl font-semibold">Subscriptions</span>
                         </div>
                     </Tabs.Content>
                 </div>

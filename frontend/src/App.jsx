@@ -9,7 +9,7 @@ import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Creator from "@/pages/Creator"
 import Login from "@/pages/Login"
-import OnboardingCreator from "@/pages/OnboardingCreator2"
+import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
 import Read from "@/pages/Read"
 import Signup from "@/pages/Signup"
@@ -61,6 +61,7 @@ function App() {
                     <>
                         <Route index element={<Read />} />
                         <Route path="/account" element={<Account />} />
+                        <Route path="/account/subscriptions" element={<Account />} />
                         <Route path="/:slug" element={<Article />} />
                         <Route path="/creator/:creator" element={<Creator />} />
                         <Route path="/organization/:id/:contributor" element={<Creator />} />

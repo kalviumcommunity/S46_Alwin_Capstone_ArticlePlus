@@ -29,7 +29,7 @@ function Footer() {
             <div className="flex flex-col gap-3 px-4 py-6 pb-14 sm:flex-row sm:items-end sm:px-8 md:gap-0  lg:px-16">
                 <div className="flex flex-wrap items-end gap-2 sm:flex-1">
                     <div className="flex items-center gap-3">
-                        <img className="h-5" src="./logo.svg" alt="" />
+                        <img className="h-5 w-fit" src="/logo.svg" alt="" />
                         <span className="pt-[0.1rem] font-serif text-2xl font-bold leading-6">
                             Article+
                         </span>
