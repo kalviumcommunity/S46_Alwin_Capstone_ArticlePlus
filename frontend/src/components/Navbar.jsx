@@ -4,6 +4,7 @@ import { useSignalEffect } from "@preact/signals-react"
 import { useSignals } from "@preact/signals-react/runtime"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
+import { isUserCreator } from "@/signals/creator"
 import { userDetails, userExists } from "@/signals/user"
 import { getCookie, setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
@@ -90,8 +91,8 @@ function Navbar() {
                                     Account & Settings
                                 </DropdownMenu.Item>
                             </Link>
-                            {user && user.creator ? (
-                                <Link to="/dasboard">
+                            {(user && user.creator) || (user && isUserCreator.value) ? (
+                                <Link to="/dashboard">
                                     <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
                                         Dashboard
                                     </DropdownMenu.Item>
