@@ -45,6 +45,52 @@ export const articles = [
         ],
     },
     {
+        slug: "new-york-city-travel-posters-through-the-decades",
+        display: "header",
+        header: "default",
+        title: "New York City Travel Posters Through the Decades",
+        views: "3.2k",
+        subtitle:
+            "Images from a century past showcase colorful dreams of a magnetic metropolis.",
+        author: {
+            name: "Nicholas D. Lowry",
+            id: "nicholas-d-lowry",
+            type: "individual",
+        },
+        paywall: true,
+        timestamp: "March 24, 2024",
+        category: "culture-desk",
+        image: {
+            url: "https://media.newyorker.com/photos/65fc513fa938d6709b3d8be7/master/w_1920,c_limit/WonderCityOfTheWorld_p067a_web.jpg",
+            credit: "Courtesy Poster Photo Archives, Posters Please Inc., N.Y.C.",
+            caption: `“New York Central Building,” by Chesley Bonestell (1930).`,
+        },
+        content: [
+            {
+                type: "text",
+                text: "New York has long loomed large in the traveller’s imagination, most notably in the olden, jet-setting days when getting there was half the fun. A new book, “Wonder City of the World: New York City Travel Posters,” out this month, coupled with a forthcoming exhibit at Poster House, presents a compelling history of New York City tourism through travel posters. In the retrospective, which starts at the close of the nineteenth century and takes us through the decades, ocean liners give way to airplanes, graphic styles evolve, and skyscrapers climb ever higher. At the beginning of the twenty-first century, one of the recurrent visual symbols of the city, the Twin Towers, fell. New York City tourism declined, and, even as it recovered, the tradition of printed posters had passed its prime. But the images, some of which are gathered below, remain. Together, they depict a cumulative dream of a city forever in motion, still beckoning to be discovered. —Françoise Mouly & Genevieve Bormes",
+            },
+            {
+                type: "img",
+                url: "https://media.newyorker.com/photos/65fc51415755d6f118155581/master/w_1600,c_limit/WonderCityOfTheWorld_p017a_web.jpg",
+                caption: `“Barnum & Bailey/Coney Island” (1898).`,
+                credit: `Poster Photo Archives, Posters Please Inc., N.Y.C.`,
+            },
+            {
+                type: "img",
+                url: "https://media.newyorker.com/photos/65fc5140e257056eed36f98b/master/w_1600,c_limit/WonderCityOfTheWorld_p092a_web.jpg",
+                caption: `French Line/New York,” by Harry Hudson Rodmell (circa 1932).`,
+                credit: `WorldPhotos / Alamy Stock Photo`,
+            },
+            {
+                type: "img",
+                url: "https://media.newyorker.com/photos/65fc5141755f36e15251f676/master/w_1600,c_limit/WonderCityOfTheWorld_p236a_web.jpg",
+                caption: `“New York/Delta Air Lines” (1993).`,
+                credit: `Courtesy Collection Galerie 1 2 3, Geneva/Switzerland`,
+            },
+        ],
+    },
+    {
         slug: "the-next-targets-for-the-group-that-overturned-roe",
         display: "header",
         header: "reverse",

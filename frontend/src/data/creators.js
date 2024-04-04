@@ -13,7 +13,30 @@ export const creators = [
         description:
             "Hey there! I'm Nicholas D Lowry, and I love sharing my art with the world. Thanks for stopping by!",
         type: "individual",
-        membership: "true",
+        subscription: true,
+        subscriptions: [
+            {
+                name: "premium",
+                features: [
+                    "One week of early access for every new post",
+                    "One Exclusive content every week",
+                ],
+                pricing: [
+                    {
+                        plan: "premium",
+                        type: "monthly",
+                        price: 299,
+                    },
+                    {
+                        plan: "premium",
+                        type: "yearly",
+                        actualPrice: 3588,
+                        discount: 598,
+                        price: 2990,
+                    },
+                ],
+            },
+        ],
     },
     {
         id: "david-d-kirkpatrick",
@@ -26,6 +49,7 @@ export const creators = [
             subscription: 9,
         },
         verified: true,
+        subscription: false,
         description:
             "David D Kirkpatrick is an investigative journalist uncovering stories that matter.",
         type: "organization",
@@ -45,10 +69,34 @@ export const creators = [
             free: 1,
             subscription: 8,
         },
+        subscription: true,
         verified: true,
         description:
             "Hey there! It's Jay Caspian Kang, and I love writing about issues that matter to me. Thanks for reading!",
         type: "individual",
+        subscriptions: [
+            {
+                name: "premium",
+                features: [
+                    "One week of early access for every new post",
+                    "One Exclusive content every week",
+                ],
+                pricing: [
+                    {
+                        plan: "premium",
+                        type: "monthly",
+                        price: 299,
+                    },
+                    {
+                        plan: "premium",
+                        type: "yearly",
+                        actualPrice: 3588,
+                        discount: 598,
+                        price: 2990,
+                    },
+                ],
+            },
+        ],
     },
     {
         id: "paige-williams",
@@ -61,6 +109,7 @@ export const creators = [
             subscription: 3,
         },
         verified: true,
+        subscription: false,
         description:
             "Paige Williams is an investigative journalist with a keen eye for detail.",
         type: "organization",

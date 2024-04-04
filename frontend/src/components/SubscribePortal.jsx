@@ -138,8 +138,8 @@ function SubscribePortal({ details }) {
                             Access to exclusive content
                         </span>
                         <div className="grid-rows-auto grid grid-cols-2 gap-3">
-                            {selectedSubscription.features.map((feature) => (
-                                <div className="flex rounded-md border-2 px-3 py-2">
+                            {selectedSubscription.features.map((feature, index) => (
+                                <div className="flex rounded-md border-2 px-3 py-2" key={index}>
                                     <span className="text-base font-medium">{feature}</span>
                                 </div>
                             ))}
@@ -150,10 +150,11 @@ function SubscribePortal({ details }) {
                                 Choose your subscription plan
                             </span>
                             <div className="flex gap-3">
-                                {selectedSubscription.pricing.map((pricing) => (
+                                {selectedSubscription.pricing.map((pricing, index) => (
                                     <div
                                         className="flex flex-1 flex-col justify-between rounded-xl border-2 px-4 py-3"
-                                        onClick={() => handlePaymentTypeSelect(pricing)}>
+                                        onClick={() => handlePaymentTypeSelect(pricing)}
+                                        key={index}>
                                         <div className="flex flex-col">
                                             <span className="text-sm font-medium capitalize text-gray-800">
                                                 {pricing.type}

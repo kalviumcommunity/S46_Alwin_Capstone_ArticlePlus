@@ -44,13 +44,13 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 z-30 flex flex-row items-center justify-between border-b bg-white sm:min-h-14 ${
+            className={`sticky top-0 z-40 flex flex-row items-center justify-between border bg-white sm:min-h-14 ${
                 scrolled ? "px-4 py-2.5 sm:px-6 lg:px-12" : "px-4 py-3 sm:px-8 lg:px-16"
             }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-2">
                 <>
-                    <img className="h-5" src="./logo.svg" alt="" />
+                    <img className="h-5 w-fit" src="/logo.svg" alt="" />
                     <span className="pt-[0.1rem] font-serif text-2xl font-bold leading-6">
                         Article+
                     </span>
@@ -90,11 +90,20 @@ function Navbar() {
                                     Account & Settings
                                 </DropdownMenu.Item>
                             </Link>
-                            <Link to="/creator">
-                                <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
-                                    {user && user.creator ? "Dashboard" : "Become a Creator 🔦"}
-                                </DropdownMenu.Item>
-                            </Link>
+                            {user && user.creator ? (
+                                <Link to="/dasboard">
+                                    <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
+                                        Dashboard
+                                    </DropdownMenu.Item>
+                                </Link>
+                            ) : (
+                                <Link to="/onboarding">
+                                    <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
+                                        Become a Creator 🔦
+                                    </DropdownMenu.Item>
+                                </Link>
+                            )}
+
                             <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                             <DropdownMenu.Item
                                 className="dropdown-item bg-red-100 font-semibold text-red-500 hover:bg-red-500 hover:text-white"

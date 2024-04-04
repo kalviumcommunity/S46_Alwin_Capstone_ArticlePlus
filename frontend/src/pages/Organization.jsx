@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as Tabs from "@radix-ui/react-tabs"
 
@@ -13,12 +13,13 @@ import { organizations } from "@/data/organizations"
 
 function Organization() {
     const { id } = useParams()
+    const navigate = useNavigate()
 
     const [gradient, setGradient] = useState("")
     const [organization, setOrgansisation] = useState()
     const [articles, setArticles] = useState()
     const [isFollowing, setIsFollowing] = useState(false)
-    const [isSubscribed, setIsSubscribed] = useState()
+    const [isSubscribed, setIsSubscribed] = useState(false)
 
     useEffect(() => {
         randomGradient(setGradient)
@@ -33,13 +34,14 @@ function Organization() {
     }, [id])
 
     const handleFollow = () => {
-        setIsFollowing()
         setIsFollowing(!isFollowing)
     }
 
     const handleSubscribe = () => {
-        setIsSubscribed()
         setIsSubscribed(!isSubscribed)
+        if (isSubscribed === true) {
+            navigate("/account/subscriptions")
+        }
     }
 
     if (organization && articles) {
@@ -113,7 +115,7 @@ function Organization() {
                                                 <button
                                                     className={`flex h-9 w-fit min-w-28 items-center justify-center rounded-full border px-6 py-1 pr-5 text-base font-medium ${
                                                         isSubscribed === true
-                                                            ? "border-gray-300 bg-gray-50 hover:bg-gray-100"
+                                                            ? "border-gray-300 hover:bg-gray-100"
                                                             : isSubscribed === false
                                                               ? "border-red-100 bg-red-100 text-red-700"
                                                               : "bg-white text-black"
@@ -163,7 +165,7 @@ function Organization() {
                 <div className="pb-20 pt-2 sm:px-8 lg:px-16">
                     <Tabs.Root className="flex flex-col gap-2" defaultValue="for-followers">
                         <Tabs.List
-                            className="sticky top-12 z-40 flex flex-1 flex-row items-center gap-1 border-b bg-white pt-1 lg:top-14"
+                            className="sticky top-12 z-30 flex flex-1 flex-row items-center gap-1 border-b bg-white pt-1 lg:top-14"
                             aria-label="creator tabs">
                             <Tabs.Trigger className="creator-tab" value="for-followers">
                                 For followers

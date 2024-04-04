@@ -145,7 +145,7 @@ function Login() {
                             <div className="my-3">
                                 <button
                                     type="submit"
-                                    className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white underline decoration-white decoration-wavy">
+                                    className="w-full rounded-full border-2 border-black bg-rose-500 px-4 py-2 font-semibold text-white">
                                     Login
                                 </button>
                             </div>
