@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
+import { creatorInfo, isUserCreator } from "@/signals/creator"
 import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -8,6 +9,7 @@ import Account from "@/pages/Account"
 import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Creator from "@/pages/Creator"
+import Dashboard from "@/pages/Dashboard"
 import Login from "@/pages/Login"
 import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
@@ -66,7 +68,23 @@ function App() {
                         <Route path="/creator/:creator" element={<Creator />} />
                         <Route path="/organization/:id/:contributor" element={<Creator />} />
                         <Route path="/organization/:id" element={<Organization />} />
-                        <Route path="/onboarding" element={<OnboardingCreator />} />
+                        {isUserCreator.value ? (
+                            <>
+                                <Route path="/dashboard" element={<Dashboard />} />
+                                <Route
+                                    path="/onboarding"
+                                    element={<Navigate to="/dashboard" replace={true} />}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Route path="/onboarding" element={<OnboardingCreator />} />
+                                <Route
+                                    path="/dashboard"
+                                    element={<Navigate to="/onboarding" replace={true} />}
+                                />
+                            </>
+                        )}
                         <Route path="/read" element={<Navigate to="/" replace={true} />} />
                         <Route path="/login" element={<Navigate to="/read" replace={true} />} />
                         <Route

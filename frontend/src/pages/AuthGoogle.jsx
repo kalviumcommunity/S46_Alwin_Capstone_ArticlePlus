@@ -47,7 +47,7 @@ function AuthGoogle() {
                                 </Link>
                                 <Link
                                     to="/signup"
-                                    className="px-6 py-1 font-semibold underline decoration-rose-500">
+                                    className="px-6 py-1 font-semibold underline decoration-rose-500 decoration-wavy">
                                     Signup
                                 </Link>
                             </div>

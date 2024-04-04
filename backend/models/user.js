@@ -23,6 +23,12 @@ const userSchema = new mongoose.Schema({
     provider: { type: String, required: true, default: "email" },
     picture: { type: String },
     creator: { type: Boolean, default: false },
+    creatorId: {
+        type: String,
+        required: function () {
+            return this.creator === true
+        },
+    },
 })
 
 const User = mongoose.model("users", userSchema)
