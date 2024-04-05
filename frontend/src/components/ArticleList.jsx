@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 export const ArticleList = ({ article }) => {
     return (
         <Link
-            to={`/${article.slug}`}
+            to={`/article/${article.slug}`}
             className="group flex w-full flex-row-reverse items-center gap-5 hover:cursor-pointer lg:flex-row lg:gap-8">
             <div
                 className="flex h-fit w-40 items-center justify-center lg:w-96"

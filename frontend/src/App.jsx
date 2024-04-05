@@ -2,7 +2,7 @@ import React from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
-import { isUserCreator } from "@/signals/creator"
+import { creatorInfo, isUserCreator } from "@/signals/creator"
 import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -10,6 +10,7 @@ import Account from "@/pages/Account"
 import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Creator from "@/pages/Creator"
+import DashboardLayout from "@/pages/Dashboard/Layout"
 import Login from "@/pages/Login"
 import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
@@ -20,11 +21,16 @@ import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
 import SuspenseLoader from "@/components/SuspenseLoader"
 
-import DashboardLayout from "@/DashboardLayout"
-
 import "./App.css"
 
-const DashboardHome = React.lazy(() => import("@/pages/DashboardHome"))
+const DashboardHome = React.lazy(() => import("@/pages/Dashboard/Home"))
+const DashboardArticles = React.lazy(() => import("@/pages/Dashboard/Articles"))
+const DashboardAnalytics = React.lazy(() => import("@/pages/Dashboard/Analytics"))
+const DashboardSettings = React.lazy(() => import("@/pages/Dashboard/Settings"))
+
+const SuspenseHandler = ({ component }) => {
+    return <React.Suspense fallback={<SuspenseLoader />}>{component}</React.Suspense>
+}
 
 function Layout() {
     useSignals()
@@ -62,67 +68,70 @@ function App() {
     useSignals()
 
     return (
-        <Routes>
-            <Route path="/" element={<Layout />}>
-                {userExists.value === true ? (
-                    <>
-                        <Route index element={<Read />} />
-                        <Route path="/account" element={<Account />} />
-                        <Route path="/account/subscriptions" element={<Account />} />
-                        <Route path="/:slug" element={<Article />} />
-                        <Route path="/creator/:creator" element={<Creator />} />
-                        <Route path="/organization/:id/:contributor" element={<Creator />} />
-                        <Route path="/organization/:id" element={<Organization />} />
-                        {isUserCreator.value ? (
-                            <>
+        <div className="w-screen 2xl:max-w-screen-2xl">
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                    {userExists.value ? (
+                        <>
+                            <Route index element={<Read />} />
+                            <Route path="/account" element={<Account />} />
+                            <Route path="/account/subscriptions" element={<Account />} />
+                            <Route path="/article/:slug" element={<Article />} />
+                            <Route path="/creator/:creator" element={<Creator />} />
+                            <Route
+                                path="/organization/:id/:contributor"
+                                element={<Creator />}
+                            />
+                            <Route path="/organization/:id" element={<Organization />} />
+                            {isUserCreator.value ? (
                                 <Route path="/dashboard" element={<DashboardLayout />}>
                                     <Route
                                         index
                                         element={
-                                            <React.Suspense fallback={<SuspenseLoader />}>
-                                                <DashboardHome />
-                                            </React.Suspense>
+                                            <SuspenseHandler component={<DashboardHome />} />
+                                        }
+                                    />
+                                    <Route
+                                        path="articles"
+                                        element={
+                                            <SuspenseHandler
+                                                component={<DashboardArticles />}
+                                            />
+                                        }
+                                    />
+                                    <Route
+                                        path="analytics"
+                                        element={
+                                            <SuspenseHandler
+                                                component={<DashboardAnalytics />}
+                                            />
+                                        }
+                                    />
+                                    <Route
+                                        path="settings"
+                                        element={
+                                            <SuspenseHandler
+                                                component={<DashboardSettings />}
+                                            />
                                         }
                                     />
                                 </Route>
-                                <Route
-                                    path="/onboarding"
-                                    element={<Navigate to="/dashboard" replace={true} />}
-                                />
-                            </>
-                        ) : (
-                            <>
+                            ) : (
                                 <Route path="/onboarding" element={<OnboardingCreator />} />
-                                <Route
-                                    path="/dashboard"
-                                    element={<Navigate to="/onboarding" replace={true} />}
-                                />
-                            </>
-                        )}
-                        <Route path="/read" element={<Navigate to="/" replace={true} />} />
-                        <Route path="/login" element={<Navigate to="/read" replace={true} />} />
-                        <Route
-                            path="/signup"
-                            element={<Navigate to="/read" replace={true} />}
-                        />
-                        <Route
-                            path="auth/google"
-                            element={<Navigate to="/" replace={true} />}
-                        />
-                        <Route path="*" element={<Navigate to="/" replace={true} />} />
-                    </>
-                ) : (
-                    <>
-                        <Route index element={<Hero />} />
-                        <Route path="/signup" element={<Signup />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/auth/google" element={<AuthGoogle />} />
-                        <Route path="/read" element={<Navigate to="/login" replace={true} />} />
-                        <Route path="*" element={<Navigate to="/" replace={true} />} />
-                    </>
-                )}
-            </Route>
-        </Routes>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <Route index element={<Hero />} />
+                            <Route path="/signup" element={<Signup />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/auth/google" element={<AuthGoogle />} />
+                        </>
+                    )}
+                    <Route path="*" element={<Navigate to="/" replace={true} />} />
+                </Route>
+            </Routes>
+        </div>
     )
 }
 
