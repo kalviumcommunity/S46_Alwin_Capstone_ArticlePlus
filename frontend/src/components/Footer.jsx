@@ -1,7 +1,7 @@
 function Footer() {
     return (
         <div className="flex flex-col">
-            <div className="flex flex-col gap-8 border-t px-4 pb-14 pt-16 text-sm sm:flex-row sm:px-8 lg:px-16">
+            <div className="flex flex-col gap-8 border-t px-4 pb-10 pt-10 text-sm sm:flex-row sm:px-8 sm:pb-14 sm:pt-16 lg:px-16">
                 <div className="flex flex-col gap-6 sm:w-1/2">
                     <span className="font-semibold">For readers</span>
                     <div className="grid grid-cols-2 gap-3 text-gray-700">
@@ -26,7 +26,7 @@ function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col gap-3 px-4 py-6 pb-14 sm:flex-row sm:items-end sm:px-8 md:gap-0  lg:px-16">
+            <div className="z-40 flex flex-col gap-3 px-4 py-6 pb-8 sm:flex-row sm:items-end sm:px-8 sm:pb-14 md:gap-0 lg:px-16">
                 <div className="flex flex-wrap items-end gap-2 sm:flex-1">
                     <div className="flex items-center gap-3">
                         <img className="h-5 w-fit" src="/logo.svg" alt="" />

@@ -1,5 +1,6 @@
 import { effect, signal } from "@preact/signals-react"
 
+import { creatorInfo, isUserCreator } from "@/signals/creator"
 import { getCookie } from "@/helpers/cookies"
 
 const isUserLoggedIn = () => {
@@ -19,5 +20,8 @@ effect(() => {
 
     if (!userExists.value) {
         userDetails.value = {}
+        isUserCreator.value = {}
+        creatorInfo.value = {}
+        isUserCreator.value = false
     }
 })

@@ -1,6 +1,8 @@
+import React from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
+import { isUserCreator } from "@/signals/creator"
 import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -16,8 +18,13 @@ import Signup from "@/pages/Signup"
 import Footer from "@/components/Footer"
 import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
+import SuspenseLoader from "@/components/SuspenseLoader"
+
+import DashboardLayout from "@/DashboardLayout"
 
 import "./App.css"
+
+const DashboardHome = React.lazy(() => import("@/pages/DashboardHome"))
 
 function Layout() {
     useSignals()
@@ -66,7 +73,32 @@ function App() {
                         <Route path="/creator/:creator" element={<Creator />} />
                         <Route path="/organization/:id/:contributor" element={<Creator />} />
                         <Route path="/organization/:id" element={<Organization />} />
-                        <Route path="/onboarding" element={<OnboardingCreator />} />
+                        {isUserCreator.value ? (
+                            <>
+                                <Route path="/dashboard" element={<DashboardLayout />}>
+                                    <Route
+                                        index
+                                        element={
+                                            <React.Suspense fallback={<SuspenseLoader />}>
+                                                <DashboardHome />
+                                            </React.Suspense>
+                                        }
+                                    />
+                                </Route>
+                                <Route
+                                    path="/onboarding"
+                                    element={<Navigate to="/dashboard" replace={true} />}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Route path="/onboarding" element={<OnboardingCreator />} />
+                                <Route
+                                    path="/dashboard"
+                                    element={<Navigate to="/onboarding" replace={true} />}
+                                />
+                            </>
+                        )}
                         <Route path="/read" element={<Navigate to="/" replace={true} />} />
                         <Route path="/login" element={<Navigate to="/read" replace={true} />} />
                         <Route
