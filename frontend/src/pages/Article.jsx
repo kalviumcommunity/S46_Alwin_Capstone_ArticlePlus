@@ -24,8 +24,8 @@ function Article() {
                     className={`flex flex-col items-center justify-center gap-10 border-b px-4 py-8 sm:gap-10 md:flex-row md:px-16 lg:px-32 ${article.header === "reverse" ? "md:flex-row" : "md:flex-row-reverse"}`}>
                     <div className="flex flex-col text-center">
                         <Link
-                            to={`/?tag=${article.category}`}
-                            className="mb-2 font-serif uppercase text-rose-500 hover:underline">
+                            className="mb-2 font-serif uppercase text-rose-500 hover:underline"
+                            to={`/?tag=${article.category}`}>
                             {convertCategoryFormat(article.category)}
                         </Link>
                         <h1 className="mb-4 font-serif text-4xl font-semibold">

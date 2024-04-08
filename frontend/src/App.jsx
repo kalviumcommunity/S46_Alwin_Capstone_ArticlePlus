@@ -2,7 +2,7 @@ import React from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
-import { isUserCreator } from "@/signals/creator"
+import { creatorInfo, isUserCreator } from "@/signals/creator"
 import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -21,8 +21,6 @@ import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
 import SuspenseLoader from "@/components/ui/SuspenseLoader"
 
-import "./App.css"
-
 const DashboardHome = React.lazy(() => import("@/pages/Dashboard/Home"))
 const DashboardArticles = React.lazy(() => import("@/pages/Dashboard/Articles"))
 const DashboardAnalytics = React.lazy(() => import("@/pages/Dashboard/Analytics"))
@@ -38,10 +36,11 @@ function Layout() {
     useSignalEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const res = await axiosInstance.get("auth")
-                userDetails.value = res.data
+                const response = await axiosInstance.get("auth")
+                userDetails.value = response.data
+                isUserCreator.value = response.data.creator
             } catch (error) {
-                console.error("Error fetching user details:", error)
+                console.error(error)
             }
         }
 
@@ -49,11 +48,13 @@ function Layout() {
             fetchUserDetails()
         }
 
+        console.log(creatorInfo.value)
+
         if (userDetailsUpdate.value > 0) {
             const unsubscribe = userDetailsUpdate.subscribe(fetchUserDetails)
             return unsubscribe
         }
-    }, [])
+    })
 
     return (
         <>

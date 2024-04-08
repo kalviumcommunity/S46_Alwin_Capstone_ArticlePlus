@@ -1,23 +1,33 @@
 import { useState } from "react"
+import { redirect } from "react-router-dom"
+import imageCompression from "browser-image-compression"
 
 import { creatorInfo, isUserCreator } from "@/signals/creator"
+import axiosInstance from "@/axios"
 
 import OnboardingOptions from "@/components/OnboardingOptions"
 
 function OnboardingCreator() {
     const [step, setStep] = useState(1)
-    const [creatorType, setCreatorType] = useState("")
-    const [displayName, setDisplayName] = useState("")
-    const [profilePicture, setProfilePicture] = useState(null)
-    const [creatorId, setCreatorId] = useState("")
-    const [contributors, setContributors] = useState([])
     const [suggestedCreatorId, setSuggestedCreatorId] = useState("")
-    const [optionSubscription, setOptionSubscription] = useState({})
+
+    const [creatorForm, setCreatorForm] = useState({
+        id: "",
+        name: "",
+        picture: "",
+        description: "",
+        type: "",
+        subscription: false,
+        subscriptions: [],
+    })
 
     const [errors, setErrors] = useState({})
 
     const handleCreatorTypeChange = (event) => {
-        setCreatorType(event.target.value)
+        setCreatorForm((prevState) => ({
+            ...prevState,
+            type: event.target.value,
+        }))
     }
 
     const handleDisplayNameChange = (event) => {
@@ -26,9 +36,12 @@ function OnboardingCreator() {
 
         // Check if the trimmed value is empty or if the input value is empty
         if (trimmedValue === "" || value === "") {
-            setDisplayName("")
+            setCreatorForm((prevState) => ({
+                ...prevState,
+                name: "",
+                id: "",
+            }))
             setSuggestedCreatorId("")
-            setCreatorId("")
             setErrors((prevErrors) => ({
                 ...prevErrors,
                 displayName: "Display name cannot contain trailing spaces.",
@@ -38,11 +51,14 @@ function OnboardingCreator() {
 
         // Check if the value contains only allowed characters
         if (/^[a-zA-Z0-9\s]+$/.test(value)) {
-            setDisplayName(value)
             setErrors((prevErrors) => ({ ...prevErrors, displayName: "" }))
             const id = value.replace(/\s+/g, "-").toLowerCase()
             setSuggestedCreatorId(id)
-            setCreatorId(id)
+            setCreatorForm((prevState) => ({
+                ...prevState,
+                name: value,
+                id: id,
+            }))
         } else {
             setErrors((prevErrors) => ({
                 ...prevErrors,
@@ -51,18 +67,51 @@ function OnboardingCreator() {
         }
     }
 
-    const handleProfilePictureChange = (event) => {
-        setProfilePicture(event.target.files[0])
+    const handleDescriptionChange = (event) => {
+        setCreatorForm((prevState) => ({
+            ...prevState,
+            description: event.target.value,
+        }))
+    }
+
+    const handleProfilePictureChange = async (event) => {
+        const imageFile = event.target.files[0]
+        console.log("originalFile instanceof Blob", imageFile instanceof Blob)
+        console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`)
+
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+        }
+        try {
+            const compressedFile = await imageCompression(imageFile, options)
+            console.log("compressedFile instanceof Blob", compressedFile instanceof Blob)
+            console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`)
+
+            setCreatorForm((prevState) => ({
+                ...prevState,
+                picture: compressedFile,
+            }))
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const handleCreatorIdChange = (event) => {
         const value = event.target.value
         const id = value.replace(/\s+/g, "-").toLowerCase()
         if (/^[a-z0-9\s\-]+$/.test(id)) {
-            setCreatorId(id)
+            setCreatorForm((prevState) => ({
+                ...prevState,
+                id: id,
+            }))
             setErrors((prevErrors) => ({ ...prevErrors, creatorId: "" }))
         } else if (value === "") {
-            setCreatorId(id)
+            setCreatorForm((prevState) => ({
+                ...prevState,
+                id: id,
+            }))
             setErrors((prevErrors) => ({
                 ...prevErrors,
                 creatorId: "Please enter a valid creator id",
@@ -75,16 +124,19 @@ function OnboardingCreator() {
         }
     }
 
-    const resetForm = () => {
-        setStep(1)
-        setCreatorType("")
-        setDisplayName("")
-        setProfilePicture(null)
-        setCreatorId("")
-        setContributors([])
-        setSuggestedCreatorId("")
-        setOptionSubscription({})
-        setErrors({})
+    const onboardCreator = () => {
+        axiosInstance
+            .post("/creator/onboarding", creatorForm)
+            .then((response) => {
+                isUserCreator.value = true
+                creatorInfo.value = response.data
+                redirect("/dashboard")
+                console.log("successfully onboarded")
+            })
+            .catch((error) => {
+                console.error(error)
+                console.log("failed to onboard")
+            })
     }
 
     const handleNextStep = (event) => {
@@ -93,30 +145,37 @@ function OnboardingCreator() {
         if (step < 1 || step > 3) return
 
         if (step === 1) {
-            if (!creatorType) {
+            if (!creatorForm.type) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
                     creatorType: "Please select a creator type.",
                 }))
                 return
             }
-            if (!displayName) {
+            if (!creatorForm.name) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
                     displayName: "Please enter a display name.",
                 }))
                 return
             }
+            if (!creatorForm.description) {
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    description: "Please enter a description.",
+                }))
+                return
+            }
             setStep(step + 1)
         } else if (step === 2) {
-            if (!profilePicture) {
+            if (!creatorForm.picture) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
                     profilePicture: "Please upload a profile picture.",
                 }))
                 return
             }
-            if (!creatorId.match(/^[a-z0-9\-]+$/)) {
+            if (!creatorForm.id.match(/^[a-z0-9\-]+$/)) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
                     creatorId: "Please enter a valid creator ID.",
@@ -125,20 +184,7 @@ function OnboardingCreator() {
             }
             setStep(step + 1)
         } else if (step === 3) {
-            const creatorInfoObj = {
-                creatorType,
-                displayName,
-                profilePicture,
-                creatorId,
-                contributors,
-                optionSubscription,
-            }
-
-            console.log(creatorInfoObj)
-
-            creatorInfo.value = creatorInfoObj
-            isUserCreator.value = true
-            resetForm()
+            onboardCreator()
         }
     }
 
@@ -182,7 +228,7 @@ function OnboardingCreator() {
                                         <input
                                             type="radio"
                                             value="individual"
-                                            checked={creatorType === "individual"}
+                                            checked={creatorForm.type === "individual"}
                                             onChange={handleCreatorTypeChange}
                                             className="mr-1"
                                         />
@@ -192,7 +238,7 @@ function OnboardingCreator() {
                                         <input
                                             type="radio"
                                             value="organization"
-                                            checked={creatorType === "organization"}
+                                            checked={creatorForm.type === "organization"}
                                             onChange={handleCreatorTypeChange}
                                             className="mr-1"
                                         />
@@ -214,10 +260,10 @@ function OnboardingCreator() {
                                 <input
                                     type="text"
                                     id="displayName"
-                                    value={displayName}
+                                    value={creatorForm.name}
                                     onChange={handleDisplayNameChange}
                                     placeholder={
-                                        creatorType === "organization"
+                                        creatorForm.type === "organization"
                                             ? "Eg: New Yorker"
                                             : "Eg: John Doe"
                                     }
@@ -226,6 +272,31 @@ function OnboardingCreator() {
                                 {errors.displayName && (
                                     <p className="mt-2 text-sm font-medium text-red-500">
                                         {errors.displayName}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="description"
+                                    className="mb-2 block font-semibold">
+                                    Description:
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    type="text"
+                                    id="description"
+                                    value={creatorForm.description}
+                                    onChange={handleDescriptionChange}
+                                    placeholder={
+                                        creatorForm.type === "organization"
+                                            ? "The New Yorker is an American weekly magazine featuring journalism, commentary, criticism, essays, fiction, satire, cartoons, and poetry."
+                                            : "John Doe is an investigative journalist uncovering stories that matter."
+                                    }
+                                    className="input w-full"
+                                />
+                                {errors.description && (
+                                    <p className="mt-2 text-sm font-medium text-red-500">
+                                        {errors.description}
                                     </p>
                                 )}
                             </div>
@@ -241,10 +312,10 @@ function OnboardingCreator() {
                                 </label>
                                 <input
                                     type="file"
+                                    className="w-full rounded-xl border-2 px-3 py-2 file:mr-3 file:rounded-full file:border-0 file:bg-rose-50 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-rose-700 hover:file:bg-rose-100"
                                     id="profilePicture"
                                     onChange={handleProfilePictureChange}
                                     accept="image/*"
-                                    className="w-full rounded-xl border-2 px-3 py-2 file:mr-3 file:rounded-full file:border-0 file:bg-rose-50 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-rose-700 hover:file:bg-rose-100"
                                 />
                                 {errors.profilePicture && (
                                     <p className="mt-2 text-sm font-medium text-red-500">
@@ -259,7 +330,7 @@ function OnboardingCreator() {
                                 <input
                                     type="text"
                                     id="creatorId"
-                                    value={creatorId}
+                                    value={creatorForm.id}
                                     onChange={handleCreatorIdChange}
                                     className="input bg-white"
                                     placeholder="Eg: new-yorker"
@@ -280,7 +351,7 @@ function OnboardingCreator() {
                                         . You can update it manually if needed.
                                     </p>
                                 )}
-                                {suggestedCreatorId !== creatorId && (
+                                {suggestedCreatorId !== creatorForm.id && (
                                     <span
                                         className="ml-auto mt-1 w-fit rounded-full border border-rose-100 bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:cursor-pointer"
                                         onClick={() => setCreatorId(suggestedCreatorId)}>
@@ -301,10 +372,10 @@ function OnboardingCreator() {
                                         </div>
                                         <span className="w-full whitespace-normal break-all px-2 text-sm font-medium leading-4">
                                             articleplus.alwinsunil.in/
-                                            {creatorType === "organization"
+                                            {creatorForm.type === "organization"
                                                 ? "organization"
                                                 : "creator"}
-                                            /{creatorId || suggestedCreatorId}
+                                            /{creatorForm.id || suggestedCreatorId}
                                         </span>
                                     </div>
                                 </div>
@@ -314,8 +385,8 @@ function OnboardingCreator() {
 
                     {step === 3 && (
                         <OnboardingOptions
-                            creatorType={creatorType}
-                            setOptionSubscription={setOptionSubscription}
+                            creatorType={creatorForm.type}
+                            setCreatorForm={setCreatorForm}
                         />
                     )}
 

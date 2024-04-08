@@ -3,7 +3,7 @@ import * as Dialog from "@radix-ui/react-dialog"
 
 import Toggle from "@/components/ui/Toggle"
 
-function OnboardingOptions({ setOptionSubscription }) {
+function OnboardingOptions({ setCreatorForm }) {
     const [isSubscriptionOn, setIsSubscriptionOn] = useState(false)
     const [features, setFeatures] = useState([])
     const [monthlyPrice, setMonthlyPrice] = useState("")
@@ -94,7 +94,11 @@ function OnboardingOptions({ setOptionSubscription }) {
             }
         }
 
-        setOptionSubscription(subscriptionData)
+        setCreatorForm((prevState) => ({
+            ...prevState,
+            subscription: isSubscriptionOn,
+            subscriptions: isSubscriptionOn ? subscriptionData : [],
+        }))
     }, [
         isSubscriptionOn,
         features,
@@ -102,7 +106,7 @@ function OnboardingOptions({ setOptionSubscription }) {
         annualPrice,
         sellingPrice,
         offer,
-        setOptionSubscription,
+        setCreatorForm,
     ])
 
     return (

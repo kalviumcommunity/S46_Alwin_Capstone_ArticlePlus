@@ -31,7 +31,9 @@ function Signup() {
             .then((res) => {
                 userExists.value = true
             })
-            .catch((error) => setActionStatus(error.response.data))
+            .catch((error) => {
+                setActionStatus(error.response.data)
+            })
             .finally(() => {
                 setIsLoading(false)
                 reset()
