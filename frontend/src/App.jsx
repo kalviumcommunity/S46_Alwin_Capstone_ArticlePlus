@@ -2,7 +2,7 @@ import React from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
-import { creatorInfo, isUserCreator } from "@/signals/creator"
+import { isUserCreator } from "@/signals/creator"
 import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -19,7 +19,7 @@ import Signup from "@/pages/Signup"
 import Footer from "@/components/Footer"
 import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
-import SuspenseLoader from "@/components/SuspenseLoader"
+import SuspenseLoader from "@/components/ui/SuspenseLoader"
 
 import "./App.css"
 
@@ -68,7 +68,7 @@ function App() {
     useSignals()
 
     return (
-        <div className="w-screen 2xl:max-w-screen-2xl">
+        <div className="w-[100vw] sm:w-[calc(100vw-1rem)] 2xl:max-w-screen-2xl">
             <Routes>
                 <Route path="/" element={<Layout />}>
                     {userExists.value ? (

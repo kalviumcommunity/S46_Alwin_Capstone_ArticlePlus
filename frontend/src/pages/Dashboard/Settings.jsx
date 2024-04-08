@@ -1,5 +1,3 @@
-import React from "react"
-
 function DashboardSettings() {
     return (
         <div className="wrapper">

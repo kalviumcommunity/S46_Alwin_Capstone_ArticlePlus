@@ -183,13 +183,13 @@ function Creator() {
                                 </Tabs.Trigger>
                             </Tabs.List>
                             <Tabs.Content
-                                className="flex flex-col gap-8 px-4 pt-6 lg:w-2/3"
+                                className="flex flex-col gap-8 px-4 pt-6 transition-none data-[state='inactive']:hidden lg:w-2/3"
                                 value="for-followers">
                                 {articles.map((article, index) => (
                                     <ArticleList article={article} key={index} />
                                 ))}
                             </Tabs.Content>
-                            <Tabs.Content value="for-subscribers" asChild>
+                            <Tabs.Content value="for-subscribers">
                                 <ForSubscribers creator={creator} articles={articles} />
                             </Tabs.Content>
                         </Tabs.Root>

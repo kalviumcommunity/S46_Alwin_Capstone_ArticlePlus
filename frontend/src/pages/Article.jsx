@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom"
 
 import { convertCategoryFormat } from "@/utils/ui/convertCategoryFormat"
 
-import Loader from "@/components/Loader"
+import Loader from "@/components/ui/Loader"
 
 import { articles } from "@/data/articles"
 

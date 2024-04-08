@@ -1,4 +1,4 @@
-import ArticlesTable from "@/components/ArticlesTable"
+import ArticlesTable from "@/components/Dashboard/ArticlesTable"
 
 const articles = [
     {

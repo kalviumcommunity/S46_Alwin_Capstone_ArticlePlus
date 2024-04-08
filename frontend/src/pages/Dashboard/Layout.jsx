@@ -1,6 +1,6 @@
-import { Link, Outlet, useLocation } from "react-router-dom"
+import { Outlet } from "react-router-dom"
 
-import DashboardSubNav from "@/components/DashboardSubNav"
+import DashboardSubNav from "@/components/Dashboard/Nav"
 
 function DashboardLayout() {
     return (

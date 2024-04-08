@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 
-import ArticlesTable from "@/components/ArticlesTable"
+import ArticlesTable from "@/components/Dashboard/ArticlesTable"
 
 const articles = [
     {

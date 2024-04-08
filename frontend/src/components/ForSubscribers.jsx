@@ -1,4 +1,4 @@
-import { ArticleList } from "./ArticleList"
+import { ArticleList } from "@/components/ArticleList"
 
 function ForSubscribers({ articles }) {
     const subscriberArticles = articles.filter((article) => article.paywall === true)

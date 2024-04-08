@@ -5,7 +5,7 @@ import { userDetailsUpdate } from "@/signals/user"
 import { getCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/Loader"
+import Loader from "@/components/ui/Loader"
 
 export function Session({ session }) {
     const [loader, setLoader] = useState(false)
