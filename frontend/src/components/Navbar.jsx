@@ -45,7 +45,7 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 z-40 flex flex-row items-center justify-between border bg-white sm:min-h-14 ${
+            className={`sticky top-0 z-40 flex flex-row items-center justify-between border-b bg-white sm:min-h-14 ${
                 scrolled ? "px-4 py-2.5 sm:px-6 lg:px-12" : "px-4 py-3 sm:px-8 lg:px-16"
             }`}
             id="navbar">
@@ -78,7 +78,7 @@ function Navbar() {
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                         <DropdownMenu.Content
-                            className="DropdownMenuContent z-50 min-w-52 rounded-md border-2 bg-white"
+                            className="z-50 min-w-52 rounded-md border-2 bg-white"
                             align="end"
                             sideOffset={5}>
                             <div className="mx-3 my-2 flex flex-col px-2 py-1">

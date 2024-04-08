@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import * as Dialog from "@radix-ui/react-dialog"
 
-import Toggle from "@/components/Toggle"
+import Toggle from "@/components/ui/Toggle"
 
 function OnboardingOptions({ setOptionSubscription }) {
     const [isSubscriptionOn, setIsSubscriptionOn] = useState(false)

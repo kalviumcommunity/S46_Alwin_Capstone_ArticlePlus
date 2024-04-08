@@ -134,6 +134,8 @@ function OnboardingCreator() {
                 optionSubscription,
             }
 
+            console.log(creatorInfoObj)
+
             creatorInfo.value = creatorInfoObj
             isUserCreator.value = true
             resetForm()

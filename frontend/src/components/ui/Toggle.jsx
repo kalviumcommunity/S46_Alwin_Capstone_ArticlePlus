@@ -1,5 +1,3 @@
-import React, { useState } from "react"
-
 const Toggle = ({ state, setState }) => {
     const handleCheckboxChange = () => {
         setState(!state)

@@ -11,8 +11,8 @@ function Highlight({ article }) {
     }, [])
 
     return (
-        <Link to={`/${article.slug}`} className="flex" style={{ background: gradient }}>
-            <div className="group flex flex-col gap-4 bg-gradient-to-t from-white to-transparent px-4 pb-10 pt-20 hover:cursor-pointer sm:flex-row">
+        <Link to={`/article/${article.slug}`} className="flex" style={{ background: gradient }}>
+            <div className="group flex flex-col gap-8 bg-gradient-to-t from-white to-transparent px-4 pb-10 pt-20 hover:cursor-pointer sm:flex-row sm:gap-4">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
                         <span className="font-serif text-3xl font-medium group-hover:underline group-hover:underline-offset-4 sm:text-2xl lg:text-3xl">

@@ -6,7 +6,7 @@ import { useSignals } from "@preact/signals-react/runtime"
 import { userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/Loader"
+import Loader from "@/components/ui/Loader"
 
 function Login() {
     useSignals()
