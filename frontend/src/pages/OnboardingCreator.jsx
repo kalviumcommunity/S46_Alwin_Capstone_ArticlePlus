@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { redirect } from "react-router-dom"
-import imageCompression from "browser-image-compression"
 
 import { creatorInfo, isUserCreator } from "@/signals/creator"
 import axiosInstance from "@/axios"
@@ -76,26 +75,6 @@ function OnboardingCreator() {
 
     const handleProfilePictureChange = async (event) => {
         const imageFile = event.target.files[0]
-        console.log("originalFile instanceof Blob", imageFile instanceof Blob)
-        console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`)
-
-        const options = {
-            maxSizeMB: 1,
-            maxWidthOrHeight: 1920,
-            useWebWorker: true,
-        }
-        try {
-            const compressedFile = await imageCompression(imageFile, options)
-            console.log("compressedFile instanceof Blob", compressedFile instanceof Blob)
-            console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`)
-
-            setCreatorForm((prevState) => ({
-                ...prevState,
-                picture: compressedFile,
-            }))
-        } catch (error) {
-            console.log(error)
-        }
     }
 
     const handleCreatorIdChange = (event) => {
@@ -311,8 +290,8 @@ function OnboardingCreator() {
                                     Profile Picture:
                                 </label>
                                 <input
-                                    type="file"
                                     className="w-full rounded-xl border-2 px-3 py-2 file:mr-3 file:rounded-full file:border-0 file:bg-rose-50 file:px-4 file:py-1 file:text-sm file:font-semibold file:text-rose-700 hover:file:bg-rose-100"
+                                    type="file"
                                     id="profilePicture"
                                     onChange={handleProfilePictureChange}
                                     accept="image/*"

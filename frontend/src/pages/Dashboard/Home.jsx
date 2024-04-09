@@ -39,14 +39,14 @@ function DashboardHome() {
                     </Link>
                 </div>
                 <div className="cols grid auto-rows-auto grid-cols-3 gap-1 rounded border p-5 font-normal text-gray-700">
-                    <span className="col-span-2 font-medium">Followers</span>
-                    <span className="text-center font-semibold text-black">100</span>
+                    <span className="col-span-2">Followers</span>
+                    <span className="text-center font-medium text-black">100</span>
 
-                    <span className="col-span-2 font-medium">Subscribers</span>
-                    <span className="text-center font-semibold text-black">30</span>
+                    <span className="col-span-2">Subscribers</span>
+                    <span className="text-center font-medium text-black">30</span>
 
-                    <span className="col-span-2 font-medium">Views in last 1 month</span>
-                    <span className="text-center font-semibold text-black">482</span>
+                    <span className="col-span-2">Views in last 1 month</span>
+                    <span className="text-center font-medium text-black">482</span>
                 </div>
             </div>
         </div>

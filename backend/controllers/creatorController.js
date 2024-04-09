@@ -6,16 +6,18 @@ const getCreatorOnboard = async (req, res) => {
         const { userId } = req
         const payload = req.body
 
-        console.log(req.body)
-
         const user = await User.findById(userId)
         if (user.creator) {
             return res.json({ status: "failed", message: "User is already a creator" })
         }
 
-        const newCreator = await Creator({ ...payload, picture: "ello", owner: userId }).save()
+        const newCreator = await Creator({
+            ...payload,
+            picture: "placeholder-link",
+            owner: userId,
+        }).save()
 
-        await User.findByIdAndUpdate(userId, { creator: true })
+        await User.findByIdAndUpdate(userId, { creator: true, creatorId: newCreator.id })
 
         return res.json({ onboarding: "success", details: newCreator })
     } catch (error) {

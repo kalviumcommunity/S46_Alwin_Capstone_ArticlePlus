@@ -19,21 +19,12 @@ const CreatorSchema = new mongoose.Schema({
     subscriptions: {
         type: [
             {
-                name: { type: String, required: true },
+                name: { type: String, required: true, default: "default" },
                 features: [{ type: String, required: true }],
-                pricing: [
-                    {
-                        plan: { type: String, required: true },
-                        type: {
-                            type: String,
-                            required: true,
-                            enum: ["monthly", "yearly"],
-                        },
-                        price: { type: Number, required: true },
-                        actualPrice: { type: Number },
-                        discount: { type: Number },
-                    },
-                ],
+                monthlyPrice: { type: Number, required: true },
+                annualPrice: { type: Number, required: true },
+                sellingPrice: { type: Number, required: true },
+                offer: { type: { type: String }, value: { type: Number } },
             },
         ],
         default: function () {

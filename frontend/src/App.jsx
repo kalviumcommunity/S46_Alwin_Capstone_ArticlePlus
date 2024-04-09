@@ -2,7 +2,7 @@ import React from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
-import { creatorInfo, isUserCreator } from "@/signals/creator"
+import { isUserCreator } from "@/signals/creator"
 import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
@@ -31,31 +31,6 @@ const SuspenseHandler = ({ component }) => {
 }
 
 function Layout() {
-    useSignals()
-
-    useSignalEffect(() => {
-        const fetchUserDetails = async () => {
-            try {
-                const response = await axiosInstance.get("auth")
-                userDetails.value = response.data
-                isUserCreator.value = response.data.creator
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        if (userExists.value) {
-            fetchUserDetails()
-        }
-
-        console.log(creatorInfo.value)
-
-        if (userDetailsUpdate.value > 0) {
-            const unsubscribe = userDetailsUpdate.subscribe(fetchUserDetails)
-            return unsubscribe
-        }
-    })
-
     return (
         <>
             <Navbar />
@@ -65,8 +40,29 @@ function Layout() {
     )
 }
 
+const fetchUserDetails = async () => {
+    try {
+        const response = await axiosInstance.get("auth")
+        userDetails.value = response.data
+        isUserCreator.value = response.data.creator
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 function App() {
     useSignals()
+
+    useSignalEffect(() => {
+        if (userExists.value) {
+            fetchUserDetails()
+        }
+
+        if (userDetailsUpdate.value > 0) {
+            const unsubscribe = userDetailsUpdate.subscribe(fetchUserDetails)
+            return unsubscribe
+        }
+    })
 
     return (
         <div className="w-[100vw] sm:w-[calc(100vw-1rem)] 2xl:max-w-screen-2xl">
@@ -85,40 +81,51 @@ function App() {
                             />
                             <Route path="/organization/:id" element={<Organization />} />
                             {isUserCreator.value ? (
-                                <Route path="/dashboard" element={<DashboardLayout />}>
+                                <>
+                                    <Route path="/dashboard" element={<DashboardLayout />}>
+                                        <Route
+                                            index
+                                            element={
+                                                <SuspenseHandler
+                                                    component={<DashboardHome />}
+                                                />
+                                            }
+                                        />
+                                        <Route
+                                            path="articles"
+                                            element={
+                                                <SuspenseHandler
+                                                    component={<DashboardArticles />}
+                                                />
+                                            }
+                                        />
+                                        <Route
+                                            path="analytics"
+                                            element={
+                                                <SuspenseHandler
+                                                    component={<DashboardAnalytics />}
+                                                />
+                                            }
+                                        />
+                                        <Route
+                                            path="settings"
+                                            element={
+                                                <SuspenseHandler
+                                                    component={<DashboardSettings />}
+                                                />
+                                            }
+                                        />
+                                    </Route>
                                     <Route
-                                        index
-                                        element={
-                                            <SuspenseHandler component={<DashboardHome />} />
-                                        }
+                                        path="/onboarding"
+                                        element={<Navigate to="/dashboard" replace={true} />}
                                     />
-                                    <Route
-                                        path="articles"
-                                        element={
-                                            <SuspenseHandler
-                                                component={<DashboardArticles />}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="analytics"
-                                        element={
-                                            <SuspenseHandler
-                                                component={<DashboardAnalytics />}
-                                            />
-                                        }
-                                    />
-                                    <Route
-                                        path="settings"
-                                        element={
-                                            <SuspenseHandler
-                                                component={<DashboardSettings />}
-                                            />
-                                        }
-                                    />
-                                </Route>
+                                </>
                             ) : (
-                                <Route path="/onboarding" element={<OnboardingCreator />} />
+                                <>
+                                    <Route path="/onboarding" element={<OnboardingCreator />} />
+                                    <Route path="/dashboard" element={<Navigate to="/" />} />
+                                </>
                             )}
                         </>
                     ) : (
@@ -129,7 +136,6 @@ function App() {
                             <Route path="/auth/google" element={<AuthGoogle />} />
                         </>
                     )}
-                    <Route path="*" element={<Navigate to="/" replace={true} />} />
                 </Route>
             </Routes>
         </div>

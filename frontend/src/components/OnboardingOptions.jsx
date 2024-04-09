@@ -79,10 +79,6 @@ function OnboardingOptions({ setCreatorForm }) {
     }, [monthlyPrice, offer])
 
     useEffect(() => {
-        let subscriptionData = {
-            isSubscriptionOn,
-        }
-
         if (isSubscriptionOn) {
             subscriptionData = {
                 features,
@@ -90,7 +86,6 @@ function OnboardingOptions({ setCreatorForm }) {
                 annualPrice,
                 sellingPrice,
                 offer,
-                ...subscriptionData,
             }
         }
 
@@ -197,7 +192,7 @@ function OnboardingOptions({ setCreatorForm }) {
                                     type="number"
                                     className="on-input"
                                     value={monthlyPrice}
-                                    onChange={(e) => setMonthlyPrice(e.target.value)}
+                                    onChange={(e) => setMonthlyPrice(parseInt(e.target.value))}
                                 />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -235,7 +230,7 @@ function OnboardingOptions({ setCreatorForm }) {
                                             onChange={(e) =>
                                                 setOffer({
                                                     ...offer,
-                                                    value: e.target.value,
+                                                    value: parseInt(e.target.value),
                                                 })
                                             }
                                             min="0"
