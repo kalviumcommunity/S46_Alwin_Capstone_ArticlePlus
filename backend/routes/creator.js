@@ -1,13 +1,19 @@
 const express = require("express")
+const multer = require("multer")
+
+const router = express.Router()
 
 const asyncHandler = require("../middlewares/asyncHandler")
 const { verifyToken } = require("../middlewares/verifyToken")
-const router = require("./auth")
 
-const { getCreatorOnboard } = require("../controllers/creatorController")
+const { onboardCreator, settingsCreatorInfo } = require("../controllers/creatorController")
+
+const inMemoryStorage = multer.memoryStorage()
+const upload = multer({ inMemoryStorage })
 
 router.use(asyncHandler(verifyToken))
 
-router.post("/onboarding", asyncHandler(getCreatorOnboard))
+router.post("/onboarding", upload.single("displayPicture"), asyncHandler(onboardCreator))
+router.get("/auth/info", asyncHandler(settingsCreatorInfo))
 
 module.exports = router

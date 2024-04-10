@@ -5,14 +5,16 @@ import Toggle from "@/components/ui/Toggle"
 
 function OnboardingOptions({ setCreatorForm }) {
     const [isSubscriptionOn, setIsSubscriptionOn] = useState(false)
+
     const [features, setFeatures] = useState([])
     const [monthlyPrice, setMonthlyPrice] = useState("")
     const [annualPrice, setAnnualPrice] = useState("")
     const [sellingPrice, setSellingPrice] = useState("")
     const [offer, setOffer] = useState({ type: "amount", value: "" })
-    const [newFeature, setNewFeature] = useState("")
+    const [subscriptionDetails, setSubscriptionDetails] = useState(null)
 
     const [openAddFeatureDialog, setOpenAddFeatureDialog] = useState(false)
+    const [newFeature, setNewFeature] = useState("")
     const [isHovered, setIsHovered] = useState(false)
     const [hoveredIndex, setHoveredIndex] = useState(null)
 
@@ -80,29 +82,23 @@ function OnboardingOptions({ setCreatorForm }) {
 
     useEffect(() => {
         if (isSubscriptionOn) {
-            subscriptionData = {
-                features,
-                monthlyPrice,
-                annualPrice,
-                sellingPrice,
-                offer,
-            }
+            setSubscriptionDetails([
+                {
+                    features,
+                    monthlyPrice,
+                    annualPrice,
+                    sellingPrice,
+                    offer,
+                },
+            ])
         }
 
         setCreatorForm((prevState) => ({
             ...prevState,
             subscription: isSubscriptionOn,
-            subscriptions: isSubscriptionOn ? subscriptionData : [],
+            subscriptions: isSubscriptionOn ? JSON.stringify(subscriptionDetails) : [],
         }))
-    }, [
-        isSubscriptionOn,
-        features,
-        monthlyPrice,
-        annualPrice,
-        sellingPrice,
-        offer,
-        setCreatorForm,
-    ])
+    }, [isSubscriptionOn, features, monthlyPrice, annualPrice, sellingPrice, offer])
 
     return (
         <div className="mt-4 flex flex-col gap-5 px-1">
