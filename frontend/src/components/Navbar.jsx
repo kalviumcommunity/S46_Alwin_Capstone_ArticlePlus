@@ -46,16 +46,14 @@ function Navbar() {
     return (
         <div
             className={`sticky top-0 z-40 flex flex-row items-center justify-between border-b bg-white sm:min-h-14 ${
-                scrolled ? "px-4 py-2.5 sm:px-6 lg:px-12" : "px-4 py-3 sm:px-8 lg:px-16"
+                scrolled ? "px-4 py-3 sm:px-6 lg:px-12" : "px-4 py-3.5 sm:px-8 lg:px-16"
             }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-2">
-                <>
-                    <img className="h-5 w-fit" src="/logo.svg" alt="" />
-                    <span className="pt-[0.1rem] font-serif text-2xl font-bold leading-6">
-                        Article+
-                    </span>
-                </>
+                <img className="h-5 w-fit" src="/logo.svg" alt="" />
+                <span className="pt-[0.1rem] font-serif text-2xl font-bold leading-6">
+                    Article
+                </span>
             </Link>
             {user && user.name && (
                 <DropdownMenu.Root>

@@ -17,9 +17,7 @@ const Toggle = ({ state, setState }) => {
                         state ? "bg-[#212b36]" : "bg-[#CCCCCE]"
                     }`}>
                     <span
-                        className={`h-5 w-5 rounded-full bg-white duration-200 ${
-                            state ? "translate-x-5" : ""
-                        }`}></span>
+                        className={`h-5 w-5 rounded-full bg-white duration-200 ${state ? "translate-x-5" : ""}`}></span>
                 </span>
             </label>
         </>

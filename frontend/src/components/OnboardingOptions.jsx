@@ -3,16 +3,18 @@ import * as Dialog from "@radix-ui/react-dialog"
 
 import Toggle from "@/components/ui/Toggle"
 
-function OnboardingOptions({ setOptionSubscription }) {
+function OnboardingOptions({ setCreatorForm }) {
     const [isSubscriptionOn, setIsSubscriptionOn] = useState(false)
+
     const [features, setFeatures] = useState([])
     const [monthlyPrice, setMonthlyPrice] = useState("")
     const [annualPrice, setAnnualPrice] = useState("")
     const [sellingPrice, setSellingPrice] = useState("")
     const [offer, setOffer] = useState({ type: "amount", value: "" })
-    const [newFeature, setNewFeature] = useState("")
+    const [subscriptionDetails, setSubscriptionDetails] = useState(null)
 
     const [openAddFeatureDialog, setOpenAddFeatureDialog] = useState(false)
+    const [newFeature, setNewFeature] = useState("")
     const [isHovered, setIsHovered] = useState(false)
     const [hoveredIndex, setHoveredIndex] = useState(null)
 
@@ -79,31 +81,24 @@ function OnboardingOptions({ setOptionSubscription }) {
     }, [monthlyPrice, offer])
 
     useEffect(() => {
-        let subscriptionData = {
-            isSubscriptionOn,
-        }
-
         if (isSubscriptionOn) {
-            subscriptionData = {
-                features,
-                monthlyPrice,
-                annualPrice,
-                sellingPrice,
-                offer,
-                ...subscriptionData,
-            }
+            setSubscriptionDetails([
+                {
+                    features,
+                    monthlyPrice,
+                    annualPrice,
+                    sellingPrice,
+                    offer,
+                },
+            ])
         }
 
-        setOptionSubscription(subscriptionData)
-    }, [
-        isSubscriptionOn,
-        features,
-        monthlyPrice,
-        annualPrice,
-        sellingPrice,
-        offer,
-        setOptionSubscription,
-    ])
+        setCreatorForm((prevState) => ({
+            ...prevState,
+            subscription: isSubscriptionOn,
+            subscriptions: isSubscriptionOn ? JSON.stringify(subscriptionDetails) : [],
+        }))
+    }, [isSubscriptionOn, features, monthlyPrice, annualPrice, sellingPrice, offer])
 
     return (
         <div className="mt-4 flex flex-col gap-5 px-1">
@@ -193,7 +188,7 @@ function OnboardingOptions({ setOptionSubscription }) {
                                     type="number"
                                     className="on-input"
                                     value={monthlyPrice}
-                                    onChange={(e) => setMonthlyPrice(e.target.value)}
+                                    onChange={(e) => setMonthlyPrice(parseInt(e.target.value))}
                                 />
                             </label>
                             <label className="flex flex-col gap-1">
@@ -231,7 +226,7 @@ function OnboardingOptions({ setOptionSubscription }) {
                                             onChange={(e) =>
                                                 setOffer({
                                                     ...offer,
-                                                    value: e.target.value,
+                                                    value: parseInt(e.target.value),
                                                 })
                                             }
                                             min="0"

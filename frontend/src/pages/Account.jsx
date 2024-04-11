@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 import * as Tabs from "@radix-ui/react-tabs"
 
+import { isUserCreator } from "@/signals/creator"
 import { userDetails } from "@/signals/user"
 import { randomGradient } from "@/utils/ui/randomGradient"
 
@@ -52,12 +53,12 @@ function Account() {
                         )}
                         <div className="flex flex-col">
                             <span className="text-xl font-semibold leading-7">{user.name}</span>
-                            <span className="text-sm leading-4 text-gray-800 opacity-90">
+                            <span className="text-sm leading-4 text-gray-700">
                                 {user.email}
                             </span>
                         </div>
                     </div>
-                    <div className="flex-1 font-medium">0 active subscriptions</div>
+                    <div className="flex-1 font-medium  ">0 active subscriptions</div>
                 </div>
             </div>
             <Tabs.Root
@@ -68,17 +69,24 @@ function Account() {
                     className="sticky top-12 flex flex-1 flex-row items-start gap-2 border-b bg-white px-2 py-2 pb-0 pt-3 sm:mr-2 sm:max-w-56 sm:flex-col sm:border-0 sm:px-4 sm:py-0"
                     aria-label="manage your account">
                     <Tabs.Trigger
-                        className="w-fit rounded border border-white px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-50 sm:w-full sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                        className="w-fit rounded-t border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="account"
                         asChild>
                         <Link to="/account">Account</Link>
                     </Tabs.Trigger>
                     <Tabs.Trigger
-                        className="w-fit rounded border border-white px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-50 sm:w-full sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                        className="w-fit rounded-t border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="subscriptions"
                         asChild>
                         <Link to="/account/subscriptions">Subscriptions and payments</Link>
                     </Tabs.Trigger>
+                    {isUserCreator.value && (
+                        <Link
+                            className="rounded px-4 py-2 text-start font-medium text-gray-500 hover:bg-black hover:text-white"
+                            to="/dashboard">
+                            Creator Dashboard
+                        </Link>
+                    )}
                 </Tabs.List>
                 <div className="flex-auto px-4 sm:pl-4">
                     <Tabs.Content value="account" className="flex flex-col gap-2">

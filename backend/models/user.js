@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     ],
     verified: { type: Boolean, required: true, default: false },
     provider: { type: String, required: true, default: "email" },
-    picture: { type: String },
+    displayPicture: { type: String },
     creator: { type: Boolean, default: false },
     creatorId: {
         type: String,
