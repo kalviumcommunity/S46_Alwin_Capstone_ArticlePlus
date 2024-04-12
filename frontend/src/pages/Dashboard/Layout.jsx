@@ -13,7 +13,7 @@ function DashboardLayout() {
         if (!isUserCreator.value) {
             redirect("/onboarding")
         }
-    }, [isUserCreator])
+    }, [])
 
     return (
         <div className="mb-10 flex flex-col gap-2">

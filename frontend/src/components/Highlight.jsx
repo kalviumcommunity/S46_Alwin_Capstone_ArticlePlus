@@ -24,9 +24,11 @@ function Highlight({ article }) {
                     </div>
                     {article.author.type === "individual" ? (
                         <>
-                            <span className="text-base font-semibold leading-4">
-                                {article.author.name}
-                            </span>
+                            <Link
+                                className="text-sm font-semibold leading-4 hover:underline"
+                                to={`/creator/${article.author.id}`}>
+                                <span>{article.author.name}</span>
+                            </Link>
                             <span className="text-base leading-4 text-gray-500">
                                 {article.views} views
                             </span>

@@ -66,23 +66,23 @@ function Account() {
                 value={activeTab}
                 onValueChange={setActiveTab}>
                 <Tabs.List
-                    className="sticky top-12 flex flex-1 flex-row items-start gap-2 border-b bg-white px-2 py-2 pb-0 pt-3 sm:mr-2 sm:max-w-56 sm:flex-col sm:border-0 sm:px-4 sm:py-0"
+                    className="sticky top-12 flex flex-1 flex-row items-end gap-1 border-b bg-white px-2 py-2 pb-0 pt-3 sm:mr-2 sm:max-w-56 sm:flex-col sm:items-start sm:gap-2 sm:border-0 sm:px-4 sm:py-0"
                     aria-label="manage your account">
                     <Tabs.Trigger
-                        className="w-fit rounded-t border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                        className="w-fit border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="account"
                         asChild>
                         <Link to="/account">Account</Link>
                     </Tabs.Trigger>
                     <Tabs.Trigger
-                        className="w-fit rounded-t border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                        className="border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-fit sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="subscriptions"
                         asChild>
-                        <Link to="/account/subscriptions">Subscriptions and payments</Link>
+                        <Link to="/account/subscriptions">Subscriptions & payments</Link>
                     </Tabs.Trigger>
                     {isUserCreator.value && (
                         <Link
-                            className="rounded px-4 py-2 text-start font-medium text-gray-500 hover:bg-black hover:text-white"
+                            className="w-fit px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-black hover:text-white sm:rounded sm:text-base"
                             to="/dashboard">
                             Creator Dashboard
                         </Link>

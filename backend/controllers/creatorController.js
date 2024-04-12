@@ -34,8 +34,6 @@ const onboardCreator = async (req, res) => {
         subscriptions: subscriptions ? JSON.parse(subscriptions) : null,
     }
 
-    console.log(creatorDetails)
-
     const { error } = await creatorDetailsSchema.validate(creatorDetails, {
         abortEarly: false,
     })

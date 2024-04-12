@@ -25,6 +25,10 @@ const SuspenseHandler = ({ component }) => {
 function UserRoutes() {
     useSignals()
 
+    if (isUserCreator.value === "loading") {
+        return <SuspenseLoader />
+    }
+
     return (
         <Routes>
             <Route index element={<Read />} />
@@ -35,7 +39,7 @@ function UserRoutes() {
             <Route path="/organization/:id/:contributor" element={<Creator />} />
             <Route path="/organization/:id" element={<Organization />} />
 
-            {isUserCreator.value ? (
+            {isUserCreator.value === true && (
                 <Route path="/dashboard" element={<DashboardLayout />}>
                     <Route index element={<SuspenseHandler component={<DashboardHome />} />} />
                     <Route
@@ -51,10 +55,12 @@ function UserRoutes() {
                         element={<SuspenseHandler component={<DashboardSettings />} />}
                     />
                 </Route>
-            ) : (
-                <Route path="/onboarding" element={<OnboardingCreator />} />
             )}
-
+            {isUserCreator.value === false && (
+                <>
+                    <Route path="/onboarding" element={<OnboardingCreator />} />
+                </>
+            )}
             <Route
                 path="/dashboard"
                 element={
@@ -65,7 +71,6 @@ function UserRoutes() {
                     )
                 }
             />
-
             <Route
                 path="/onboarding"
                 element={
@@ -76,7 +81,6 @@ function UserRoutes() {
                     )
                 }
             />
-
             <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>
     )
