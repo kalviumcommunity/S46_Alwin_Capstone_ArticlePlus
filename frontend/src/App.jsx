@@ -5,7 +5,6 @@ import { userDetails, userDetailsUpdate, userExists } from "@/signals/user"
 import axiosInstance from "@/axios"
 
 import Footer from "@/components/Footer"
-import Navbar from "@/components/Navbar"
 
 import GuestRoutes from "@/routes/GuestRoutes"
 import UserRoutes from "@/routes/UserRoutes"
@@ -36,7 +35,6 @@ function App() {
 
     return (
         <div className="flex min-h-screen w-[100vw] flex-col sm:w-[calc(100vw-1rem)] 2xl:max-w-[1920px]">
-            <Navbar />
             {userExists.value ? <UserRoutes /> : <GuestRoutes />}
             <Footer />
         </div>
