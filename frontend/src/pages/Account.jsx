@@ -9,6 +9,7 @@ import { randomGradient } from "@/utils/ui/randomGradient"
 
 import ChangePassword from "@/components/ChangePassword"
 import { Session } from "@/components/Session"
+import VerifyAccount from "@/components/VerifyAccount"
 
 function Account() {
     useSignals()
@@ -99,7 +100,7 @@ function Account() {
                                     </span>
                                     <div className="flex gap-4 sm:flex-1 sm:gap-0">
                                         {user.provider === "google" && (
-                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-medium text-gray-700">
+                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-normal text-gray-800">
                                                 <img
                                                     className="h-5 w-5"
                                                     src="assets/icons/google.svg"
@@ -109,7 +110,7 @@ function Account() {
                                             </div>
                                         )}
                                         {user.provider === "email" && (
-                                            <span className="flex rounded-full border px-6 py-1 text-center font-medium leading-5 text-gray-700">
+                                            <span className="flex rounded-full border px-6 py-1 text-center font-normal leading-5 text-gray-800">
                                                 Email & Password
                                             </span>
                                         )}
@@ -123,6 +124,25 @@ function Account() {
                                         <ChangePassword />
                                     </div>
                                 )}
+                                <div className="flex flex-1 items-center gap-4 py-4 sm:gap-0">
+                                    <span className="text-base font-medium sm:flex-1">
+                                        Account status:
+                                    </span>
+                                    <div className="flex gap-4 sm:flex-1 sm:gap-0">
+                                        {user.verified ? (
+                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-normal text-gray-800">
+                                                <img
+                                                    className="h-5 w-5"
+                                                    src="assets/icons/verified-email.svg"
+                                                    alt=""
+                                                />
+                                                <span>Verified</span>
+                                            </div>
+                                        ) : (
+                                            <VerifyAccount />
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="my-2 flex flex-col gap-3 sm:mx-4">
