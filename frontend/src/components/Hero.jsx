@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 function Hero() {
     return (
-        <div className="mx-4 flex flex-col gap-4 py-20 sm:mx-16 sm:gap-6 sm:py-28">
+        <div className="mx-4 flex flex-col gap-4 py-20 sm:mx-16 sm:gap-6 sm:pb-20 sm:pt-24">
             <h1 className="font-poppins text-4xl font-bold sm:w-full sm:text-6xl sm:leading-[1.1] xl:w-2/3 xl:leading-none">
                 Understand what's happening in the world
             </h1>

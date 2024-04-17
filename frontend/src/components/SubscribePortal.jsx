@@ -102,7 +102,7 @@ function SubscribePortal({ details }) {
     return (
         <Dialog.Portal>
             <Dialog.Overlay className="absolute inset-0 z-40 h-full w-screen bg-black/50 opacity-100" />
-            <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 flex h-fit max-h-[85vh] w-full flex-col gap-2 overflow-x-hidden overflow-y-scroll rounded-sm bg-white px-6 py-6 sm:left-1/2 sm:top-1/2 sm:w-[90vw] sm:max-w-[475px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:transform">
+            <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 flex h-fit max-h-[85vh] w-full flex-col gap-2 overflow-x-hidden overflow-y-scroll rounded bg-white px-6 py-6 sm:left-1/2 sm:top-1/2 sm:w-[90vw] sm:max-w-[475px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:transform">
                 <Dialog.Title className="mb-2 flex flex-col gap-2 text-lg font-medium">
                     Subscribe to
                     <div className="flex items-center gap-3">

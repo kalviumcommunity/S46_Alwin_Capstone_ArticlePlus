@@ -15,7 +15,6 @@ const generateGoogleOauthLink = async (req, res) => {
     const authorizeUrl = oAuth2Client.generateAuthUrl({
         access_type: "offline",
         scope: "https://www.googleapis.com/auth/userinfo.profile email openid ",
-        prompt: "consent",
     })
 
     res.json({ url: authorizeUrl })
@@ -36,7 +35,7 @@ const googleOauthCallback = async (req, res) => {
         const { tokens } = await oAuth2Client.getToken(code)
         oAuth2Client.setCredentials(tokens)
 
-        const { email, name, email_verified, picture } = await getUserData(
+        const { email, name, picture } = await getUserData(
             oAuth2Client.credentials.access_token,
         )
 
@@ -46,7 +45,6 @@ const googleOauthCallback = async (req, res) => {
             user = await User.create({
                 name,
                 email,
-                verified: email_verified,
                 provider: "google",
                 picture,
             })

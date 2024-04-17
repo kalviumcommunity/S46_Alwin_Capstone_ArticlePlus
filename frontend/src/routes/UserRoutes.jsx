@@ -39,63 +39,48 @@ function UserRoutes() {
     return (
         <Routes>
             <Route path="/" element={<UserLayout />}>
-                <Route index element={<Read />} />
+                <Route index element={<Read isLoggedin={true} />} />
                 <Route path="account" element={<Account />} />
                 <Route path="account/subscriptions" element={<Account />} />
                 <Route path="article/:slug" element={<Article />} />
                 <Route path="creator/:creator" element={<Creator />} />
                 <Route path="organization/:id/:contributor" element={<Creator />} />
                 <Route path="organization/:id" element={<Organization />} />
+                {isUserCreator.value === false && (
+                    <>
+                        <Route path="/onboarding" element={<OnboardingCreator />} />
+                        <Route path="/dashboard" element={<Navigate to="/onboarding" />} />
+                    </>
+                )}
             </Route>
 
             {isUserCreator.value === true && (
-                <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route index element={<SuspenseHandler component={<DashboardHome />} />} />
-                    <Route
-                        path="articles"
-                        element={<SuspenseHandler component={<DashboardArticles />} />}
-                    />
-                    <Route
-                        path="analytics"
-                        element={<SuspenseHandler component={<DashboardAnalytics />} />}
-                    />
-                    <Route
-                        path="settings"
-                        element={<SuspenseHandler component={<DashboardSettings />} />}
-                    />
-                    <Route
-                        path="new-article"
-                        element={<SuspenseHandler component={<NewArticle />} />}
-                    />
-                </Route>
-            )}
-
-            {isUserCreator.value === false && (
                 <>
-                    <Route path="/onboarding" element={<OnboardingCreator />} />
+                    <Route path="/dashboard" element={<DashboardLayout />}>
+                        <Route
+                            index
+                            element={<SuspenseHandler component={<DashboardHome />} />}
+                        />
+                        <Route
+                            path="articles"
+                            element={<SuspenseHandler component={<DashboardArticles />} />}
+                        />
+                        <Route
+                            path="analytics"
+                            element={<SuspenseHandler component={<DashboardAnalytics />} />}
+                        />
+                        <Route
+                            path="settings"
+                            element={<SuspenseHandler component={<DashboardSettings />} />}
+                        />
+                        <Route
+                            path="new-article"
+                            element={<SuspenseHandler component={<NewArticle />} />}
+                        />
+                    </Route>
+                    <Route path="/onboarding" element={<Navigate to="/dashboard" />} />
                 </>
             )}
-
-            <Route
-                path="/dashboard"
-                element={
-                    isUserCreator.value ? (
-                        <DashboardLayout />
-                    ) : (
-                        <Navigate to="/onboarding" replace={true} />
-                    )
-                }
-            />
-            <Route
-                path="/onboarding"
-                element={
-                    isUserCreator.value ? (
-                        <Navigate to="/dashboard" replace={true} />
-                    ) : (
-                        <OnboardingCreator />
-                    )
-                }
-            />
 
             {isUserCreator.value !== "loading" && (
                 <Route path="*" element={<Navigate to="/" replace={true} />} />

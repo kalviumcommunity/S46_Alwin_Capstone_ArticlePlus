@@ -8,7 +8,7 @@ import TagRibbion from "@/components/TagRibbion"
 
 import { articles } from "@/data/articles"
 
-function Read() {
+function Read({ isLoggedin }) {
     useSignals()
     const [searchParams] = useSearchParams()
 
@@ -19,7 +19,7 @@ function Read() {
 
     return (
         <>
-            <TagRibbion />
+            <TagRibbion isLoggedin={isLoggedin} />
             <div className="flex-col pb-10">
                 <div className="wrapper flex flex-col gap-3 py-6">
                     <span className="mb-1 font-serif text-2xl font-semibold">Latest</span>

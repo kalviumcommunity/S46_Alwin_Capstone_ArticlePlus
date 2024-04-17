@@ -50,7 +50,7 @@ function Highlight({ article }) {
                     )}
                 </div>
                 <img
-                    className="aspect-[4/3] w-2/3 rounded-sm object-cover sm:w-1/2"
+                    className="aspect-[4/3] w-2/3 object-cover sm:w-1/2"
                     src={article.image.url}
                     alt={article.image.caption}
                     loading="lazy"

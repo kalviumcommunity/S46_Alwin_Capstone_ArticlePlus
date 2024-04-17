@@ -62,7 +62,7 @@ function Article() {
                         </div>
                     </div>
                     <img
-                        className="w-full rounded-sm md:w-1/3"
+                        className="w-full md:w-1/3"
                         src={article.image.url}
                         alt={article.image.caption}
                         loading="lazy"
@@ -146,7 +146,7 @@ function Article() {
                             </p>
                         </div>
                     </div>
-                    <div className="flex h-[80vh] items-center justify-center overflow-hidden rounded-sm">
+                    <div className="flex h-[80vh] items-center justify-center overflow-hidden">
                         <img
                             className="h-full w-full object-cover"
                             src={article.image.url}

@@ -45,8 +45,8 @@ function Navbar() {
 
     return (
         <div
-            className={`sticky top-0 z-40 flex flex-row items-center justify-between border-b bg-white sm:min-h-14 ${
-                scrolled ? "px-4 py-3 sm:px-6 lg:px-12" : "px-4 py-3.5 sm:px-8 lg:px-16"
+            className={`sticky top-0 z-40 flex flex-row items-center justify-between bg-white sm:min-h-12 ${userExists.value ? "pb-3 pt-3" : "pb-4 pt-5"} ${
+                scrolled ? "px-4 !pb-3 !pt-3 sm:px-6 lg:px-12" : "px-4 py-3 sm:px-8 lg:px-16"
             }`}
             id="navbar">
             <Link to="/" className="flex items-center gap-2">

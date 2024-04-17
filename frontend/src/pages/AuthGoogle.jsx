@@ -24,7 +24,7 @@ function AuthGoogle() {
                 <Loader />
             ) : (
                 <div className="mx-4 flex flex-col items-center gap-4 py-20 sm:mx-16 sm:gap-6 sm:pb-32 sm:pt-20">
-                    <div className="border-red rounded-sm border-2 border-gray-100 px-6 py-10 sm:px-10">
+                    <div className="border-red rounded border-2 border-gray-100 px-6 py-10 sm:px-10">
                         <div className="flex flex-col gap-2 sm:w-96">
                             <div className="flex flex-col gap-1">
                                 <img

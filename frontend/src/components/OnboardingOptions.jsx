@@ -125,7 +125,7 @@ function OnboardingOptions({ setCreatorForm }) {
                                     </Dialog.Trigger>
                                     <Dialog.Portal>
                                         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30" />
-                                        <Dialog.Content className="fixed inset-x-0 bottom-0 left-1/2 top-1/2 z-50 flex h-fit max-h-[85vh] w-11/12 -translate-x-1/2 -translate-y-1/2 transform flex-col gap-1 overflow-x-hidden overflow-y-scroll rounded-sm bg-white px-6 py-6 sm:w-[90vw] sm:max-w-[475px]">
+                                        <Dialog.Content className="fixed inset-x-0 bottom-0 left-1/2 top-1/2 z-50 flex h-fit max-h-[85vh] w-11/12 -translate-x-1/2 -translate-y-1/2 transform flex-col gap-1 overflow-x-hidden overflow-y-scroll rounded bg-white px-6 py-6 sm:w-[90vw] sm:max-w-[475px]">
                                             <Dialog.Title className="text-lg font-semibold">
                                                 Add Feature description
                                             </Dialog.Title>
