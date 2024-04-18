@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom"
 
-function TagRibbion() {
+function TagRibbion({ isLoggedin }) {
     return (
-        <div className="flex justify-start border-b px-4 py-2 text-xs font-medium text-gray-700 sm:px-8 lg:px-16">
+        <div
+            className={`${isLoggedin ? "sticky top-14 z-50 bg-white" : "sticky top-12 z-50 bg-white"} flex justify-start border-y px-4 py-3 text-sm font-medium sm:px-8 lg:px-16`}>
             <Link className="tag" to="/?tag=latest">
                 Latest
             </Link>

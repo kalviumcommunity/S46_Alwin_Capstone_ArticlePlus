@@ -20,8 +20,7 @@ effect(() => {
 
     if (!userExists.value) {
         userDetails.value = {}
-        isUserCreator.value = {}
-        creatorInfo.value = {}
         isUserCreator.value = false
+        creatorInfo.value = {}
     }
 })

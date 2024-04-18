@@ -24,9 +24,11 @@ function Highlight({ article }) {
                     </div>
                     {article.author.type === "individual" ? (
                         <>
-                            <span className="text-base font-semibold leading-4">
-                                {article.author.name}
-                            </span>
+                            <Link
+                                className="text-sm font-semibold leading-4 hover:underline"
+                                to={`/creator/${article.author.id}`}>
+                                <span>{article.author.name}</span>
+                            </Link>
                             <span className="text-base leading-4 text-gray-500">
                                 {article.views} views
                             </span>
@@ -48,7 +50,7 @@ function Highlight({ article }) {
                     )}
                 </div>
                 <img
-                    className="aspect-[4/3] w-2/3 rounded-sm object-cover sm:w-1/2"
+                    className="aspect-[4/3] w-2/3 object-cover sm:w-1/2"
                     src={article.image.url}
                     alt={article.image.caption}
                     loading="lazy"

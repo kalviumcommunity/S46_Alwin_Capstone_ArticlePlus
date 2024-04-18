@@ -15,9 +15,11 @@ const articles = [
 
 function DashboardArticles() {
     return (
-        <div className="wrapper">
-            <div className="flex flex-col gap-5">
-                <h1 className="text-2xl font-semibold">Articles activity</h1>
+        <div className="mb-8 flex flex-col gap-6">
+            <h1 className="mt-8 border-b px-8 pb-5 text-2xl font-semibold">
+                Articles activity
+            </h1>
+            <div className="mb-12 flex w-fit flex-col justify-end gap-4 px-8">
                 <ArticlesTable articles={articles} />
                 <div className="ml-auto flex flex-col items-center gap-4 text-sm sm:flex-row">
                     <div className="flex gap-4">

@@ -1,6 +1,6 @@
 function Footer() {
     return (
-        <div className="flex flex-col">
+        <div className="mt-auto flex flex-col">
             <div className="flex flex-col gap-8 border-t px-4 pb-10 pt-10 text-sm sm:flex-row sm:px-8 sm:pb-14 sm:pt-16 lg:px-16">
                 <div className="flex flex-col gap-6 sm:w-1/2">
                     <span className="font-semibold">For readers</span>

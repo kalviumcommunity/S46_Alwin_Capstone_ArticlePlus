@@ -9,6 +9,7 @@ import { randomGradient } from "@/utils/ui/randomGradient"
 
 import ChangePassword from "@/components/ChangePassword"
 import { Session } from "@/components/Session"
+import VerifyAccount from "@/components/VerifyAccount"
 
 function Account() {
     useSignals()
@@ -66,23 +67,23 @@ function Account() {
                 value={activeTab}
                 onValueChange={setActiveTab}>
                 <Tabs.List
-                    className="sticky top-12 flex flex-1 flex-row items-start gap-2 border-b bg-white px-2 py-2 pb-0 pt-3 sm:mr-2 sm:max-w-56 sm:flex-col sm:border-0 sm:px-4 sm:py-0"
+                    className="sticky top-12 flex flex-1 flex-row items-end gap-1 border-b bg-white px-2 py-2 pb-0 pt-3 sm:mr-2 sm:max-w-56 sm:flex-col sm:items-start sm:gap-2 sm:border-0 sm:py-0 sm:pr-4"
                     aria-label="manage your account">
                     <Tabs.Trigger
-                        className="w-fit rounded-t border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                        className="w-fit border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="account"
                         asChild>
                         <Link to="/account">Account</Link>
                     </Tabs.Trigger>
                     <Tabs.Trigger
-                        className="w-fit rounded-t border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-full sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                        className="border border-white px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-gray-50 sm:w-fit sm:rounded sm:text-base [&[data-state='active']]:border-0 [&[data-state='active']]:border-b-2 [&[data-state='active']]:border-gray-800 [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="subscriptions"
                         asChild>
-                        <Link to="/account/subscriptions">Subscriptions and payments</Link>
+                        <Link to="/account/subscriptions">Subscriptions & payments</Link>
                     </Tabs.Trigger>
                     {isUserCreator.value && (
                         <Link
-                            className="rounded px-4 py-2 text-start font-medium text-gray-500 hover:bg-black hover:text-white"
+                            className="w-full px-4 py-2 text-start text-sm font-medium text-gray-500 hover:bg-black hover:text-white sm:rounded sm:text-base"
                             to="/dashboard">
                             Creator Dashboard
                         </Link>
@@ -99,7 +100,7 @@ function Account() {
                                     </span>
                                     <div className="flex gap-4 sm:flex-1 sm:gap-0">
                                         {user.provider === "google" && (
-                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-medium text-gray-700">
+                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-normal text-gray-800">
                                                 <img
                                                     className="h-5 w-5"
                                                     src="assets/icons/google.svg"
@@ -109,7 +110,7 @@ function Account() {
                                             </div>
                                         )}
                                         {user.provider === "email" && (
-                                            <span className="flex rounded-full border px-6 py-1 text-center font-medium leading-5 text-gray-700">
+                                            <span className="flex rounded-full border px-6 py-1 text-center font-normal leading-5 text-gray-800">
                                                 Email & Password
                                             </span>
                                         )}
@@ -123,6 +124,25 @@ function Account() {
                                         <ChangePassword />
                                     </div>
                                 )}
+                                <div className="flex flex-1 items-center gap-4 py-4 sm:gap-0">
+                                    <span className="text-base font-medium sm:flex-1">
+                                        Account status:
+                                    </span>
+                                    <div className="flex gap-4 sm:flex-1 sm:gap-0">
+                                        {user.verified ? (
+                                            <div className="flex items-center gap-2 rounded-full border px-6 py-1 font-normal text-gray-800">
+                                                <img
+                                                    className="h-5 w-5"
+                                                    src="assets/icons/verified-email.svg"
+                                                    alt=""
+                                                />
+                                                <span>Verified</span>
+                                            </div>
+                                        ) : (
+                                            <VerifyAccount />
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="my-2 flex flex-col gap-3 sm:mx-4">

@@ -1,25 +1,16 @@
-import { useEffect } from "react"
-import { Outlet, redirect } from "react-router-dom"
+import { Outlet } from "react-router-dom"
 import { useSignals } from "@preact/signals-react/runtime"
 
-import { isUserCreator } from "@/signals/creator"
-
-import DashboardSubNav from "@/components/Dashboard/Nav"
+import DashboardNavbar from "@/components/Dashboard/Navbar"
 
 function DashboardLayout() {
     useSignals()
 
-    useEffect(() => {
-        if (!isUserCreator.value) {
-            redirect("/onboarding")
-        }
-    }, [isUserCreator])
-
     return (
-        <div className="mb-10 flex flex-col gap-2">
-            <DashboardSubNav />
+        <>
+            <DashboardNavbar />
             <Outlet />
-        </div>
+        </>
     )
 }
 

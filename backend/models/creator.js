@@ -6,6 +6,7 @@ const CreatorSchema = new mongoose.Schema({
     name: { type: String, required: true },
     displayPicture: { type: String, required: true },
     followers: { type: Number, required: true, default: 0 },
+    subscribers: { type: Number, required: true, default: 0 },
     articles: {
         total: { type: Number, required: true, default: 0 },
         free: { type: Number, required: true, default: 0 },

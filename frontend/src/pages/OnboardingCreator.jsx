@@ -358,7 +358,12 @@ function OnboardingCreator() {
                                     {suggestedCreatorId !== creatorForm.id && (
                                         <span
                                             className="ml-auto mt-1 w-fit rounded-full border border-rose-100 bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 hover:cursor-pointer"
-                                            onClick={() => setCreatorId(suggestedCreatorId)}>
+                                            onClick={() =>
+                                                setCreatorForm((prevState) => ({
+                                                    ...prevState,
+                                                    id: suggestedCreatorId,
+                                                }))
+                                            }>
                                             Use suggested Id
                                         </span>
                                     )}

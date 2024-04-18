@@ -44,8 +44,8 @@ function SelectedSubscriptionSection({
                 </span>
             </div>
             <div className="grid-rows-auto grid grid-cols-2 gap-3">
-                {selectedSubscription.features.map((feature) => (
-                    <div className="flex rounded-md border-2 px-3 py-2">
+                {selectedSubscription.features.map((feature, index) => (
+                    <div className="flex rounded-md border-2 px-3 py-2" key={index}>
                         <span className="text-base font-medium">{feature}</span>
                     </div>
                 ))}
@@ -72,21 +72,9 @@ function SelectedSubscriptionSection({
             </div>
             <div className="fixed inset-x-0 bottom-0 z-50 flex bg-white px-6 py-3 sm:relative sm:p-0">
                 <button
-                    className="flex h-9 w-fit items-center justify-center gap-2 rounded-full border-2 py-1 pl-5 pr-5 text-base font-medium"
+                    className="flex h-9 w-fit items-center justify-center gap-1 rounded-full border py-1 pl-3 pr-4 text-base font-medium hover:bg-gray-50"
                     onClick={handleGoBack}>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.75}
-                        stroke="currentColor"
-                        className="h-5 w-5">
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-                        />
-                    </svg>
+                    <img className="h-5" src="/assets/icons/arrow-left.svg" alt="" />
                     Go Back
                 </button>
                 <button className="ml-auto h-9 w-fit gap-3 rounded-full border bg-rose-500 px-6 py-1 pr-5 font-medium text-white hover:bg-rose-600">
@@ -114,7 +102,7 @@ function SubscribePortal({ details }) {
     return (
         <Dialog.Portal>
             <Dialog.Overlay className="absolute inset-0 z-40 h-full w-screen bg-black/50 opacity-100" />
-            <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 flex h-fit max-h-[85vh] w-full flex-col gap-2 overflow-x-hidden overflow-y-scroll rounded-sm bg-white px-6 py-6 sm:left-1/2 sm:top-1/2 sm:w-[90vw] sm:max-w-[475px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:transform">
+            <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 flex h-fit max-h-[85vh] w-full flex-col gap-2 overflow-x-hidden overflow-y-scroll rounded bg-white px-6 py-6 sm:left-1/2 sm:top-1/2 sm:w-[90vw] sm:max-w-[475px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:transform">
                 <Dialog.Title className="mb-2 flex flex-col gap-2 text-lg font-medium">
                     Subscribe to
                     <div className="flex items-center gap-3">

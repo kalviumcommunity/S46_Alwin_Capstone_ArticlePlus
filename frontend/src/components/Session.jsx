@@ -73,7 +73,7 @@ export function Session({ session }) {
                     </Dialog.Trigger>
                     <Dialog.Portal>
                         <Dialog.Overlay className="absolute inset-0 z-40 h-full w-screen bg-black/50 opacity-100" />
-                        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[90vw] max-w-[475px] -translate-x-1/2 -translate-y-1/2 transform  flex-col gap-3 rounded-sm bg-white px-6 py-8 sm:px-8">
+                        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[85vh] w-[90vw] max-w-[475px] -translate-x-1/2 -translate-y-1/2 transform  flex-col gap-3 bg-white px-6 py-8 sm:px-8">
                             {loader ? (
                                 <div className="-mb-20 -mt-10">
                                     <Loader />
