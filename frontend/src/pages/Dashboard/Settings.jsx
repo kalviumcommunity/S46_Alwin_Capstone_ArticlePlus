@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import * as Tabs from "@radix-ui/react-tabs"
 
+import { userDetails } from "@/signals/user"
 import axiosInstance from "@/axios"
 
 import Authors from "@/components/Dashboard/Authors"
@@ -17,7 +18,6 @@ function DashboardSettings() {
     useEffect(() => {
         axiosInstance.get("/creator/auth/info").then((response) => {
             setCreatorInfo(response.data)
-            console.log(response.data)
         })
     }, [])
 
@@ -53,11 +53,6 @@ function DashboardSettings() {
                         value="team">
                         Team
                     </Tabs.Trigger>
-                    <Tabs.Trigger
-                        className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
-                        value="authors">
-                        Authors
-                    </Tabs.Trigger>
                 </Tabs.List>
                 <div
                     className={`${activeTab === "" && window.innerWidth < 640 ? "hidden" : "flex"} mt-2 w-fit items-center rounded-full border py-1.5 pl-3 pr-6 hover:cursor-pointer sm:hidden`}
@@ -68,28 +63,55 @@ function DashboardSettings() {
                 <div className="flex-auto sm:pl-6">
                     <Tabs.Content value="general" className="flex flex-col gap-2">
                         {creatorInfo && (
-                            <div className="flex flex-col gap-5 rounded border px-6 py-6 sm:px-10">
-                                <div className="flex items-center gap-4">
-                                    <img
-                                        className="h-16 w-16 rounded-full object-cover"
-                                        src={creatorInfo.displayPicture}
-                                        alt=""
-                                    />
-                                    <div className="flex flex-1 flex-col">
-                                        <p className="text-xl font-semibold leading-7">
-                                            {creatorInfo.name}
-                                        </p>
-                                        <span className="text-sm leading-4 text-gray-700">
-                                            @{creatorInfo.id}
+                            <>
+                                {creatorInfo.type === "individual" ? (
+                                    <div className="flex flex-col gap-5 rounded border px-6 py-6 sm:px-10">
+                                        <div className="flex items-center gap-4">
+                                            <img
+                                                className="h-16 w-16 rounded-full object-cover"
+                                                src={creatorInfo.displayPicture}
+                                                alt=""
+                                            />
+                                            <div className="flex flex-1 flex-col">
+                                                <p className="text-xl font-semibold leading-7">
+                                                    {creatorInfo.name}
+                                                </p>
+                                                <span className="text-sm leading-4 text-gray-700">
+                                                    @{creatorInfo.id}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-1 flex-col font-medium">
+                                                <span>{creatorInfo.followers} followers</span>
+                                                <span>
+                                                    {creatorInfo.subscribers} subscribers
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span className="lg:w-2/3">
+                                            {creatorInfo.description}
                                         </span>
                                     </div>
-                                    <div className="flex flex-1 flex-col font-medium">
-                                        <span>{creatorInfo.followers} followers</span>
-                                        <span>{creatorInfo.subscribers} subscribers</span>
+                                ) : creatorInfo.type === "organization" &&
+                                  creatorInfo.owner === userDetails.value.id ? (
+                                    <div className="flex flex-col overflow-hidden rounded border">
+                                        <span className="flex items-center gap-1.5 border-b px-6 py-3 text-sm text-gray-800 sm:px-10">
+                                            Your are owner of the{" "}
+                                            <Link
+                                                to="/organization/new-yorker"
+                                                className="font-medium underline">
+                                                {creatorInfo.name}
+                                            </Link>{" "}
+                                            organization
+                                            <Link
+                                                to="/dashboard/organization-settings"
+                                                className="ml-auto rounded-full bg-rose-100 px-6 py-1 font-medium text-rose-800">
+                                                Go to organization settings
+                                            </Link>
+                                        </span>
+                                        <div className="flex flex-col gap-5 px-6 py-6 sm:px-10"></div>
                                     </div>
-                                </div>
-                                <span className="lg:w-2/3">{creatorInfo.description}</span>
-                            </div>
+                                ) : null}
+                            </>
                         )}
                     </Tabs.Content>
                     <Tabs.Content value="billing">
@@ -97,9 +119,6 @@ function DashboardSettings() {
                     </Tabs.Content>
                     <Tabs.Content value="team">
                         <Team />
-                    </Tabs.Content>
-                    <Tabs.Content value="authors">
-                        <Authors />
                     </Tabs.Content>
                 </div>
             </Tabs.Root>

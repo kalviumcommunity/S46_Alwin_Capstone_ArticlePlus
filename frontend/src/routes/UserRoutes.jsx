@@ -2,13 +2,14 @@ import React from "react"
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useSignals } from "@preact/signals-react/runtime"
 
-import { isUserCreator } from "@/signals/creator"
+import { creatorInfo, isUserCreator } from "@/signals/creator"
 
 import Account from "@/pages/Account"
 import Article from "@/pages/Article"
 import Creator from "@/pages/Creator"
 import DashboardLayout from "@/pages/Dashboard/Layout"
 import NewArticle from "@/pages/Dashboard/NewArticle"
+import OrganizationSettings from "@/pages/Dashboard/OrganizationSettings"
 import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
 import Read from "@/pages/Read"
@@ -76,6 +77,10 @@ function UserRoutes() {
                         <Route
                             path="new-article"
                             element={<SuspenseHandler component={<NewArticle />} />}
+                        />
+                        <Route
+                            path="organization-settings"
+                            element={<OrganizationSettings />}
                         />
                     </Route>
                     <Route path="/onboarding" element={<Navigate to="/dashboard" />} />

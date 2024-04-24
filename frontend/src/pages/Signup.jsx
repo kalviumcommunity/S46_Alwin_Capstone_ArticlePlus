@@ -27,7 +27,7 @@ function Signup() {
         setActionStatus("")
 
         axiosInstance
-            .post("auth/signup", payload)
+            .get("auth/signup", payload)
             .then((res) => {
                 userExists.value = true
             })

@@ -19,6 +19,7 @@ const getUserDetails = async (req, res) => {
 
     const { name, email, creator, verified, provider, picture, refreshTokens } = user
     res.status(200).json({
+        id: user._id,
         name,
         email,
         creator,

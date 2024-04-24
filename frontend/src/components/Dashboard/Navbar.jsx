@@ -4,7 +4,10 @@ import { useSignalEffect } from "@preact/signals-react"
 import { useSignals } from "@preact/signals-react/runtime"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
-import { userDetails } from "@/signals/user"
+import { creatorInfo } from "@/signals/creator"
+import { userDetails, userExists } from "@/signals/user"
+import { getCookie, setCookie } from "@/helpers/cookies"
+import axiosInstance from "@/axios"
 
 function DashboardNavbar() {
     useSignals()
@@ -33,17 +36,19 @@ function DashboardNavbar() {
         { path: "/dashboard/articles", label: "Articles" },
         { path: "/dashboard/analytics", label: "Analytics" },
         { path: "/dashboard/settings", label: "Settings" },
+        creatorInfo.value.type === "organization" && {
+            path: "/dashboard/organization-settings",
+            label: "Organization Settings",
+        },
     ]
 
     useEffect(() => {
-        let isActive = false
         for (const link of navLinks) {
             if (currentPath === link.path) {
-                isActive = true
+                setIsSubNavActive(true)
                 break
             }
         }
-        setIsSubNavActive(isActive)
     }, [currentPath])
 
     return (

@@ -7,14 +7,18 @@ import Loader from "@/components/ui/Loader"
 
 import { articles } from "@/data/articles"
 
-function Article() {
+function Article({ data }) {
     const { slug } = useParams()
 
     const [article, setArticle] = useState()
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        setArticle(articles.find((article) => article.slug === slug))
+        if (data) {
+            setArticle(data)
+        } else {
+            setArticle(articles.find((article) => article.slug === slug))
+        }
     }, [slug])
 
     if (article && article.display === "header") {

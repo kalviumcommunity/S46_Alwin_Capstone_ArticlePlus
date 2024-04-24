@@ -25,7 +25,7 @@ router.patch("/reset-password", verifyToken, asyncHandler(resetPassword))
 
 router.post("/refresh", asyncHandler(refreshAccessToken))
 
-router.post("/google/redirect", asyncHandler(generateGoogleOauthLink))
+router.get("/google/redirect", asyncHandler(generateGoogleOauthLink))
 router.get("/google/callback", asyncHandler(googleOauthCallback))
 
 module.exports = router
