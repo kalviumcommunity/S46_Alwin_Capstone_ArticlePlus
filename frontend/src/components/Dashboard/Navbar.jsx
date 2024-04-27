@@ -4,7 +4,7 @@ import { useSignalEffect } from "@preact/signals-react"
 import { useSignals } from "@preact/signals-react/runtime"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
-import { creatorInfo } from "@/signals/creator"
+import { creatorInfo, isUserCreator } from "@/signals/creator"
 import { userDetails, userExists } from "@/signals/user"
 import { getCookie, setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"

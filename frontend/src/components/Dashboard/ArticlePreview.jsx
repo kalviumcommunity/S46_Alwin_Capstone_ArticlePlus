@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import { convertCategoryFormat } from "@/utils/ui/convertCategoryFormat"
@@ -21,7 +21,25 @@ function ControlledLink({ to, children, className }) {
     )
 }
 
-function ArticlePreview({ article }) {
+function ArticlePreview({ article, selectedElement, setArticle }) {
+    const titleRef = useRef(null)
+    const subTitleRef = useRef(null)
+
+    const setDataSelected = (selectedElement) => {
+        if (selectedElement === "header-title") {
+            return "Header Title"
+        } else if (selectedElement === "header-tag") {
+            return "Header Tag"
+        } else if (selectedElement === "header-description") {
+            return "Header Description"
+        }
+        return ""
+    }
+
+    useEffect(() => {
+        console.log(selectedElement)
+    }, [selectedElement])
+
     return (
         <div className="font-body w-full">
             <div className="flex flex-col">
@@ -36,8 +54,10 @@ function ArticlePreview({ article }) {
                                     {convertCategoryFormat(article.category)}
                                 </ControlledLink>
                             ) : null}
-                            <h1 className="mb-4 font-serif text-3xl font-semibold">
-                                {article.title && article.title}
+                            <h1
+                                ref={titleRef}
+                                className="mb-4 font-serif text-3xl font-semibold">
+                                {article.title}
                             </h1>
                             <p className="mb-4 text-sm italic text-gray-800">
                                 {article.subtitle}
@@ -91,7 +111,10 @@ function ArticlePreview({ article }) {
                                 to={`/?tag=${article.category}`}>
                                 {convertCategoryFormat(article.category)}
                             </ControlledLink>
-                            <h1 className="mb-4 font-serif text-3xl font-semibold">
+                            <h1
+                                ref={titleRef}
+                                data-selected={setDataSelected(selectedElement)}
+                                className={`relative mb-4 font-serif text-3xl font-semibold ${selectedElement === "header-title" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
                                 {article.title}
                             </h1>
                             <p className="mb-4 text-sm italic text-gray-800">

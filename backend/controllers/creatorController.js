@@ -19,6 +19,13 @@ const creatorDetailsSchema = Joi.object({
     subscriptions: Joi.any(),
 })
 
+const convertDisplayNameToId = (name) => {
+    return name
+        .toLowerCase()
+        .replace(/[^\w\s]/gi, "")
+        .replace(/\s/g, "-")
+}
+
 const onboardCreator = async (req, res) => {
     const { userId } = req
     const { id, name, description, type, subscription, subscriptions } = req.body
@@ -55,6 +62,17 @@ const onboardCreator = async (req, res) => {
         return res.json({ status: "failed", message: "User is already a creator" })
     }
 
+    const ownerId = convertDisplayNameToId(user.name)
+
+    creatorDetails.contributors = [
+        {
+            name: user.name,
+            id: ownerId,
+            type: "owner",
+            userRef: user._id.toString(),
+        },
+    ]
+
     const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
     const blobStream = imageRef.createWriteStream({
         metadata: {
@@ -65,6 +83,8 @@ const onboardCreator = async (req, res) => {
     blobStream.on("error", (err) => {
         return res.status(500).send("Error uploading file")
     })
+
+    console.log(creatorDetails)
 
     blobStream.on("finish", async () => {
         const displayPictureUrl = await getDownloadURL(imageRef)
@@ -82,7 +102,7 @@ const onboardCreator = async (req, res) => {
     blobStream.end(displayPictureFile.buffer)
 }
 
-const settingsCreatorInfo = async (req, res) => {
+const authCreatorInfo = async (req, res) => {
     const { userId } = req
 
     const user = await User.findById(userId)
@@ -95,12 +115,22 @@ const settingsCreatorInfo = async (req, res) => {
         return res.status(403).json({ message: "User is not a creator" })
     }
 
-    const creator = await Creator.findOne({ owner: userId })
+    const creator = await Creator.findOne(
+        { contributors: { $elemMatch: { userRef: userId } } },
+        { contributors: { $elemMatch: { userRef: userId } }, __v: 0 },
+    )
+
     if (!creator) {
         return res.status(404).json({ message: "Creator not found" })
     }
 
-    return res.json(creator)
+    const creatorDetails = creator.toObject()
+
+    creatorDetails.user = creatorDetails.contributors[0]
+
+    delete creatorDetails.contributors
+
+    return res.json(creatorDetails)
 }
 
-module.exports = { onboardCreator, settingsCreatorInfo }
+module.exports = { onboardCreator, authCreatorInfo }

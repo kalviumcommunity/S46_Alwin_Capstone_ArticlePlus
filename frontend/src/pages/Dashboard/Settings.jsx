@@ -1,25 +1,23 @@
 import { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
+import { useSignalEffect } from "@preact/signals-react"
 import * as Tabs from "@radix-ui/react-tabs"
 
+import { creatorInfo } from "@/signals/creator"
 import { userDetails } from "@/signals/user"
-import axiosInstance from "@/axios"
 
-import Authors from "@/components/Dashboard/Authors"
 import Billing from "@/components/Dashboard/Billing"
 import Team from "@/components/Dashboard/Team"
 
 function DashboardSettings() {
     const location = useLocation()
 
-    const [creatorInfo, setCreatorInfo] = useState(null)
+    const [creatorDetails, setCreatorDetails] = useState(null)
     const [activeTab, setActiveTab] = useState(window.innerWidth > 640 ? "general" : "")
 
-    useEffect(() => {
-        axiosInstance.get("/creator/auth/info").then((response) => {
-            setCreatorInfo(response.data)
-        })
-    }, [])
+    useSignalEffect(() => {
+        setCreatorDetails(creatorInfo.value)
+    })
 
     useEffect(() => {
         if (window.innerWidth > 640 && activeTab === "") {
@@ -43,16 +41,20 @@ function DashboardSettings() {
                         value="general">
                         General
                     </Tabs.Trigger>
-                    <Tabs.Trigger
-                        className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
-                        value="billing">
-                        Billing
-                    </Tabs.Trigger>
-                    <Tabs.Trigger
-                        className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
-                        value="team">
-                        Team
-                    </Tabs.Trigger>
+                    {creatorDetails && creatorDetails.type === "individual" && (
+                        <>
+                            <Tabs.Trigger
+                                className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                                value="billing">
+                                Billing
+                            </Tabs.Trigger>
+                            <Tabs.Trigger
+                                className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                                value="team">
+                                Team
+                            </Tabs.Trigger>
+                        </>
+                    )}
                 </Tabs.List>
                 <div
                     className={`${activeTab === "" && window.innerWidth < 640 ? "hidden" : "flex"} mt-2 w-fit items-center rounded-full border py-1.5 pl-3 pr-6 hover:cursor-pointer sm:hidden`}
@@ -62,64 +64,72 @@ function DashboardSettings() {
                 </div>
                 <div className="flex-auto sm:pl-6">
                     <Tabs.Content value="general" className="flex flex-col gap-2">
-                        {creatorInfo && (
+                        {creatorDetails && (
                             <>
-                                {creatorInfo.type === "individual" ? (
+                                {creatorDetails.type === "individual" ? (
                                     <div className="flex flex-col gap-5 rounded border px-6 py-6 sm:px-10">
                                         <div className="flex items-center gap-4">
                                             <img
                                                 className="h-16 w-16 rounded-full object-cover"
-                                                src={creatorInfo.displayPicture}
+                                                src={creatorDetails.displayPicture}
                                                 alt=""
                                             />
                                             <div className="flex flex-1 flex-col">
                                                 <p className="text-xl font-semibold leading-7">
-                                                    {creatorInfo.name}
+                                                    {creatorDetails.name}
                                                 </p>
                                                 <span className="text-sm leading-4 text-gray-700">
-                                                    @{creatorInfo.id}
+                                                    @{creatorDetails.id}
                                                 </span>
                                             </div>
                                             <div className="flex flex-1 flex-col font-medium">
-                                                <span>{creatorInfo.followers} followers</span>
                                                 <span>
-                                                    {creatorInfo.subscribers} subscribers
+                                                    {creatorDetails.followers} followers
+                                                </span>
+                                                <span>
+                                                    {creatorDetails.subscribers} subscribers
                                                 </span>
                                             </div>
                                         </div>
                                         <span className="lg:w-2/3">
-                                            {creatorInfo.description}
+                                            {creatorDetails.description}
                                         </span>
                                     </div>
-                                ) : creatorInfo.type === "organization" &&
-                                  creatorInfo.owner === userDetails.value.id ? (
+                                ) : creatorDetails.type === "organization" &&
+                                  creatorDetails.owner === userDetails.value.id ? (
                                     <div className="flex flex-col overflow-hidden rounded border">
-                                        <span className="flex items-center gap-1.5 border-b px-6 py-3 text-sm text-gray-800 sm:px-10">
-                                            Your are owner of the{" "}
-                                            <Link
-                                                to="/organization/new-yorker"
-                                                className="font-medium underline">
-                                                {creatorInfo.name}
-                                            </Link>{" "}
-                                            organization
+                                        <div className="flex flex-col items-center gap-4 border-b px-4 py-4 text-sm text-gray-800 sm:flex-row sm:gap-1.5 sm:px-8 sm:py-3">
+                                            <span>
+                                                Your are owner of the{" "}
+                                                <Link
+                                                    to="/organization/new-yorker"
+                                                    className="font-medium underline">
+                                                    {creatorDetails.name}
+                                                </Link>{" "}
+                                                organization
+                                            </span>
                                             <Link
                                                 to="/dashboard/organization-settings"
                                                 className="ml-auto rounded-full bg-rose-100 px-6 py-1 font-medium text-rose-800">
                                                 Go to organization settings
                                             </Link>
-                                        </span>
+                                        </div>
                                         <div className="flex flex-col gap-5 px-6 py-6 sm:px-10"></div>
                                     </div>
                                 ) : null}
                             </>
                         )}
                     </Tabs.Content>
-                    <Tabs.Content value="billing">
-                        <Billing />
-                    </Tabs.Content>
-                    <Tabs.Content value="team">
-                        <Team />
-                    </Tabs.Content>
+                    {creatorDetails && creatorDetails.type === "individual" && (
+                        <>
+                            <Tabs.Content value="billing">
+                                <Billing />
+                            </Tabs.Content>
+                            <Tabs.Content value="team">
+                                <Team />
+                            </Tabs.Content>
+                        </>
+                    )}
                 </div>
             </Tabs.Root>
         </div>

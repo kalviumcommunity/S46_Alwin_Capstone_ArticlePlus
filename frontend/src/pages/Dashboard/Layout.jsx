@@ -12,6 +12,7 @@ function DashboardLayout() {
     useSignalEffect(() => {
         axiosInstance.get("/creator/auth/info").then((response) => {
             creatorInfo.value = response.data
+            console.log(response.data)
         })
     })
 

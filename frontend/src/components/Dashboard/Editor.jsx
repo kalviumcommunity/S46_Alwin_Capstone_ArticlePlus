@@ -2,16 +2,34 @@ import React, { useEffect, useState } from "react"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
 import { creatorInfo } from "@/signals/creator"
-import { userDetails } from "@/signals/user"
 import useKeyPress from "@/helpers/hooks/useKeyPress"
 
 import ArticlePreview from "./ArticlePreview"
+
+const SelectButton = ({ label, type, selectedType, onSelect, className, ...rest }) => {
+    const isSelected = selectedType === type
+    const baseClasses =
+        "select-btn w-full flex-1 rounded border px-4 py-1.5 text-sm font-medium hover:bg-black hover:text-white"
+    const selectedClasses = "!bg-rose-500 text-white"
+    const unselectedClasses = "bg-white"
+
+    const mergedClasses = `${baseClasses} ${isSelected ? selectedClasses : unselectedClasses} ${className || ""}`
+
+    return (
+        <button className={mergedClasses} onClick={() => onSelect(type)} {...rest}>
+            {label}
+        </button>
+    )
+}
 
 function Editor() {
     useSignals()
 
     const isEscPressed = useKeyPress("Escape")
+
     const [isFullscreen, setIsFullscreen] = useState(false)
+    const [selectedLayout, setSelectedLayout] = useState("default")
+    const [selectedElementType, setSelectedElementType] = useState(null)
 
     const [article, setArticle] = useState({
         title: "Here goes your title for the article",
@@ -23,6 +41,10 @@ function Editor() {
             name: "",
             id: "",
             type: "",
+            organization: {
+                name: "",
+                id: "",
+            },
         },
         timestamp: new Date().toLocaleString("en-US", {
             month: "long",
@@ -38,53 +60,32 @@ function Editor() {
         content: [],
     })
 
-    const [selectedContentType, setSelectedContentType] = useState(null)
+    const toggleFullscreen = () => {
+        setIsFullscreen(!isFullscreen)
+    }
 
-    const [selectedLayout, setSelectedLayout] = useState("default")
-
-    const handleContentTypeChange = (type) => {
-        setSelectedContentType(type)
+    const handleSelectElement = (type) => {
+        setSelectedElementType(type)
     }
 
     const handleLayoutChange = (event) => {
-        setSelectedLayout(event.target.value)
-        if (event.target.value === "default") {
-            setArticle((prevArticle) => {
-                return {
-                    ...prevArticle,
-                    display: "header",
-                    flow: "default",
-                }
-            })
-        } else if (event.target.value === "default-reverse") {
-            setArticle((prevArticle) => {
-                return {
-                    ...prevArticle,
-                    display: "header",
-                    flow: "reverse",
-                }
-            })
-        } else if (event.target.value === "square") {
-            setArticle((prevArticle) => {
-                return {
-                    ...prevArticle,
-                    display: "square",
-                    flow: "default",
-                }
-            })
-        } else if (event.target.value === "square-reverse") {
-            setArticle((prevArticle) => {
-                return {
-                    ...prevArticle,
-                    display: "square",
-                    flow: "reverse",
-                }
-            })
-        }
-    }
+        const { value } = event.target
+        setSelectedLayout(value)
 
-    const toggleFullscreen = () => {
-        setIsFullscreen(!isFullscreen)
+        const layoutOptions = {
+            default: { display: "header", flow: "default" },
+            "default-reverse": { display: "header", flow: "reverse" },
+            square: { display: "square", flow: "default" },
+            "square-reverse": { display: "square", flow: "reverse" },
+        }
+
+        const { display, flow } = layoutOptions[value] || {}
+
+        setArticle((prevArticle) => ({
+            ...prevArticle,
+            display,
+            flow,
+        }))
     }
 
     useEffect(() => {
@@ -95,18 +96,23 @@ function Editor() {
 
     useSignalEffect(() => {
         const getAuthorDetails = () => {
-            setArticle((prevArticle) => {
-                const { name, id, type } = creatorInfo.value
-                return {
-                    ...prevArticle,
-                    author: {
-                        name,
-                        id,
-                        type,
-                    },
-                }
-            })
+            const { name, id, type, user } = creatorInfo.value
+            const author =
+                type === "organization"
+                    ? {
+                          name: user.name,
+                          id: user.id,
+                          type,
+                          organization: { name, id },
+                      }
+                    : { name, id, type }
+
+            setArticle((prevArticle) => ({
+                ...prevArticle,
+                author,
+            }))
         }
+
         getAuthorDetails()
     }, [])
 
@@ -125,7 +131,11 @@ function Editor() {
                         </span>
                     </div>
                     <div className="flex h-full overflow-y-scroll rounded border bg-white">
-                        <ArticlePreview article={article} />
+                        <ArticlePreview
+                            article={article}
+                            selectedElement={selectedElementType}
+                            setArticle={setArticle}
+                        />
                     </div>
                 </div>
                 <div className="flex w-1/5 flex-col gap-2">
@@ -160,29 +170,47 @@ function Editor() {
                                 </select>
                             </div>
                             <div className="flex gap-1.5">
-                                <button className="w-full flex-auto rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                    Title
-                                </button>
-                                <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                    Tag
-                                </button>
+                                <SelectButton
+                                    label="Title"
+                                    type="header-title"
+                                    selectedType={selectedElementType}
+                                    onSelect={handleSelectElement}
+                                />
+                                <SelectButton
+                                    label="Tag"
+                                    type="header-tag"
+                                    selectedType={selectedElementType}
+                                    onSelect={handleSelectElement}
+                                />
                             </div>
-                            <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                Description
-                            </button>
+                            <SelectButton
+                                label="Description"
+                                type="header-description"
+                                selectedType={selectedElementType}
+                                onSelect={handleSelectElement}
+                            />
                             <div className="flex flex-col gap-2 rounded border bg-white p-2">
                                 Image
                                 <div className="flex flex-col gap-2">
-                                    <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                        Upload image
-                                    </button>
+                                    <SelectButton
+                                        label="Upload image"
+                                        type="header-image-upload"
+                                        selectedType={selectedElementType}
+                                        onSelect={handleSelectElement}
+                                    />
                                     <div className="flex gap-1.5">
-                                        <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                            Caption
-                                        </button>
-                                        <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                            Credits
-                                        </button>
+                                        <SelectButton
+                                            label="Caption"
+                                            type="header-image-caption"
+                                            selectedType={selectedElementType}
+                                            onSelect={handleSelectElement}
+                                        />
+                                        <SelectButton
+                                            label="Credits"
+                                            type="header-image-credits"
+                                            selectedType={selectedElementType}
+                                            onSelect={handleSelectElement}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -192,15 +220,24 @@ function Editor() {
                     <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
                         <span>Content</span>
                         <div className="flex flex-col gap-1.5">
-                            <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                Paragraph
-                            </button>
-                            <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                Image
-                            </button>
-                            <button className="w-full flex-1 rounded border bg-white px-4 py-1.5 text-sm font-medium">
-                                Quote
-                            </button>
+                            <SelectButton
+                                label="Paragraph"
+                                type="content-paragraph"
+                                selectedType={selectedElementType}
+                                onSelect={handleSelectElement}
+                            />
+                            <SelectButton
+                                label="Image"
+                                type="content-image"
+                                selectedType={selectedElementType}
+                                onSelect={handleSelectElement}
+                            />
+                            <SelectButton
+                                label="Quote"
+                                type="content-quote"
+                                selectedType={selectedElementType}
+                                onSelect={handleSelectElement}
+                            />
                         </div>
                     </div>
                 </div>
