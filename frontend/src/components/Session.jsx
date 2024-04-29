@@ -12,9 +12,9 @@ export function Session({ session }) {
     const [actionStatus, setActionStatus] = useState()
     const [timeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone)
 
-    const removeSession = (refreshTokenId) => {
+    const removeSession = (refreshTokenId, isCurrenSession) => {
         axiosInstance
-            .post("session/remove", { refreshTokenId })
+            .post("session/remove", { refreshTokenId, isCurrenSession })
             .then((res) => setActionStatus(res.data))
             .catch((err) => setActionStatus(err.response.data))
             .finally(() => setLoader(false))
@@ -27,7 +27,8 @@ export function Session({ session }) {
             const confirmLogout = confirm(
                 "This session is your current device. Are you sure you want to log out?",
             )
-            if (confirmLogout) removeSession(refreshTokenId)
+            if (confirmLogout)
+                removeSession(refreshTokenId, currentRefreshTokenId === refreshTokenId)
             else setLoader(false)
         } else {
             removeSession(refreshTokenId)

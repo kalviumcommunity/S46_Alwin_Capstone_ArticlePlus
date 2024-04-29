@@ -6,7 +6,7 @@ const User = require("../models/user")
 const router = express.Router()
 
 const handleRemoveRefreshToken = async (req, res) => {
-    const { refreshTokenId } = req.body
+    const { refreshTokenId, isCurrenSession } = req.body
 
     try {
         const user = await User.findOne({
@@ -22,11 +22,23 @@ const handleRemoveRefreshToken = async (req, res) => {
         )
         await user.save()
 
-        res.cookie("refreshToken", "null", {
-            domain: process.env.COOKIE_DOMAIN,
-            httpOnly: true,
-            secure: true,
-        })
+        if (isCurrenSession) {
+            res.cookie("accessToken", "null", {
+                domain: process.env.COOKIE_DOMAIN,
+                httpOnly: true,
+                secure: true,
+            })
+            res.cookie("refreshToken", "null", {
+                domain: process.env.COOKIE_DOMAIN,
+                httpOnly: true,
+                secure: true,
+            })
+            res.cookie("refreshTokenId", "null", {
+                domain: process.env.COOKIE_DOMAIN,
+                httpOnly: true,
+                secure: true,
+            })
+        }
 
         res.status(200).json({ message: "Refresh token removed successfully" })
     } catch (error) {
