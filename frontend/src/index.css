@@ -33,6 +33,7 @@ body {
 .highlight::after {
     content: attr(data-selected);
     position: absolute;
+    text-transform: capitalize;
     top: -1rem;
     left: -2px;
     background-color: red;

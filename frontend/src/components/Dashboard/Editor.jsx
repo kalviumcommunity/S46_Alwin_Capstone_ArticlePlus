@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 
 import { creatorInfo } from "@/signals/creator"
 import useKeyPress from "@/helpers/hooks/useKeyPress"
+import axiosInstance from "@/axios"
 
 import ArticlePreview from "./ArticlePreview"
 
@@ -15,14 +16,41 @@ const SelectButton = ({ label, type, selectedType, onSelect, className, ...rest 
 
     const mergedClasses = `${baseClasses} ${isSelected ? selectedClasses : unselectedClasses} ${className || ""}`
 
+    const fileInputRef = useRef(null)
+
+    const handleUploadDialog = () => {
+        fileInputRef.current.click()
+    }
+
+    const handleFileUpload = async (event) => {}
+
     return (
-        <button className={mergedClasses} onClick={() => onSelect(type)} {...rest}>
-            {label}
-        </button>
+        <>
+            {type === "header-image-upload" ? (
+                <button
+                    className={`${mergedClasses} overflow-hidden !px-3 !py-2 !text-start`}
+                    onClick={handleUploadDialog}
+                    {...rest}>
+                    Upload Image
+                    <input
+                        ref={fileInputRef}
+                        className="mt-1.5 cursor-pointer file:mr-2 file:cursor-pointer file:rounded file:border-0 file:bg-rose-500 file:text-white"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                    />
+                    {/* {imageUrl && <img src={imageUrl} alt="Uploaded" />} */}
+                </button>
+            ) : (
+                <button className={mergedClasses} onClick={() => onSelect(type)} {...rest}>
+                    {label}
+                </button>
+            )}
+        </>
     )
 }
 
-function Editor() {
+function Editor({ articleFromDB }) {
     useSignals()
 
     const isEscPressed = useKeyPress("Escape")
@@ -58,6 +86,7 @@ function Editor() {
             credit: "Placeholder credit",
         },
         content: [],
+        ...articleFromDB,
     })
 
     const toggleFullscreen = () => {
@@ -95,26 +124,8 @@ function Editor() {
     }, [isEscPressed])
 
     useSignalEffect(() => {
-        const getAuthorDetails = () => {
-            const { name, id, type, user } = creatorInfo.value
-            const author =
-                type === "organization"
-                    ? {
-                          name: user.name,
-                          id: user.id,
-                          type,
-                          organization: { name, id },
-                      }
-                    : { name, id, type }
-
-            setArticle((prevArticle) => ({
-                ...prevArticle,
-                author,
-            }))
-        }
-
-        getAuthorDetails()
-    }, [])
+        setArticle((prevArticle) => ({ ...prevArticle, ...articleFromDB }))
+    }, [articleFromDB])
 
     return (
         <div
@@ -138,8 +149,8 @@ function Editor() {
                         />
                     </div>
                 </div>
-                <div className="flex w-1/5 flex-col gap-2">
-                    <div className="flex gap-2">
+                <div className="editor-actions flex h-full w-1/5 flex-col gap-2 overflow-x-hidden overflow-y-scroll">
+                    <div className="flex flex-col gap-1.5">
                         <button
                             className="flex w-full justify-center rounded border bg-white p-2 hover:bg-slate-50"
                             onClick={toggleFullscreen}>
@@ -151,6 +162,24 @@ function Editor() {
                                 alt=""
                             />
                         </button>
+
+                        <div>
+                            <button className="flex w-full items-center justify-center gap-2 rounded border bg-green-500 p-2 text-sm font-medium text-white hover:bg-green-600">
+                                <img
+                                    className="h-5 w-5"
+                                    src="/assets/icons/cloud-upload.svg"
+                                    alt=""
+                                />{" "}
+                                Save as draft
+                            </button>
+                            <div className="mt-2 flex items-center justify-end gap-2  text-sm font-medium">
+                                <span>Status</span>
+                                <span className="flex items-center rounded border bg-white px-2 py-0.5">
+                                    <span className="mr-1 text-green-500">⦿</span>
+                                    Saved
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <hr className="border-gray-300" />
                     <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
@@ -184,8 +213,8 @@ function Editor() {
                                 />
                             </div>
                             <SelectButton
-                                label="Description"
-                                type="header-description"
+                                label="Subtitle"
+                                type="header-subtitle"
                                 selectedType={selectedElementType}
                                 onSelect={handleSelectElement}
                             />

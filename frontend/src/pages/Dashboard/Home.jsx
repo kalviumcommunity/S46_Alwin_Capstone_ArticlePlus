@@ -24,6 +24,7 @@ function DashboardHome() {
                     <div className="flex flex-col gap-4 rounded border px-6 py-6 font-normal sm:flex-row sm:items-center sm:px-8">
                         <Link
                             to="new-article"
+                            state={{ fromDashboard: true }}
                             className="flex w-fit items-center gap-2 rounded-full bg-rose-500 py-1.5 pl-2 pr-3 font-medium leading-5 text-white">
                             <img src="/assets/icons/add-circle.svg" alt="" /> New article
                         </Link>

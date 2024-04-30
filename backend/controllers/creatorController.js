@@ -68,7 +68,7 @@ const onboardCreator = async (req, res) => {
         {
             name: user.name,
             id: ownerId,
-            type: "owner",
+            role: "owner",
             userRef: user._id.toString(),
         },
     ]
@@ -94,7 +94,10 @@ const onboardCreator = async (req, res) => {
 
         const newCreator = await Creator(creatorDetails).save()
 
-        await User.findByIdAndUpdate(userId, { creator: true, creatorId: newCreator.id })
+        await User.findByIdAndUpdate(userId, {
+            creator: true,
+            creatorId: newCreator._id.toString(),
+        })
 
         return res.json({ onboarding: "success" })
     })

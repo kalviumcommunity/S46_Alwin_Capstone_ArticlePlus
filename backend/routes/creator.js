@@ -3,7 +3,7 @@ const multer = require("multer")
 
 const router = express.Router()
 
-const asyncHandler = require("../middlewares/asyncHandler")
+const { asyncHandler } = require("../middlewares/asyncHandler")
 const { verifyToken } = require("../middlewares/verifyToken")
 
 const { onboardCreator, authCreatorInfo } = require("../controllers/creatorController")

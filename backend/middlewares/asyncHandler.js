@@ -5,4 +5,4 @@ const asyncHandler = (handler) => (req, res, next) =>
         res.status(500).json({ error: "Internal Server Error" })
     })
 
-module.exports = asyncHandler
+module.exports = { asyncHandler }

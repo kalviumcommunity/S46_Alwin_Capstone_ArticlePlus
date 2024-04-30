@@ -21,7 +21,7 @@ const CreatorSchema = new mongoose.Schema({
             {
                 name: { type: String, required: true },
                 id: { type: String, required: true },
-                type: { type: String, required: true, enum: ["owner", "author", "editor"] },
+                role: { type: String, required: true, enum: ["owner", "author", "editor"] },
                 userRef: { type: String, required: true },
             },
         ],

@@ -3,7 +3,15 @@ import { Link, useNavigate } from "react-router-dom"
 
 import { convertCategoryFormat } from "@/utils/ui/convertCategoryFormat"
 
-function ControlledLink({ to, children, className }) {
+function ControlledLink({
+    to,
+    reference,
+    children,
+    className,
+    dataSelected,
+    handleOnInput,
+    isContentEditable,
+}) {
     const navigate = useNavigate()
 
     const handleClick = (event) => {
@@ -15,23 +23,50 @@ function ControlledLink({ to, children, className }) {
     }
 
     return (
-        <Link to={to} onClick={handleClick} className={className}>
+        <Link
+            ref={reference}
+            to={to}
+            onClick={handleClick}
+            className={className}
+            data-selected={dataSelected}
+            contentEditable={isContentEditable}
+            onInput={handleOnInput}>
             {children}
         </Link>
     )
 }
 
 function ArticlePreview({ article, selectedElement, setArticle }) {
+    const tagRef = useRef(null)
     const titleRef = useRef(null)
     const subTitleRef = useRef(null)
 
+    const handleContentEditable = (e, key) => {
+        const newContent = e.currentTarget.textContent
+        handleEditElement(key, newContent)
+
+        const selection = window.getSelection()
+        const range = document.createRange()
+        range.selectNodeContents(e.currentTarget)
+        range.collapse(false)
+        selection.removeAllRanges()
+        selection.addRange(range)
+    }
+
+    const handleEditElement = (key, value) => {
+        setArticle({ ...article, [key]: value })
+    }
+
     const setDataSelected = (selectedElement) => {
         if (selectedElement === "header-title") {
+            titleRef.current.focus()
             return "Header Title"
         } else if (selectedElement === "header-tag") {
+            tagRef.current.focus()
             return "Header Tag"
-        } else if (selectedElement === "header-description") {
-            return "Header Description"
+        } else if (selectedElement === "header-subtitle") {
+            subTitleRef.current.focus()
+            return "Header Subtitle"
         }
         return ""
     }
@@ -59,7 +94,7 @@ function ArticlePreview({ article, selectedElement, setArticle }) {
                                 className="mb-4 font-serif text-3xl font-semibold">
                                 {article.title}
                             </h1>
-                            <p className="mb-4 text-sm italic text-gray-800">
+                            <p ref={subTitleRef} className="mb-4 text-sm italic text-gray-800">
                                 {article.subtitle}
                             </p>
                             {article.author && (
@@ -107,17 +142,28 @@ function ArticlePreview({ article, selectedElement, setArticle }) {
                         <div
                             className={`flex flex-1 flex-col px-16 text-center ${article.flow === "reverse" && "order-1"}`}>
                             <ControlledLink
-                                className="mb-2 font-serif text-sm uppercase text-rose-500 hover:underline"
+                                reference={tagRef}
+                                handleOnInput={(e) => handleContentEditable(e, "category")}
+                                isContentEditable={selectedElement === "header-tag"}
+                                dataSelected={setDataSelected(selectedElement)}
+                                className={`relative mb-2 font-serif text-sm uppercase text-rose-500 hover:underline ${selectedElement === "header-tag" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}
                                 to={`/?tag=${article.category}`}>
                                 {convertCategoryFormat(article.category)}
                             </ControlledLink>
                             <h1
                                 ref={titleRef}
+                                onInput={(e) => handleContentEditable(e, "title")}
+                                contentEditable={selectedElement === "header-title"}
                                 data-selected={setDataSelected(selectedElement)}
                                 className={`relative mb-4 font-serif text-3xl font-semibold ${selectedElement === "header-title" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
                                 {article.title}
                             </h1>
-                            <p className="mb-4 text-sm italic text-gray-800">
+                            <p
+                                ref={subTitleRef}
+                                onInput={(e) => handleContentEditable(e, "subtitle")}
+                                contentEditable={selectedElement === "header-subtitle"}
+                                data-selected={setDataSelected(selectedElement)}
+                                className={`relative mb-4 text-sm italic text-gray-800 ${selectedElement === "header-subtitle" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
                                 {article.subtitle}
                             </p>
                             {article.author && (
