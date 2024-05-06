@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 
-import { convertCategoryFormat } from "@/utils/ui/convertCategoryFormat"
+import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
 
 import Loader from "@/components/ui/Loader"
 

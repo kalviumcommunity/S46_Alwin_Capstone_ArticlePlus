@@ -5,7 +5,7 @@ import * as Tabs from "@radix-ui/react-tabs"
 
 import { isUserCreator } from "@/signals/creator"
 import { userDetails } from "@/signals/user"
-import { randomGradient } from "@/utils/ui/randomGradient"
+import { randomGradient } from "@/helpers/ui/randomGradient"
 
 import ChangePassword from "@/components/ChangePassword"
 import { Session } from "@/components/Session"

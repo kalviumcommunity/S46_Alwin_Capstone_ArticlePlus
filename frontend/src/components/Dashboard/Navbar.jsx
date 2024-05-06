@@ -9,14 +9,43 @@ import { userDetails, userExists } from "@/signals/user"
 import { getCookie, setCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
-function DashboardNavbar() {
+function useLogic() {
     useSignals()
-    const currentPath = useLocation().pathname
+
+    const { pathname: currentPath } = useLocation()
 
     const [user, setUser] = useState()
     const [isSubNavActive, setIsSubNavActive] = useState(true)
 
+    const navLinks = [
+        { path: "/dashboard", label: "Dashboard" },
+        { path: "/dashboard/articles", label: "Articles" },
+        { path: "/dashboard/analytics", label: "Analytics" },
+        { path: "/dashboard/settings", label: "Settings" },
+        creatorInfo.value.type === "organization" && {
+            path: "/dashboard/organization-settings",
+            label: "Organization Settings",
+        },
+    ]
+
+    const linksWithoutSubNav = ["/dashboard/editor", "/dashboard/new-article"]
+
     useSignalEffect(() => setUser(userDetails.value))
+
+    useEffect(() => {
+        for (const link of navLinks) {
+            if (currentPath === link.path) {
+                setIsSubNavActive(true)
+                break
+            }
+        }
+        for (const link of linksWithoutSubNav) {
+            if (currentPath.includes(link)) {
+                setIsSubNavActive(false)
+                break
+            }
+        }
+    }, [currentPath])
 
     const handleLogout = () => {
         const refreshTokenId = getCookie("refreshTokenId")
@@ -31,25 +60,11 @@ function DashboardNavbar() {
             .catch((err) => console.error(err))
     }
 
-    const navLinks = [
-        { path: "/dashboard", label: "Dashboard" },
-        { path: "/dashboard/articles", label: "Articles" },
-        { path: "/dashboard/analytics", label: "Analytics" },
-        { path: "/dashboard/settings", label: "Settings" },
-        creatorInfo.value.type === "organization" && {
-            path: "/dashboard/organization-settings",
-            label: "Organization Settings",
-        },
-    ]
+    return { user, isSubNavActive, navLinks, currentPath, handleLogout }
+}
 
-    useEffect(() => {
-        for (const link of navLinks) {
-            if (currentPath === link.path) {
-                setIsSubNavActive(true)
-                break
-            }
-        }
-    }, [currentPath])
+function DashboardNavbar() {
+    const { user, isSubNavActive, navLinks, currentPath, handleLogout } = useLogic()
 
     return (
         <nav className="sticky top-0 z-40 flex flex-col bg-white">

@@ -7,6 +7,8 @@ import { creatorInfo, isUserCreator } from "@/signals/creator"
 import Account from "@/pages/Account"
 import Article from "@/pages/Article"
 import Creator from "@/pages/Creator"
+import Editor from "@/pages/Dashboard/Editor"
+import EditorPage from "@/pages/Dashboard/Editor"
 import DashboardLayout from "@/pages/Dashboard/Layout"
 import NewArticle from "@/pages/Dashboard/NewArticle"
 import OrganizationSettings from "@/pages/Dashboard/OrganizationSettings"
@@ -78,6 +80,7 @@ function UserRoutes() {
                             path="new-article"
                             element={<SuspenseHandler component={<NewArticle />} />}
                         />
+                        <Route path="editor/:articleId" element={<EditorPage />} />
                         <Route
                             path="organization-settings"
                             element={<OrganizationSettings />}

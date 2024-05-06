@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as Tabs from "@radix-ui/react-tabs"
 
-import { randomGradient } from "@/utils/ui/randomGradient"
+import { randomGradient } from "@/helpers/ui/randomGradient"
 
 import { ArticleList } from "@/components/ArticleList"
 import SubscribePortal from "@/components/SubscribePortal"

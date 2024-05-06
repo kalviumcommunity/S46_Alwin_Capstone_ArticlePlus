@@ -84,8 +84,6 @@ const onboardCreator = async (req, res) => {
         return res.status(500).send("Error uploading file")
     })
 
-    console.log(creatorDetails)
-
     blobStream.on("finish", async () => {
         const displayPictureUrl = await getDownloadURL(imageRef)
 

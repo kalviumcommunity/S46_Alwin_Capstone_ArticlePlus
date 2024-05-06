@@ -7,7 +7,7 @@ const contentBlockSchema = new mongoose.Schema({
     url: { type: String },
     caption: { type: String },
     comment: { type: String },
-    author: { type: String },
+    reference: { type: String },
     items: { type: [String], default: undefined },
 })
 
@@ -40,7 +40,16 @@ const articleSchema = new mongoose.Schema({
             if (this.status === "published" || this.status === "for-review") return true
         },
     },
-    image: { type: String },
+    image: {
+        url: {
+            type: String,
+            required: true,
+            default:
+                "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
+        },
+        caption: { type: String },
+        credit: { type: String },
+    },
     subtitle: { type: String },
     author: authorSchema,
     timestamp: {

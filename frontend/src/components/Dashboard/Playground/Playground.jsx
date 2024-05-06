@@ -1,131 +1,21 @@
-import React, { useEffect, useRef, useState } from "react"
-import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
-
-import { creatorInfo } from "@/signals/creator"
-import useKeyPress from "@/helpers/hooks/useKeyPress"
-import axiosInstance from "@/axios"
+import React from "react"
 
 import ArticlePreview from "./ArticlePreview"
+import SelectButton from "./SelectButton"
+import usePlaygroundLogic from "./usePlaygroundLogic"
 
-const SelectButton = ({ label, type, selectedType, onSelect, className, ...rest }) => {
-    const isSelected = selectedType === type
-    const baseClasses =
-        "select-btn w-full flex-1 rounded border px-4 py-1.5 text-sm font-medium hover:bg-black hover:text-white"
-    const selectedClasses = "!bg-rose-500 text-white"
-    const unselectedClasses = "bg-white"
-
-    const mergedClasses = `${baseClasses} ${isSelected ? selectedClasses : unselectedClasses} ${className || ""}`
-
-    const fileInputRef = useRef(null)
-
-    const handleUploadDialog = () => {
-        fileInputRef.current.click()
-    }
-
-    const handleFileUpload = async (event) => {}
-
-    return (
-        <>
-            {type === "header-image-upload" ? (
-                <button
-                    className={`${mergedClasses} overflow-hidden !px-3 !py-2 !text-start`}
-                    onClick={handleUploadDialog}
-                    {...rest}>
-                    Upload Image
-                    <input
-                        ref={fileInputRef}
-                        className="mt-1.5 cursor-pointer file:mr-2 file:cursor-pointer file:rounded file:border-0 file:bg-rose-500 file:text-white"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                    />
-                    {/* {imageUrl && <img src={imageUrl} alt="Uploaded" />} */}
-                </button>
-            ) : (
-                <button className={mergedClasses} onClick={() => onSelect(type)} {...rest}>
-                    {label}
-                </button>
-            )}
-        </>
-    )
-}
-
-function Editor({ articleFromDB }) {
-    useSignals()
-
-    const isEscPressed = useKeyPress("Escape")
-
-    const [isFullscreen, setIsFullscreen] = useState(false)
-    const [selectedLayout, setSelectedLayout] = useState("default")
-    const [selectedElementType, setSelectedElementType] = useState(null)
-
-    const [article, setArticle] = useState({
-        title: "Here goes your title for the article",
-        subtitle: "Write what is teh short summary/hook for the article",
-        display: "header",
-        flow: "default",
-        slug: "here-goes-your-title-for-the-article",
-        author: {
-            name: "",
-            id: "",
-            type: "",
-            organization: {
-                name: "",
-                id: "",
-            },
-        },
-        timestamp: new Date().toLocaleString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-        }),
-        category: "tag for article",
-        image: {
-            url: "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
-            caption: "Placeholder caption or description",
-            credit: "Placeholder credit",
-        },
-        content: [],
-        ...articleFromDB,
-    })
-
-    const toggleFullscreen = () => {
-        setIsFullscreen(!isFullscreen)
-    }
-
-    const handleSelectElement = (type) => {
-        setSelectedElementType(type)
-    }
-
-    const handleLayoutChange = (event) => {
-        const { value } = event.target
-        setSelectedLayout(value)
-
-        const layoutOptions = {
-            default: { display: "header", flow: "default" },
-            "default-reverse": { display: "header", flow: "reverse" },
-            square: { display: "square", flow: "default" },
-            "square-reverse": { display: "square", flow: "reverse" },
-        }
-
-        const { display, flow } = layoutOptions[value] || {}
-
-        setArticle((prevArticle) => ({
-            ...prevArticle,
-            display,
-            flow,
-        }))
-    }
-
-    useEffect(() => {
-        if (isFullscreen && isEscPressed) {
-            setIsFullscreen(false)
-        }
-    }, [isEscPressed])
-
-    useSignalEffect(() => {
-        setArticle((prevArticle) => ({ ...prevArticle, ...articleFromDB }))
-    }, [articleFromDB])
+function Playground({ articleId }) {
+    const {
+        isFullscreen,
+        article,
+        selectedElementType,
+        setArticle,
+        toggleFullscreen,
+        selectedLayout,
+        handleLayoutChange,
+        handleArticleDBUpdate,
+        handleSelectElement,
+    } = usePlaygroundLogic({ articleId })
 
     return (
         <div
@@ -149,8 +39,8 @@ function Editor({ articleFromDB }) {
                         />
                     </div>
                 </div>
-                <div className="editor-actions flex h-full w-1/5 flex-col gap-2 overflow-x-hidden overflow-y-scroll">
-                    <div className="flex flex-col gap-1.5">
+                <div className="flex h-full w-1/5 flex-col gap-2 overflow-x-hidden overflow-y-scroll pr-2.5">
+                    <div className="sticky top-0 flex flex-col gap-1.5 border-b border-gray-300 bg-gray-100">
                         <button
                             className="flex w-full justify-center rounded border bg-white p-2 hover:bg-slate-50"
                             onClick={toggleFullscreen}>
@@ -162,26 +52,24 @@ function Editor({ articleFromDB }) {
                                 alt=""
                             />
                         </button>
-
-                        <div>
-                            <button className="flex w-full items-center justify-center gap-2 rounded border bg-green-500 p-2 text-sm font-medium text-white hover:bg-green-600">
-                                <img
-                                    className="h-5 w-5"
-                                    src="/assets/icons/cloud-upload.svg"
-                                    alt=""
-                                />{" "}
-                                Save as draft
-                            </button>
-                            <div className="mt-2 flex items-center justify-end gap-2  text-sm font-medium">
+                        <button className="flex w-full items-center justify-center gap-1 rounded border bg-green-500 px-4 py-2 text-sm font-medium leading-none text-white hover:bg-green-600">
+                            <img
+                                className="h-5 w-5"
+                                src="/assets/icons/cloud-upload.svg"
+                                alt=""
+                            />{" "}
+                            Save as draft
+                        </button>
+                        <div className="mt-0.5 flex justify-between gap-2 px-1 pb-2 text-sm">
+                            <div className="flex flex-col items-end justify-center gap-0.5 text-sm font-medium">
                                 <span>Status</span>
-                                <span className="flex items-center rounded border bg-white px-2 py-0.5">
-                                    <span className="mr-1 text-green-500">⦿</span>
-                                    Saved
-                                </span>
                             </div>
+                            <span className="flex items-center rounded border bg-white px-2 py-0.5">
+                                <span className="mr-1 text-green-500">⦿</span>
+                                Saved
+                            </span>
                         </div>
                     </div>
-                    <hr className="border-gray-300" />
                     <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
                         <span>Header</span>
                         <div className="flex flex-col gap-1.5">
@@ -224,8 +112,10 @@ function Editor({ articleFromDB }) {
                                     <SelectButton
                                         label="Upload image"
                                         type="header-image-upload"
+                                        article={article}
                                         selectedType={selectedElementType}
                                         onSelect={handleSelectElement}
+                                        handleArticleDBUpdate={handleArticleDBUpdate}
                                     />
                                     <div className="flex gap-1.5">
                                         <SelectButton
@@ -275,4 +165,4 @@ function Editor({ articleFromDB }) {
     )
 }
 
-export default Editor
+export default Playground

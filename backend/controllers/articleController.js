@@ -1,6 +1,10 @@
+const { getStorage, getDownloadURL } = require("firebase-admin/storage")
+
 const Article = require("../models/article")
 const User = require("../models/user")
 const Creator = require("../models/creator")
+
+const storage = getStorage()
 
 const createNewArticle = async (req, res) => {
     const { userId } = req
@@ -52,4 +56,41 @@ const createNewArticle = async (req, res) => {
     res.status(200).json(article)
 }
 
-module.exports = { createNewArticle }
+const addArticleImage = async (req, res) => {
+    const { articleId } = req.body
+
+    const articleImageFile = req.file
+    let article = await Article.findById(articleId)
+
+    const creator = await Creator.findOne({ "contributors.id": article.author.id })
+
+    if (!creator) {
+        return res
+            .status(403)
+            .json({ error: "You are not authorized to update this article's image." })
+    }
+
+    const imageRef = storage.bucket().file(`article/${articleId}/header-image.jpg`)
+    const blobStream = imageRef.createWriteStream({
+        metadata: {
+            contentType: articleImageFile.mimetype,
+        },
+    })
+
+    blobStream.on("error", (err) => {
+        return res.status(500).json({ error: "Error uploading file" })
+    })
+
+    blobStream.on("finish", async () => {
+        const articleImageUrl = await getDownloadURL(imageRef)
+        article.image = { url: articleImageUrl, caption: "", credit: "" }
+
+        await article.save()
+        console.log(article)
+        return res.json({ success: true })
+    })
+
+    blobStream.end(articleImageFile.buffer)
+}
+
+module.exports = { createNewArticle, addArticleImage }

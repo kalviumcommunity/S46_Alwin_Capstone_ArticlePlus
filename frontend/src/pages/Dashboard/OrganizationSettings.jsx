@@ -4,7 +4,6 @@ import { useSignalEffect } from "@preact/signals-react"
 import * as Tabs from "@radix-ui/react-tabs"
 
 import { creatorInfo } from "@/signals/creator"
-import axiosInstance from "@/axios"
 
 import Authors from "@/components/Dashboard/Authors"
 import Billing from "@/components/Dashboard/Billing"
@@ -12,17 +11,6 @@ import Team from "@/components/Dashboard/Team"
 
 function OrganizationSettings() {
     const location = useLocation()
-
-    if (creatorInfo.value && creatorInfo.value.type === "individual") {
-        return (
-            <div>
-                <h1 className="text-2xl font-semibold">Organization Settings</h1>
-                <p className="text-gray-500">
-                    You need to be logged in as an organization to access this page.
-                </p>
-            </div>
-        )
-    }
 
     const [creatorDetails, setCreatorDetails] = useState(null)
     const [activeTab, setActiveTab] = useState(window.innerWidth > 640 ? "general" : "")
@@ -38,6 +26,17 @@ function OrganizationSettings() {
             setActiveTab("general")
         }
     }, [activeTab, location.pathname])
+
+    if (creatorInfo.value && creatorInfo.value.type === "individual") {
+        return (
+            <div>
+                <h1 className="text-2xl font-semibold">Organization Settings</h1>
+                <p className="text-gray-500">
+                    You need to be logged in as an organization to access this page.
+                </p>
+            </div>
+        )
+    }
 
     return (
         <div className="mb-8 flex flex-col sm:gap-6">

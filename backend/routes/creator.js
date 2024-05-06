@@ -1,15 +1,14 @@
 const express = require("express")
-const multer = require("multer")
 
-const router = express.Router()
+const initMulter = require("../lib/multer")
 
 const { asyncHandler } = require("../middlewares/asyncHandler")
 const { verifyToken } = require("../middlewares/verifyToken")
 
 const { onboardCreator, authCreatorInfo } = require("../controllers/creatorController")
 
-const inMemoryStorage = multer.memoryStorage()
-const upload = multer({ inMemoryStorage })
+const router = express.Router()
+const upload = initMulter()
 
 router.use(asyncHandler(verifyToken))
 
