@@ -4,6 +4,8 @@ const Article = require("../models/article")
 const User = require("../models/user")
 const Creator = require("../models/creator")
 
+const { convertToWebp } = require("../lib/sharp")
+
 const storage = getStorage()
 
 const createNewArticle = async (req, res) => {
@@ -58,6 +60,9 @@ const createNewArticle = async (req, res) => {
 
 const addArticleImage = async (req, res) => {
     const { articleId } = req.body
+    const { ref } = req.params
+
+    console.log(ref)
 
     const articleImageFile = req.file
     let article = await Article.findById(articleId)
@@ -70,10 +75,12 @@ const addArticleImage = async (req, res) => {
             .json({ error: "You are not authorized to update this article's image." })
     }
 
-    const imageRef = storage.bucket().file(`article/${articleId}/header-image.jpg`)
+    const webpArticleImageFile = await convertToWebp(articleImageFile)
+
+    const imageRef = storage.bucket().file(`article/${articleId}/header-image`)
     const blobStream = imageRef.createWriteStream({
         metadata: {
-            contentType: articleImageFile.mimetype,
+            contentType: "image/webp",
         },
     })
 
@@ -83,6 +90,7 @@ const addArticleImage = async (req, res) => {
 
     blobStream.on("finish", async () => {
         const articleImageUrl = await getDownloadURL(imageRef)
+
         article.image = { url: articleImageUrl, caption: "", credit: "" }
 
         await article.save()
@@ -90,7 +98,7 @@ const addArticleImage = async (req, res) => {
         return res.json({ success: true })
     })
 
-    blobStream.end(articleImageFile.buffer)
+    blobStream.end(webpArticleImageFile.buffer)
 }
 
 module.exports = { createNewArticle, addArticleImage }

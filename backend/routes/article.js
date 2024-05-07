@@ -29,7 +29,7 @@ router.get("/:id", async (req, res) => {
 
 router.post("/create", verifyToken, asyncHandler(createNewArticle))
 router.post(
-    "/addimage",
+    "/addimage/:ref",
     verifyToken,
     upload.single("articleImage"),
     asyncHandler(addArticleImage),

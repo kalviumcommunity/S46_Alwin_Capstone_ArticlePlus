@@ -4,6 +4,8 @@ const Joi = require("joi")
 const Creator = require("../models/creator")
 const User = require("../models/user")
 
+const { convertToWebp } = require("../lib/sharp")
+
 const storage = getStorage()
 
 const creatorDetailsSchema = Joi.object({
@@ -73,10 +75,12 @@ const onboardCreator = async (req, res) => {
         },
     ]
 
+    const webpDisplayPictureFile = await convertToWebpDP(displayPictureFile, 80, 1920, 1920)
+
     const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
     const blobStream = imageRef.createWriteStream({
         metadata: {
-            contentType: displayPictureFile.mimetype,
+            contentType: "image/webp",
         },
     })
 
@@ -100,7 +104,7 @@ const onboardCreator = async (req, res) => {
         return res.json({ onboarding: "success" })
     })
 
-    blobStream.end(displayPictureFile.buffer)
+    blobStream.end(webpDisplayPictureFile.buffer)
 }
 
 const authCreatorInfo = async (req, res) => {
