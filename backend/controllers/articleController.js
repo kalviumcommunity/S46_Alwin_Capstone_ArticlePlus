@@ -98,7 +98,7 @@ const addArticleImage = async (req, res) => {
         return res.json({ success: true })
     })
 
-    blobStream.end(webpArticleImageFile.buffer)
+    blobStream.end(webpArticleImageFile)
 }
 
 module.exports = { createNewArticle, addArticleImage }

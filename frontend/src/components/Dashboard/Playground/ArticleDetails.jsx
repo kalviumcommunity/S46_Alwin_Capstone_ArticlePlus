@@ -3,7 +3,7 @@ import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
 import ControlledLink from "./ControlledLink"
 
 function ArticleDetails({
-    tagRef,
+    categoryRef,
     titleRef,
     subTitleRef,
     article,
@@ -14,12 +14,12 @@ function ArticleDetails({
     return (
         <>
             <span
-                ref={tagRef}
+                ref={categoryRef}
                 onInput={(e) => handleContentEditable(e, "category")}
-                contentEditable={selectedElement === "header-tag"}
+                contentEditable={selectedElement === "header-category"}
                 aria-rowspan={1}
                 data-selected={setDataSelected(selectedElement)}
-                className={`relative mb-2 font-serif text-sm uppercase text-rose-500 hover:underline ${selectedElement === "header-tag" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
+                className={`relative mb-2 font-serif text-sm uppercase text-rose-500 hover:underline ${selectedElement === "header-category" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
                 {convertCategoryFormat(article.category.replace(/(\r\n|\n|\r)/gm, ""))}
             </span>
             <h1

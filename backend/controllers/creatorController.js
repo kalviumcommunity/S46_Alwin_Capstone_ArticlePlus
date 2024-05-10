@@ -75,7 +75,7 @@ const onboardCreator = async (req, res) => {
         },
     ]
 
-    const webpDisplayPictureFile = await convertToWebpDP(displayPictureFile, 80, 1920, 1920)
+    const webpDisplayPictureFile = await convertToWebp(displayPictureFile, 80, 1920, 1920)
 
     const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
     const blobStream = imageRef.createWriteStream({
@@ -104,7 +104,7 @@ const onboardCreator = async (req, res) => {
         return res.json({ onboarding: "success" })
     })
 
-    blobStream.end(webpDisplayPictureFile.buffer)
+    blobStream.end(webpDisplayPictureFile)
 }
 
 const authCreatorInfo = async (req, res) => {

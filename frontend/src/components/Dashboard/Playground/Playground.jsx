@@ -1,21 +1,117 @@
-import React from "react"
+import { useEffect, useState } from "react"
+import { useSignals } from "@preact/signals-react/runtime"
 
+import useKeyPress from "@/helpers/hooks/useKeyPress"
+import axiosInstance from "@/axios"
+
+import AddContentButton from "./AddContentButton"
 import ArticlePreview from "./ArticlePreview"
+import ContentControlButton from "./ContentControlButton"
 import SelectButton from "./SelectButton"
-import usePlaygroundLogic from "./usePlaygroundLogic"
 
 function Playground({ articleId }) {
-    const {
-        isFullscreen,
-        article,
-        selectedElementType,
-        setArticle,
-        toggleFullscreen,
-        selectedLayout,
-        handleLayoutChange,
-        handleArticleDBUpdate,
-        handleSelectElement,
-    } = usePlaygroundLogic({ articleId })
+    useSignals()
+
+    const isEscPressed = useKeyPress("Escape")
+
+    const [isFullscreen, setIsFullscreen] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const [selectedLayout, setSelectedLayout] = useState("default")
+    const [selectedElementType, setSelectedElementType] = useState(null)
+
+    const [article, setArticle] = useState({
+        title: "Here goes your title for the article",
+        subtitle: "Write what is the short summary/hook for the article",
+        display: "header",
+        flow: "default",
+        slug: "here-goes-your-title-for-the-article",
+        author: {
+            name: "",
+            id: "",
+            type: "",
+            organization: {
+                name: "",
+                id: "",
+            },
+        },
+        timestamp: new Date().toLocaleString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+        }),
+        category: "tag-for-article",
+        image: {
+            url: "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
+            caption: "Placeholder caption or description",
+            credit: "Placeholder credit",
+        },
+        content: [],
+    })
+
+    const toggleFullscreen = () => {
+        setIsFullscreen(!isFullscreen)
+    }
+
+    const handleSelectElement = (type) => {
+        console.log(type)
+        setSelectedElementType(type)
+    }
+
+    const handleLayoutChange = (event) => {
+        const { value } = event.target
+        setSelectedLayout(value)
+
+        const layoutOptions = {
+            default: { display: "header", flow: "default" },
+            "default-reverse": { display: "header", flow: "reverse" },
+            square: { display: "square", flow: "default" },
+            "square-reverse": { display: "square", flow: "reverse" },
+        }
+
+        const { display, flow } = layoutOptions[value] || {}
+
+        setArticle((prevArticle) => ({
+            ...prevArticle,
+            display,
+            flow,
+        }))
+    }
+
+    const getArticle = () => {
+        setIsLoading(true)
+        axiosInstance
+            .get(`article/${articleId}`)
+            .then((res) => {
+                setArticle((prevArticle) => ({
+                    ...prevArticle,
+                    ...res.data,
+                }))
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
+    }
+
+    const handleArticleDBUpdate = () => {
+        getArticle()
+    }
+
+    useEffect(() => {
+        getArticle()
+    }, [articleId])
+
+    useEffect(() => {
+        if (isFullscreen && isEscPressed) {
+            setIsFullscreen(false)
+        }
+    }, [isEscPressed])
+
+    useEffect(() => {
+        console.log(article)
+    }, [article])
 
     return (
         <div
@@ -33,6 +129,7 @@ function Playground({ articleId }) {
                     </div>
                     <div className="flex h-full overflow-y-scroll rounded border bg-white">
                         <ArticlePreview
+                            isLoading={isLoading}
                             article={article}
                             selectedElement={selectedElementType}
                             setArticle={setArticle}
@@ -41,25 +138,27 @@ function Playground({ articleId }) {
                 </div>
                 <div className="flex h-full w-1/5 flex-col gap-2 overflow-x-hidden overflow-y-scroll pr-2.5">
                     <div className="sticky top-0 flex flex-col gap-1.5 border-b border-gray-300 bg-gray-100">
-                        <button
-                            className="flex w-full justify-center rounded border bg-white p-2 hover:bg-slate-50"
-                            onClick={toggleFullscreen}>
-                            <img
-                                className="h-5"
-                                src={`/assets/icons/${
-                                    isFullscreen ? "close-fullscreen" : "fullscreen"
-                                }.svg`}
-                                alt=""
-                            />
-                        </button>
-                        <button className="flex w-full items-center justify-center gap-1 rounded border bg-green-500 px-4 py-2 text-sm font-medium leading-none text-white hover:bg-green-600">
-                            <img
-                                className="h-5 w-5"
-                                src="/assets/icons/cloud-upload.svg"
-                                alt=""
-                            />{" "}
-                            Save as draft
-                        </button>
+                        <div className="flex w-full gap-2">
+                            <button className="flex flex-auto items-center justify-center rounded border bg-green-500 px-3 py-2 text-sm font-medium leading-none text-white hover:bg-green-600 lg:gap-2">
+                                <img
+                                    className="h-5 w-5"
+                                    src="/assets/icons/cloud-upload.svg"
+                                    alt=""
+                                />{" "}
+                                <span className="line-clamp-1 w-fit">Save as draft</span>
+                            </button>
+                            <button
+                                className="flex justify-center rounded border bg-white p-2 hover:bg-slate-50"
+                                onClick={toggleFullscreen}>
+                                <img
+                                    className="h-5 w-5"
+                                    src={`/assets/icons/${
+                                        isFullscreen ? "close-fullscreen" : "fullscreen"
+                                    }.svg`}
+                                    alt=""
+                                />
+                            </button>
+                        </div>
                         <div className="mt-0.5 flex justify-between gap-2 px-1 pb-2 text-sm">
                             <div className="flex flex-col items-end justify-center gap-0.5 text-sm font-medium">
                                 <span>Status</span>
@@ -95,7 +194,7 @@ function Playground({ articleId }) {
                                 />
                                 <SelectButton
                                     label="Tag"
-                                    type="header-tag"
+                                    type="header-category"
                                     selectedType={selectedElementType}
                                     onSelect={handleSelectElement}
                                 />
@@ -106,18 +205,19 @@ function Playground({ articleId }) {
                                 selectedType={selectedElementType}
                                 onSelect={handleSelectElement}
                             />
-                            <div className="flex flex-col gap-2 rounded border bg-white p-2">
-                                Image
+                            <div className="flex flex-col gap-2 rounded border bg-white p-2.5">
+                                Upload Header Image
                                 <div className="flex flex-col gap-2">
                                     <SelectButton
-                                        label="Upload image"
+                                        label="Upload header image"
                                         type="header-image-upload"
+                                        setIsLoading={setIsLoading}
                                         article={article}
                                         selectedType={selectedElementType}
                                         onSelect={handleSelectElement}
                                         handleArticleDBUpdate={handleArticleDBUpdate}
                                     />
-                                    <div className="flex gap-1.5">
+                                    <div className="flex gap-1.5 overflow-auto">
                                         <SelectButton
                                             label="Caption"
                                             type="header-image-caption"
@@ -137,26 +237,53 @@ function Playground({ articleId }) {
                     </div>
                     <hr className="border-gray-300" />
                     <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
-                        <span>Content</span>
-                        <div className="flex flex-col gap-1.5">
-                            <SelectButton
+                        <span>Add Content</span>
+                        <div className="flex gap-1.5 overflow-x-auto">
+                            <AddContentButton
                                 label="Paragraph"
                                 type="content-paragraph"
-                                selectedType={selectedElementType}
-                                onSelect={handleSelectElement}
+                                article={article}
+                                setArticle={setArticle}
                             />
-                            <SelectButton
+                            <AddContentButton
                                 label="Image"
                                 type="content-image"
-                                selectedType={selectedElementType}
-                                onSelect={handleSelectElement}
+                                article={article}
+                                setArticle={setArticle}
                             />
-                            <SelectButton
+                            <AddContentButton
                                 label="Quote"
                                 type="content-quote"
-                                selectedType={selectedElementType}
-                                onSelect={handleSelectElement}
+                                article={article}
+                                setArticle={setArticle}
                             />
+                        </div>
+                    </div>
+                    <hr className="border-gray-300" />
+                    <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
+                        <span>
+                            Content Map
+                            <br />
+                            <span className="text-xs font-normal">
+                                (Select an element to edit)
+                            </span>
+                        </span>
+                        <div className="mb-4 flex flex-col gap-1.5">
+                            {article.content.map((content, index) => (
+                                <div key={index}>
+                                    <ContentControlButton
+                                        label={`[${index + 1}] ${content.type}`}
+                                        type={`content-${index}-${content.type}`}
+                                        selectedType={selectedElementType}
+                                        onSelect={handleSelectElement}
+                                    />
+                                </div>
+                            ))}
+                            {article.content.length === 0 && (
+                                <div className="mb-3 flex items-center justify-center gap-1 rounded px-1 py-2 text-sm  font-normal text-gray-800">
+                                    Add an element by selecting it from the list above
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

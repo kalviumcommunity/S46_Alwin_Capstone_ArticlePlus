@@ -4,11 +4,14 @@ import { Link, useLocation, useParams } from "react-router-dom"
 import axiosInstance from "@/axios"
 
 import Playground from "@/components/Dashboard/Playground"
+import Loader from "@/components/ui/Loader"
 
 function EditorPage() {
     const location = useLocation()
 
     const { articleId } = useParams()
+
+    const [isLoading, setIsLoading] = useState(true)
     const [isArticleNew, setIsArticleNew] = useState(false)
     const [isArticleAccessible, setIsArticleAccessible] = useState(false)
 
@@ -21,6 +24,9 @@ function EditorPage() {
             })
             .catch((err) => {
                 console.log(err)
+            })
+            .finally(() => {
+                setIsLoading(false)
             })
     }, [])
 
@@ -39,16 +45,20 @@ function EditorPage() {
                 <Playground articleId={articleId} />
             ) : (
                 <div className="m-2 flex h-[50vh] w-full flex-col items-center justify-center gap-3 border bg-gray-100 p-2">
-                    <div className="flex flex-col items-center gap-3">
-                        <p className="text-xl font-semibold">
-                            You don't have access to this article.
-                        </p>
-                        <Link
-                            to="/dashboard"
-                            className="flex h-fit w-fit items-center gap-2 rounded-full bg-rose-500 px-5 py-1.5 font-medium leading-5 text-white">
-                            Back to dashboard
-                        </Link>
-                    </div>
+                    {isLoading ? (
+                        <Loader />
+                    ) : (
+                        <div className="flex flex-col items-center gap-3">
+                            <p className="text-xl font-semibold">
+                                You don't have access to this article.
+                            </p>
+                            <Link
+                                to="/dashboard"
+                                className="flex h-fit w-fit items-center gap-2 rounded-full bg-rose-500 px-5 py-1.5 font-medium leading-5 text-white">
+                                Back to dashboard
+                            </Link>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
