@@ -1,33 +1,36 @@
-import { useEffect, useRef } from "react"
+import { useContext, useRef } from "react"
 
 import axiosInstance from "@/axios"
+
+import { PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
 const SelectButton = ({
     setIsLoading,
     label,
     type,
-    selectedType,
-    onSelect,
-    className,
-    article,
     handleArticleDBUpdate,
     selectionRef,
     ...rest
 }) => {
-    const isSelected = selectedType === type
+    const { article } = useContext(PlaygroundArticleContext)
+    const { selectedElementType, setSelectedElementType } = useContext(SelectedElementContext)
+
+    const isSelected = selectedElementType === type
     const baseClasses =
         "capitalize w-full flex-1 rounded border px-4 py-1.5 text-sm font-medium hover:bg-black hover:text-white"
     const selectedClasses = "!bg-rose-500 text-white"
     const unselectedClasses = "bg-white"
-    const mergedClasses = `${baseClasses} ${
-        isSelected ? selectedClasses : unselectedClasses
-    } ${className || ""}`
+    const mergedClasses = `${baseClasses} ${isSelected ? selectedClasses : unselectedClasses}`
 
     const fileInputRef = useRef(null)
 
+    const handleSelectElement = () => {
+        setSelectedElementType(type)
+    }
+
     const handleUploadDialog = () => {
         fileInputRef.current.click()
-        onSelect(type)
+        setSelectedElementType(type)
     }
 
     const handleFileUpload = async (event) => {
@@ -42,8 +45,6 @@ const SelectButton = ({
         const formData = new FormData()
         formData.append("articleImage", file)
         formData.append("articleId", article._id)
-
-        console.log(selectedType)
 
         setIsLoading(true)
         axiosInstance
@@ -76,13 +77,12 @@ const SelectButton = ({
                         className="label mt-1.5 cursor-pointer file:mb-1.5 file:mr-2 file:flex file:cursor-pointer file:flex-col file:rounded file:border-0 file:bg-rose-500 file:text-white"
                         ref={fileInputRef}
                         type="file"
-                        for={type}
                         accept="image/*"
                         onChange={handleFileUpload}
                     />
                 </button>
             ) : (
-                <button className={mergedClasses} onClick={() => onSelect(type)} {...rest}>
+                <button className={mergedClasses} onClick={handleSelectElement} {...rest}>
                     {label}
                 </button>
             )}

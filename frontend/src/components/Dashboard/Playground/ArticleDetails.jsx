@@ -1,16 +1,20 @@
+import { useContext } from "react"
+
 import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
 
 import ControlledLink from "./ControlledLink"
+import { PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
 function ArticleDetails({
     categoryRef,
     titleRef,
     subTitleRef,
-    article,
-    selectedElement,
     handleContentEditable,
     setDataSelected,
 }) {
+    const { article } = useContext(PlaygroundArticleContext)
+    const { selectedElementType: selectedElement } = useContext(SelectedElementContext)
+
     return (
         <>
             <span
@@ -27,7 +31,8 @@ function ArticleDetails({
                 onInput={(e) => handleContentEditable(e, "title")}
                 contentEditable={selectedElement === "header-title"}
                 data-selected={setDataSelected(selectedElement)}
-                className={`relative mb-4 font-serif text-3xl font-semibold ${selectedElement === "header-title" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
+                className={`relative mb-4 font-serif text-3xl font-semibold ${selectedElement === "header-title" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}
+                suppressContentEditableWarning={true}>
                 {article.title}
             </h1>
             <p

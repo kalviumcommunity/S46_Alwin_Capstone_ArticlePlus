@@ -2,8 +2,9 @@ const mongoose = require("mongoose")
 
 // Content block schema
 const contentBlockSchema = new mongoose.Schema({
-    type: { type: String, required: true },
+    type: { type: String, required: true, enum: ["paragraph", "image", "quote"] },
     text: { type: String },
+    content: { type: String },
     url: { type: String },
     caption: { type: String },
     comment: { type: String },
@@ -47,8 +48,6 @@ const articleSchema = new mongoose.Schema({
             default:
                 "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
         },
-        caption: { type: String },
-        credit: { type: String },
     },
     subtitle: { type: String },
     author: authorSchema,

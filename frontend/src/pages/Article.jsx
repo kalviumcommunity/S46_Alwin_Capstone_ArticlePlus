@@ -68,20 +68,14 @@ function Article({ data }) {
                     <img
                         className="w-full md:w-1/3"
                         src={article.image.url}
-                        alt={article.image.caption}
+                        alt={article.title}
                         loading="lazy"
                     />
                 </div>
-
-                <div className="space-x-2 px-4 pt-3 text-sm md:px-16 lg:px-32">
-                    <span>{article.image.caption}</span>
-                    <span className="text-gray-500">{article.image.credit}</span>
-                </div>
-
                 <div className="m-auto flex max-w-xl flex-col px-5 pt-12">
                     {article.content.map((block, index) => (
                         <div key={index} className="mb-6">
-                            {block.type === "text" && (
+                            {block.type === "paragraph" && (
                                 <p className="font-serif text-lg leading-relaxed text-black">
                                     {block.text}
                                 </p>
@@ -96,7 +90,7 @@ function Article({ data }) {
                                     />
                                     <div className="space-x-2 text-sm leading-5">
                                         <span>{block.caption}</span>
-                                        <span className="text-gray-500">{block.credit}</span>
+                                        <span className="text-gray-500">{block?.credit}</span>
                                     </div>
                                 </div>
                             )}
@@ -154,21 +148,16 @@ function Article({ data }) {
                         <img
                             className="h-full w-full object-cover"
                             src={article.image.url}
-                            alt={article.image.caption}
+                            alt={article.title}
                             loading="lazy"
                         />
                     </div>
                 </div>
 
-                <div className="space-x-2 px-4 pt-3 text-sm md:px-16 lg:px-32">
-                    <span>{article.image.caption}</span>
-                    <span className="text-gray-500">{article.image.credit}</span>
-                </div>
-
                 <div className="m-auto flex max-w-xl flex-col px-5 pt-12">
                     {article.content.map((block, index) => (
                         <div key={index} className="mb-6">
-                            {block.type === "text" && (
+                            {block.type === "paragraph" && (
                                 <p className="font-serif text-lg leading-relaxed text-black">
                                     {block.text}
                                 </p>
@@ -178,12 +167,12 @@ function Article({ data }) {
                                     <img
                                         className="h-full"
                                         src={block.url}
-                                        alt={block.caption}
+                                        alt={block?.caption}
                                         loading="lazy"
                                     />
                                     <div className="space-x-2 text-sm leading-5">
-                                        <span>{block.caption}</span>
-                                        <span className="text-gray-500">{block.credit}</span>
+                                        <span>{block?.caption}</span>
+                                        <span className="text-gray-500">{block?.credit}</span>
                                     </div>
                                 </div>
                             )}

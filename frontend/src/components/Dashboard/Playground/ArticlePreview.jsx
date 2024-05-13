@@ -1,11 +1,15 @@
-import React, { useEffect, useRef } from "react"
-import { ToyBrick } from "lucide-react"
+import React, { useContext, useEffect, useRef } from "react"
 
 import Loader from "@/components/ui/Loader"
 
 import ArticleDetails from "./ArticleDetails"
+import ContentControlButton from "./ContentControlButton"
+import { PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
-function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
+function ArticlePreview({ isLoading }) {
+    const { article, setArticle } = useContext(PlaygroundArticleContext)
+    const { selectedElementType: selectedElement } = useContext(SelectedElementContext)
+
     const categoryRef = useRef(null)
     const titleRef = useRef(null)
     const subTitleRef = useRef(null)
@@ -26,7 +30,7 @@ function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
 
     const handleEditElement = (key, index, type, value) => {
         if (key === "content") {
-            if (type === "text") {
+            if (type === "paragraph") {
                 setArticle({
                     ...article,
                     content: article.content.map((block, i) =>
@@ -39,27 +43,37 @@ function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
         setArticle({ ...article, [key]: value })
     }
 
-    const setDataSelected = (selectedElement) => {
-        console.log(selectedElement)
+    const setDataSelected = () => {
         if (selectedElement === "header-title") {
+            titleRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
             titleRef.current.focus()
             return "Header Title"
         } else if (selectedElement === "header-category") {
+            titleRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
             categoryRef.current.focus()
             return "Header Category"
         } else if (selectedElement === "header-subtitle") {
+            titleRef.current.scrollIntoView({ behavior: "smooth", block: "center" })
             subTitleRef.current.focus()
             return "Header Subtitle"
         } else if (selectedElement?.startsWith("content")) {
             const index = selectedElement.split("-")[1]
             const elementRef = elementRefs.current[index]?.element
             if (elementRef) {
+                elementRef.scrollIntoView({ behavior: "smooth", block: "center" })
                 elementRef.focus()
                 return `Content ${parseInt(index) + 1}`
             }
         }
         return ""
     }
+
+    useEffect(() => {
+        const articlePrev = document.querySelector("#article-preview")
+        if (articlePrev) {
+            articlePrev.scrollTo(0, articlePrev.scrollHeight)
+        }
+    }, [article?.content])
 
     return (
         <div className={`font-body relative w-full ${isLoading && "overflow-hidden"}`}>
@@ -77,8 +91,6 @@ function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
                                 categoryRef={categoryRef}
                                 titleRef={titleRef}
                                 subTitleRef={subTitleRef}
-                                article={article}
-                                selectedElement={selectedElement}
                                 handleContentEditable={handleContentEditable}
                                 setDataSelected={setDataSelected}
                             />
@@ -114,20 +126,16 @@ function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
                         </div>
                     </div>
                 )}
-                <div className="space-x-2 px-4 pt-3 text-xs md:px-16 lg:px-32">
-                    <span>{article.image.caption}</span>
-                    <span className="text-gray-500">{article.image.credit}</span>
-                </div>
                 <div className="flex justify-center">
                     <div className="flex w-full max-w-lg flex-col px-5 pt-12">
                         {article.content.map((block, index) => (
                             <div key={index} className="relative mb-6">
-                                {block.type === "text" && (
+                                {block.type === "paragraph" && (
                                     <p
                                         ref={(el) =>
                                             (elementRefs.current[index] = {
                                                 index,
-                                                type: "text",
+                                                type: "paragraph",
                                                 element: el,
                                                 text: block.text,
                                             })
@@ -168,9 +176,23 @@ function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
                                             alt={block?.caption}
                                             loading="lazy"
                                         />
-                                        <div className="space-x-2 text-sm leading-5">
-                                            <span>{block?.caption}</span>
-                                            <span className="text-gray-500">
+                                        <div className="flex flex-col gap-1 leading-5">
+                                            <span
+                                                className={`relative text-sm ${selectedElement === `content-${index}-${block.type}-caption` && `highlight top-0 outline-dotted outline-2 outline-red-500`}`}
+                                                data-selected={setDataSelected(selectedElement)}
+                                                contentEditable={
+                                                    selectedElement ===
+                                                    `content-${index}-${block.type}-caption`
+                                                }>
+                                                {block?.caption}
+                                            </span>
+                                            <span
+                                                className={`relative text-xs text-gray-500 ${selectedElement === `content-${index}-${block.type}-credits` && `highlight top-0 outline-dotted outline-2 outline-red-500`}`}
+                                                data-selected={setDataSelected(selectedElement)}
+                                                contentEditable={
+                                                    selectedElement ===
+                                                    `content-${index}-${block.type}-credits`
+                                                }>
                                                 {block?.credit}
                                             </span>
                                         </div>
@@ -202,15 +224,27 @@ function ArticlePreview({ article, selectedElement, setArticle, isLoading }) {
                                                 fill="#eeeeee"></path>
                                         </svg>
                                         <div className="relative z-10 mt-2">
-                                            <p className="text-lg font-normal text-gray-900">
-                                                <em>{block.text}</em>
+                                            <p
+                                                className={`text-lg font-normal italic text-gray-900 ${selectedElement === `content-${index}-${block.type}-content` && `highlight top-0 outline-dotted outline-2 outline-red-500`}`}
+                                                data-selected={setDataSelected(selectedElement)}
+                                                contentEditable={
+                                                    selectedElement ===
+                                                    `content-${index}-${block.type}-content`
+                                                }>
+                                                {block.content}
                                             </p>
                                         </div>
-                                        {block?.reference && (
-                                            <div className="text-base font-semibold">
+                                        <div className="relative">
+                                            <p
+                                                className={`text-base font-semibold ${selectedElement === `content-${index}-${block.type}-ref` && `highlight top-0 outline-dotted outline-2 outline-red-500`}`}
+                                                data-selected={setDataSelected(selectedElement)}
+                                                contentEditable={
+                                                    selectedElement ===
+                                                    `content-${index}-${block.type}-ref`
+                                                }>
                                                 {block.reference}
-                                            </div>
-                                        )}
+                                            </p>
+                                        </div>
                                     </blockquote>
                                 )}
                             </div>

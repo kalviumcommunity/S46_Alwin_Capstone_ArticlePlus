@@ -1,6 +1,11 @@
-import React from "react"
+import React, { useContext } from "react"
+import { doc } from "prettier"
 
-function AddContentButton({ label, type, article, setArticle }) {
+import { PlaygroundArticleContext } from "./Playground"
+
+function AddContentButton({ label, type }) {
+    const { article, setArticle } = useContext(PlaygroundArticleContext)
+
     const handleAddElement = () => {
         console.log("Adding element")
         if (type === "content-paragraph") {
@@ -11,8 +16,8 @@ function AddContentButton({ label, type, article, setArticle }) {
                 content: [
                     ...prevContent,
                     {
-                        type: "text",
-                        text: `Select [${prevContent.length + 1}] Text content and start editing`,
+                        type: "paragraph",
+                        text: `Select [${prevContent.length + 1}] Paragraph content and start editing`,
                     },
                 ],
             })
@@ -24,7 +29,10 @@ function AddContentButton({ label, type, article, setArticle }) {
                     ...prevContent,
                     {
                         type: "image",
-                        url: `Upload image by selecting [${prevContent.length + 1}] Image`,
+                        url: `https://placehold.co/600x400/fafafa/222222/svg?font=Lato&text=Upload+in+[${prevContent.length + 1}]+Image`,
+                        alt: `Select [${prevContent.length + 1}] Image alt text and start editing`,
+                        caption: `Select [${prevContent.length + 1}] Image caption and start editing`,
+                        credit: `Select [${prevContent.length + 1}] Image credits and start editing`,
                     },
                 ],
             })
@@ -36,7 +44,7 @@ function AddContentButton({ label, type, article, setArticle }) {
                     ...prevContent,
                     {
                         type: "quote",
-                        text: `Select [${prevContent.length + 1}] Quote content and start editing`,
+                        content: `Select [${prevContent.length + 1}] Quote content and start editing`,
                         reference: `Select [${prevContent.length + 1}] Quote reference and start editing`,
                     },
                 ],
