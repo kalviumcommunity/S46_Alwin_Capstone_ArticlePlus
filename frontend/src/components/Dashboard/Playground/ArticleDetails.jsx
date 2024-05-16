@@ -1,4 +1,5 @@
 import { useContext } from "react"
+import clsx from "clsx"
 
 import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
 
@@ -9,38 +10,56 @@ function ArticleDetails({
     categoryRef,
     titleRef,
     subTitleRef,
-    handleContentEditable,
+    handleHeaderEditable,
+    handlePaste,
     setDataSelected,
 }) {
     const { article } = useContext(PlaygroundArticleContext)
     const { selectedElementType: selectedElement } = useContext(SelectedElementContext)
 
+    const isSelected = (type) => selectedElement === type
+
     return (
         <>
             <span
                 ref={categoryRef}
-                onInput={(e) => handleContentEditable(e, "category")}
-                contentEditable={selectedElement === "header-category"}
+                onPaste={handlePaste}
+                onInput={(e) => handleHeaderEditable(e, "category")}
+                contentEditable={isSelected("header-category")}
                 aria-rowspan={1}
                 data-selected={setDataSelected(selectedElement)}
-                className={`relative mb-2 font-serif text-sm uppercase text-rose-500 hover:underline ${selectedElement === "header-category" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
+                className={clsx(
+                    "relative mb-1 font-serif text-sm uppercase text-rose-500 hover:underline",
+                    isSelected("header-category") &&
+                        "highlight absolute top-0 outline-dotted outline-2 outline-red-500",
+                )}>
                 {convertCategoryFormat(article.category.replace(/(\r\n|\n|\r)/gm, ""))}
             </span>
             <h1
                 ref={titleRef}
-                onInput={(e) => handleContentEditable(e, "title")}
-                contentEditable={selectedElement === "header-title"}
+                onInput={(e) => handleHeaderEditable(e, "title")}
+                contentEditable={isSelected("header-title")}
+                onPaste={handlePaste}
                 data-selected={setDataSelected(selectedElement)}
-                className={`relative mb-4 font-serif text-3xl font-semibold ${selectedElement === "header-title" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}
-                suppressContentEditableWarning={true}>
+                className={clsx(
+                    "relative mb-2 font-serif text-3xl font-semibold",
+                    isSelected("header-title") &&
+                        "highlight absolute top-0 outline-dotted outline-2 outline-red-500",
+                )}
+                suppressContentEditableWarning>
                 {article.title}
             </h1>
             <p
                 ref={subTitleRef}
-                onInput={(e) => handleContentEditable(e, "subtitle")}
-                contentEditable={selectedElement === "header-subtitle"}
+                onInput={(e) => handleHeaderEditable(e, "subtitle")}
+                contentEditable={isSelected("header-subtitle")}
+                onPaste={handlePaste}
                 data-selected={setDataSelected(selectedElement)}
-                className={`relative mb-4 text-sm italic text-gray-800 ${selectedElement === "header-subtitle" && `highlight absolute top-0 outline-dotted outline-2 outline-red-500`}`}>
+                className={clsx(
+                    "relative mb-3 text-sm italic text-gray-800",
+                    isSelected("header-subtitle") &&
+                        "highlight absolute top-0 outline-dotted outline-2 outline-red-500",
+                )}>
                 {article.subtitle}
             </p>
             {article.author && (
@@ -52,7 +71,7 @@ function ArticleDetails({
                             {article.author.name}
                         </ControlledLink>
                     ) : (
-                        <div className="flex items-center gap-1.5 ">
+                        <div className="flex items-center gap-1.5">
                             <ControlledLink
                                 to={`/organization/${article.author.organization.id}`}
                                 className="text-xs font-semibold leading-4 hover:underline">
@@ -62,7 +81,7 @@ function ArticleDetails({
                             <ControlledLink
                                 className="text-xs font-semibold leading-4 hover:underline"
                                 to={`/organization/${article.author.organization.id}/${article.author.id}`}>
-                                <span>{article.author.name}</span>
+                                {article.author.name}
                             </ControlledLink>
                         </div>
                     )}

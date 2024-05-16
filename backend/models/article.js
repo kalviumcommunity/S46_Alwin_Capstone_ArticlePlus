@@ -8,7 +8,7 @@ const contentBlockSchema = new mongoose.Schema({
     url: { type: String },
     caption: { type: String },
     comment: { type: String },
-    reference: { type: String },
+    ref: { type: String },
     items: { type: [String], default: undefined },
 })
 

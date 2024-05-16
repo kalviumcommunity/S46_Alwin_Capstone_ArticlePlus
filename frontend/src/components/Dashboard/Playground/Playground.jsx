@@ -1,5 +1,6 @@
-import { createContext, useEffect, useRef, useState } from "react"
+import { createContext, useCallback, useEffect, useRef, useState } from "react"
 import { useSignals } from "@preact/signals-react/runtime"
+import clsx from "clsx"
 
 import useKeyPress from "@/helpers/hooks/useKeyPress"
 import axiosInstance from "@/axios"
@@ -45,18 +46,18 @@ function Playground({ articleId }) {
             day: "numeric",
             year: "numeric",
         }),
-        category: "tag-for-article",
+        category: "category-of-article",
         image: {
             url: "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
         },
         content: [],
     })
 
-    const toggleFullscreen = () => {
-        setIsFullscreen(!isFullscreen)
-    }
+    const toggleFullscreen = useCallback(() => {
+        setIsFullscreen((prev) => !prev)
+    }, [])
 
-    const handleLayoutChange = (event) => {
+    const handleLayoutChange = useCallback((event) => {
         const { value } = event.target
         setSelectedLayout(value)
 
@@ -74,9 +75,9 @@ function Playground({ articleId }) {
             display,
             flow,
         }))
-    }
+    }, [])
 
-    const getArticle = () => {
+    const getArticle = useCallback(() => {
         setIsLoading(true)
         axiosInstance
             .get(`article/${articleId}`)
@@ -87,43 +88,41 @@ function Playground({ articleId }) {
                 }))
             })
             .catch((err) => {
-                console.log(err)
+                console.error(err)
             })
             .finally(() => {
                 setIsLoading(false)
             })
-    }
+    }, [articleId])
 
-    const handleArticleDBUpdate = () => {
+    const handleArticleDBUpdate = useCallback(() => {
         getArticle()
-    }
+    }, [getArticle])
 
     useEffect(() => {
         getArticle()
-    }, [articleId])
+    }, [articleId, getArticle])
 
     useEffect(() => {
         if (isFullscreen && isEscPressed) {
             setIsFullscreen(false)
         }
-    }, [isEscPressed])
+    }, [isFullscreen, isEscPressed])
 
     useEffect(() => {
-        // console.log(article)
+        console.log(article)
     }, [article])
 
     return (
         <PlaygroundArticleContext.Provider value={{ article, setArticle }}>
             <SelectedElementContext.Provider
                 value={{ selectedElementType, setSelectedElementType }}>
-                <SelectedElementRefContext.Provider
-                    value={{ selectedElementRef, setSelectedElementType }}>
+                <SelectedElementRefContext.Provider value={{ selectedElementRef }}>
                     <div
-                        className={`flex bg-white ${
-                            isFullscreen
-                                ? "fixed left-0 top-0 z-50 h-screen w-screen"
-                                : "h-[calc(100vh-6rem)]"
-                        }`}>
+                        className={clsx("flex bg-white", {
+                            "fixed left-0 top-0 z-50 h-screen w-screen": isFullscreen,
+                            "h-[calc(100vh-6rem)]": !isFullscreen,
+                        })}>
                         <div className="m-2 flex w-full gap-3 border bg-gray-100 p-2">
                             <div className="flex w-4/5 flex-col gap-2">
                                 <div className="flex w-full gap-1">
@@ -145,7 +144,7 @@ function Playground({ articleId }) {
                                                 className="h-5 w-5"
                                                 src="/assets/icons/cloud-upload.svg"
                                                 alt=""
-                                            />{" "}
+                                            />
                                             <span className="line-clamp-1 w-fit">
                                                 Save as draft
                                             </span>
@@ -155,11 +154,7 @@ function Playground({ articleId }) {
                                             onClick={toggleFullscreen}>
                                             <img
                                                 className="h-5 w-5"
-                                                src={`/assets/icons/${
-                                                    isFullscreen
-                                                        ? "close-fullscreen"
-                                                        : "fullscreen"
-                                                }.svg`}
+                                                src={`/assets/icons/${isFullscreen ? "close-fullscreen" : "fullscreen"}.svg`}
                                                 alt=""
                                             />
                                         </button>
@@ -245,7 +240,7 @@ function Playground({ articleId }) {
                                             </div>
                                         ))}
                                         {article.content.length === 0 && (
-                                            <div className="mb-3 flex items-center justify-center gap-1 rounded px-1 py-2 text-sm  font-normal text-gray-800">
+                                            <div className="mb-3 flex items-center justify-center gap-1 rounded px-1 py-2 text-sm font-normal text-gray-800">
                                                 Add an element by selecting it from the list
                                                 above
                                             </div>
