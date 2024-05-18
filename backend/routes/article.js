@@ -5,7 +5,11 @@ const initMulter = require("../lib/multer")
 const { verifyToken } = require("../middlewares/verifyToken")
 const { asyncHandler } = require("../middlewares/asyncHandler")
 
-const { createNewArticle, addArticleImage } = require("../controllers/articleController")
+const {
+    createNewArticle,
+    addArticleImage,
+    updateArticle,
+} = require("../controllers/articleController")
 
 const Article = require("../models/article")
 
@@ -34,5 +38,6 @@ router.post(
     upload.single("articleImage"),
     asyncHandler(addArticleImage),
 )
+router.patch("/:id", verifyToken, asyncHandler(updateArticle))
 
 module.exports = router

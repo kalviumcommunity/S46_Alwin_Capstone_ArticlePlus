@@ -19,7 +19,6 @@ function EditorPage() {
         axiosInstance
             .get(`article/${articleId}`)
             .then((res) => {
-                console.log(res)
                 setIsArticleAccessible(true)
             })
             .catch((err) => {

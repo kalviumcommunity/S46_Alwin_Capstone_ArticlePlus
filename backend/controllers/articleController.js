@@ -53,7 +53,7 @@ const createNewArticle = async (req, res) => {
 
     console.log(author)
 
-    let article = await Article.create({ status: "draft", author: author })
+    let article = await Article.create({ author: author })
 
     res.status(200).json(article)
 }
@@ -101,4 +101,27 @@ const addArticleImage = async (req, res) => {
     blobStream.end(webpArticleImageFile)
 }
 
-module.exports = { createNewArticle, addArticleImage }
+const updateArticle = async (req, res) => {
+    const { id } = req.params
+    const newArticleData = req.body
+
+    console.log(newArticleData)
+
+    try {
+        let article = await Article.findByIdAndUpdate(
+            id,
+            { ...newArticleData, status: "draft" },
+            { new: true, runValidators: true },
+        )
+
+        if (!article) {
+            return res.status(404).json({ success: false, message: "Article not found" })
+        }
+
+        return res.json({ success: true, article })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+module.exports = { createNewArticle, addArticleImage, updateArticle }

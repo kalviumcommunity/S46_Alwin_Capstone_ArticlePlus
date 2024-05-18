@@ -3,9 +3,10 @@ import clsx from "clsx"
 
 import axiosInstance from "@/axios"
 
-import { PlaygroundArticleContext, SelectedElementContext } from "./Playground"
+import { LoadingContext, PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
 function ContentControlButton({ type, label, ...rest }) {
+    const { setIsLoading } = useContext(LoadingContext)
     const { article, setArticle } = useContext(PlaygroundArticleContext)
     const { selectedElementType, setSelectedElementType } = useContext(SelectedElementContext)
 

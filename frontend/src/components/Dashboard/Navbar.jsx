@@ -105,11 +105,6 @@ function DashboardNavbar() {
                                     <span className="text-sm text-gray-600">{user.email}</span>
                                 </div>
                                 <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
-                                <Link to="/account">
-                                    <DropdownMenu.Item className="dropdown-item mb-0">
-                                        Account & Settings
-                                    </DropdownMenu.Item>
-                                </Link>
                                 {(user && user.creator) || (user && isUserCreator.value) ? (
                                     <Link to="/dashboard">
                                         <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
@@ -123,7 +118,11 @@ function DashboardNavbar() {
                                         </DropdownMenu.Item>
                                     </Link>
                                 )}
-
+                                <Link to="/account">
+                                    <DropdownMenu.Item className="dropdown-item mb-0">
+                                        Account & Settings
+                                    </DropdownMenu.Item>
+                                </Link>
                                 <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                                 <DropdownMenu.Item
                                     className="dropdown-item bg-red-100 font-semibold text-red-500 hover:bg-red-500 hover:text-white"

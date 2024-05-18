@@ -7,9 +7,8 @@ const contentBlockSchema = new mongoose.Schema({
     content: { type: String },
     url: { type: String },
     caption: { type: String },
-    comment: { type: String },
+    credits: { type: String },
     ref: { type: String },
-    items: { type: [String], default: undefined },
 })
 
 const authorSchema = new mongoose.Schema({
@@ -34,9 +33,26 @@ const authorSchema = new mongoose.Schema({
 
 // Article schema
 const articleSchema = new mongoose.Schema({
-    status: { type: String, required: true, enum: ["draft", "published", "for-review"] },
+    status: {
+        type: String,
+        required: true,
+        enum: ["draft", "published", "for-review"],
+        default: "draft",
+    },
+    for: { type: String, required: true, enum: ["all", "subscribers"], default: "all" },
+    display: { type: String, required: true, enum: ["header", "square"], default: "header" },
+    flow: { type: String, required: true, enum: ["default", "reverse"], default: "default" },
+    slug: {
+        type: String,
+        default: "here-goes-your-title-for-the-article",
+        required: function () {
+            return this.status === "published" || this.status === "for-review"
+        },
+    },
+    category: { type: String, required: true, default: "category-of-article" },
     title: {
         type: String,
+        default: "Here goes your title for the article",
         required: function () {
             if (this.status === "published" || this.status === "for-review") return true
         },
@@ -49,7 +65,7 @@ const articleSchema = new mongoose.Schema({
                 "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
         },
     },
-    subtitle: { type: String },
+    subtitle: { type: String, default: "Write what is the short summary/hook for the article" },
     author: authorSchema,
     timestamp: {
         type: String,
@@ -60,7 +76,6 @@ const articleSchema = new mongoose.Schema({
             year: "numeric",
         }),
     },
-    category: { type: String },
     content: [contentBlockSchema],
 })
 

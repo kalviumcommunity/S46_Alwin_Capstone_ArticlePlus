@@ -1,17 +1,11 @@
-import { useContext, useRef } from "react"
+import { useCallback, useContext, useRef } from "react"
 
 import axiosInstance from "@/axios"
 
-import { PlaygroundArticleContext, SelectedElementContext } from "./Playground"
+import { LoadingContext, PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
-const SelectButton = ({
-    setIsLoading,
-    label,
-    type,
-    handleArticleDBUpdate,
-    selectionRef,
-    ...rest
-}) => {
+const SelectButton = ({ label, type, handleArticleDBUpdate, selectionRef, ...rest }) => {
+    const { setIsLoading } = useContext(LoadingContext)
     const { article } = useContext(PlaygroundArticleContext)
     const { selectedElementType, setSelectedElementType } = useContext(SelectedElementContext)
 
@@ -28,10 +22,15 @@ const SelectButton = ({
         setSelectedElementType(type)
     }
 
-    const handleUploadDialog = () => {
-        fileInputRef.current.click()
-        setSelectedElementType(type)
-    }
+    const handleUploadDialog = useCallback(
+        (event) => {
+            if (event.target !== fileInputRef.current) {
+                fileInputRef.current.click()
+                setSelectedElementType(type)
+            }
+        },
+        [setSelectedElementType, type],
+    )
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0]

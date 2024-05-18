@@ -35,6 +35,7 @@ body {
     width: max-content;
     position: absolute;
     text-transform: capitalize;
+    font-style: normal;
     top: -1rem;
     left: -2px;
     background-color: red;

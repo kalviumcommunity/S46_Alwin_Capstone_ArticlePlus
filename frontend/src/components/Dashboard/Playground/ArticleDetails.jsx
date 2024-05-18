@@ -32,7 +32,8 @@ function ArticleDetails({
                     "relative mb-1 font-serif text-sm uppercase text-rose-500 hover:underline",
                     isSelected("header-category") &&
                         "highlight absolute top-0 outline-dotted outline-2 outline-red-500",
-                )}>
+                )}
+                suppressContentEditableWarning>
                 {convertCategoryFormat(article.category.replace(/(\r\n|\n|\r)/gm, ""))}
             </span>
             <h1
@@ -59,7 +60,8 @@ function ArticleDetails({
                     "relative mb-3 text-sm italic text-gray-800",
                     isSelected("header-subtitle") &&
                         "highlight absolute top-0 outline-dotted outline-2 outline-red-500",
-                )}>
+                )}
+                suppressContentEditableWarning>
                 {article.subtitle}
             </p>
             {article.author && (
