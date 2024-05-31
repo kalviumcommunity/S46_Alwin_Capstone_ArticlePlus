@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useRef, useState } from "react"
 import { useSignals } from "@preact/signals-react/runtime"
 import clsx from "clsx"
+import { z } from "zod"
 
 import useKeyPress from "@/helpers/hooks/useKeyPress"
 import axiosInstance from "@/axios"
@@ -15,20 +16,58 @@ export const PlaygroundArticleContext = createContext()
 export const SelectedElementContext = createContext()
 export const SelectedElementRefContext = createContext()
 
+const contentBlockSchema = z.object({
+    type: z.enum(["paragraph", "image", "quote"]),
+    text: z.string().optional(),
+    content: z.string().optional(),
+    url: z.string().optional(),
+    caption: z.string().optional(),
+    credits: z.string().optional(),
+    ref: z.string().optional(),
+})
+
+const authorSchema = z.object({
+    name: z.string(),
+    id: z.string(),
+    type: z.enum(["individual", "organization"]),
+    organization: z
+        .object({
+            name: z.string().optional(),
+            id: z.string().optional(),
+        })
+        .optional(),
+})
+
+const articleSchema = z.object({
+    status: z.enum(["draft", "published", "for-review"]),
+    for: z.enum(["all", "subscribers"]),
+    display: z.enum(["header", "square"]),
+    flow: z.enum(["default", "reverse"]),
+    slug: z.string(),
+    category: z.string().min(1, "Category is required"),
+    title: z.string().min(1, "Title is required"),
+    image: z.object({
+        url: z.string(),
+    }),
+    subtitle: z.string().min(1, "Subtitle is required"),
+    author: authorSchema,
+    timestamp: z.string(),
+    content: z.array(contentBlockSchema),
+})
+
 function Playground({ articleId }) {
     useSignals()
 
     const isEscPressed = useKeyPress("Escape")
-
     const selectedElementRef = useRef(null)
 
     const [isFullscreen, setIsFullscreen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [initialLoad, setInitialLoad] = useState(true)
     const [selectedLayout, setSelectedLayout] = useState("default")
     const [selectedElementType, setSelectedElementType] = useState(null)
 
     const [article, setArticle] = useState(null)
-
     const [savedArticle, setSavedArticle] = useState(null)
     const [isSaved, setIsSaved] = useState(true)
 
@@ -69,23 +108,26 @@ function Playground({ articleId }) {
             })
             .finally(() => {
                 setIsLoading(false)
+                setInitialLoad(false)
             })
     }, [articleId])
 
     const updateArticle = () => {
-        setIsLoading(true)
-        axiosInstance
-            .patch(`article/${articleId}`, article)
-            .then((res) => {
-                setArticle(res.data.article)
-                setSavedArticle(res.data.article)
-            })
-            .catch((err) => {
-                console.error(err)
-            })
-            .finally(() => {
-                setIsLoading(false)
-            })
+        if (validateArticle()) {
+            setIsLoading(true)
+            axiosInstance
+                .patch(`article/${articleId}`, article)
+                .then((res) => {
+                    setArticle(res.data.article)
+                    setSavedArticle(res.data.article)
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+                .finally(() => {
+                    setIsLoading(false)
+                })
+        }
     }
 
     const handleArticleDBUpdate = () => {
@@ -96,9 +138,21 @@ function Playground({ articleId }) {
         updateArticle()
     }
 
+    const validateArticle = () => {
+        const validation = articleSchema.safeParse(article)
+        if (!validation.success) {
+            alert("Article data does not follow the schema. Please correct the errors.")
+            console.log(validation.error.errors)
+            return false
+        }
+        return true
+    }
+
     useEffect(() => {
-        updateArticle()
-    }, [selectedElementType, selectedLayout])
+        if (!initialLoad) {
+            updateArticle()
+        }
+    }, [selectedElementType, selectedLayout, initialLoad])
 
     useEffect(() => {
         getArticle()
@@ -115,15 +169,8 @@ function Playground({ articleId }) {
 
         const deepCopy = (obj) => JSON.parse(JSON.stringify(obj))
 
-        const sortObjectKeys = (obj) => {
-            const sortedObj = [obj].sort((a, b) => a.order - b.order)
-            return sortedObj[0]
-        }
-
-        const sortedArticle = sortObjectKeys(deepCopy(article))
-        const sortedSavedArticle = sortObjectKeys(deepCopy(savedArticle))
-
-        const isEqual = JSON.stringify(sortedArticle) === JSON.stringify(sortedSavedArticle)
+        const isEqual =
+            JSON.stringify(deepCopy(article)) === JSON.stringify(deepCopy(savedArticle))
 
         setIsSaved(isEqual)
     }, [article, savedArticle])
@@ -155,15 +202,15 @@ function Playground({ articleId }) {
                                 <div className="flex h-full w-1/5 flex-col gap-2 overflow-x-hidden overflow-y-scroll pr-2.5">
                                     <div className="sticky top-0 flex flex-col gap-1.5 border-b border-gray-300 bg-gray-100">
                                         <div className="flex w-full gap-2">
-                                            <button className="flex flex-auto items-center justify-center rounded border bg-green-500 px-3 py-2 text-sm font-medium leading-none text-white hover:bg-green-600 lg:gap-2">
+                                            <button
+                                                className="flex flex-auto items-center justify-center rounded border bg-green-500 px-3 py-2 text-sm font-medium leading-none text-white hover:bg-green-600 lg:gap-2"
+                                                onClick={handleSave}>
                                                 <img
                                                     className="h-5 w-5"
                                                     src="/assets/icons/cloud-upload.svg"
                                                     alt=""
                                                 />
-                                                <span
-                                                    className="line-clamp-1 w-fit"
-                                                    onClick={handleSave}>
+                                                <span className="line-clamp-1 w-fit">
                                                     Save as draft
                                                 </span>
                                             </button>
