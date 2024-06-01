@@ -4,6 +4,7 @@ import clsx from "clsx"
 
 import axiosInstance from "@/axios"
 
+import ArticleSettings from "@/components/Dashboard/ArticleSettings"
 import Playground from "@/components/Dashboard/Playground"
 import Loader from "@/components/ui/Loader"
 
@@ -111,7 +112,7 @@ function EditorPage() {
                 activeTab === "compose" ? (
                     <Playground articleId={articleId} />
                 ) : (
-                    <div className="p-8">Article Settings Content</div>
+                    <ArticleSettings />
                 )
             ) : (
                 <div className="m-2 flex h-[50vh] w-full flex-col items-center justify-center gap-3 border bg-gray-100 p-2">
