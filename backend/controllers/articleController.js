@@ -1,3 +1,4 @@
+const crypto = require("crypto")
 const { getStorage, getDownloadURL } = require("firebase-admin/storage")
 
 const Article = require("../models/article")
@@ -8,6 +9,11 @@ const { convertToWebp } = require("../lib/sharp")
 
 const storage = getStorage()
 
+const generateSlugHash = () => {
+    const hash = crypto.randomBytes(4).toString("hex") // Generate 8-character hash
+    return hash
+}
+
 const createNewArticle = async (req, res) => {
     const { userId } = req
 
@@ -15,21 +21,21 @@ const createNewArticle = async (req, res) => {
         return res.status(400).json({ success: false, message: "Invalid request" })
     }
 
-    let user = await User.findById(userId)
+    try {
+        const user = await User.findById(userId)
 
-    if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" })
-    }
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" })
+        }
 
-    let creator = await Creator.findById(user.creatorId)
+        const creator = await Creator.findById(user.creatorId)
 
-    if (!creator) {
-        return res.status(404).json({ success: false, message: "Creator not found" })
-    }
+        if (!creator) {
+            return res.status(404).json({ success: false, message: "Creator not found" })
+        }
 
-    const author = {}
+        let author = {}
 
-    if (creator.type === "organization") {
         const contributor = creator.contributors.find(
             (contributor) => contributor.userRef === userId,
         )
@@ -38,24 +44,67 @@ const createNewArticle = async (req, res) => {
             return res.status(403).json({ success: false, message: "Invalid request" })
         }
 
-        author.name = contributor.name
-        author.id = contributor.id
-        author.type = creator.type
-        author.organization = {
-            name: creator.name,
-            id: creator.id,
+        if (creator.type === "organization") {
+            author = {
+                name: contributor.name,
+                id: contributor.id,
+                type: creator.type,
+                organization: {
+                    name: creator.name,
+                    id: creator.id,
+                },
+            }
+        } else {
+            author = {
+                name: creator.name,
+                id: creator.id,
+                type: creator.type,
+            }
         }
-    } else {
-        author.name = creator.name
-        author.id = creator.id
-        author.type = creator.type
+
+        const defaultTitle = "Here goes your title for the article"
+        const slugHash = generateSlugHash(defaultTitle)
+        const slug = `${defaultTitle
+            .replace(/[^a-zA-Z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()}-${slugHash}`
+
+        const newArticle = {
+            flags: {
+                creator: creator._id.toString(),
+                author: {
+                    userRef: contributor.userRef,
+                    type: creator.type,
+                },
+                slugHash: slugHash,
+            },
+            slug: slug,
+            author: author,
+        }
+
+        const article = await Article.create(newArticle)
+
+        res.status(200).json(article)
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message })
     }
+}
 
-    console.log(author)
+const accessArticle = async (req, res) => {
+    const { id } = req.params
+    console.log(id)
 
-    let article = await Article.create({ author: author })
+    try {
+        const article = await Article.findById(id).select("-flags")
 
-    res.status(200).json(article)
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        res.json(article)
+    } catch (err) {
+        res.status(500).json({ message: err.message })
+    }
 }
 
 const addArticleImage = async (req, res) => {
@@ -103,9 +152,11 @@ const addArticleImage = async (req, res) => {
 
 const updateArticle = async (req, res) => {
     const { id } = req.params
-    const newArticleData = req.body
+    const newArticleData = { ...req.body }
 
-    console.log(newArticleData)
+    if (newArticleData.flags) {
+        delete newArticleData.flags
+    }
 
     try {
         let article = await Article.findByIdAndUpdate(
@@ -113,6 +164,16 @@ const updateArticle = async (req, res) => {
             { ...newArticleData, status: "draft" },
             { new: true, runValidators: true },
         )
+
+        const slugHash = article.flags.slugHash
+        const slug = `${article.title
+            .replace(/[^a-zA-Z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()}-${slugHash}`
+
+        article.slug = slug
+
+        await article.save()
 
         if (!article) {
             return res.status(404).json({ success: false, message: "Article not found" })
@@ -124,4 +185,61 @@ const updateArticle = async (req, res) => {
     }
 }
 
-module.exports = { createNewArticle, addArticleImage, updateArticle }
+const getArticleSettings = async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const article = await Article.findById(id)
+
+        const articleSettings = {}
+
+        articleSettings.title = article.title
+        articleSettings.subtitle = article.subtitle
+        articleSettings.datestamp = article.datestamp
+        articleSettings.image = article.image.url
+
+        if (article.flags) {
+            articleSettings.access = article.flags.access
+            articleSettings.status = article.flags.status
+        }
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        res.json(articleSettings)
+    } catch (err) {
+        res.status(500).json({ message: err.message })
+    }
+}
+
+const updateArticleSettings = async (req, res) => {
+    const { id } = req.params
+    const newSettings = { ...req.body }
+
+    try {
+        const article = await Article.findById(id)
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        article.flags.access = newSettings.access
+        article.flags.status = newSettings.status
+
+        await article.save()
+
+        res.json({ success: true, message: "Article Settings updated" })
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message })
+    }
+}
+
+module.exports = {
+    createNewArticle,
+    accessArticle,
+    addArticleImage,
+    updateArticle,
+    getArticleSettings,
+    updateArticleSettings,
+}

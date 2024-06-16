@@ -27,39 +27,17 @@ function ArticlesTable({ articles }) {
                     </Link>
 
                     <div className="w-32 flex-shrink-0 px-4 py-2">
-                        <span className="h-fit w-fit rounded border border-green-200 bg-green-100 px-3 font-medium text-green-600">
+                        <span className="h-fit w-fit rounded border border-green-200 bg-green-100 px-3 py-0.5 font-medium text-green-600">
                             {article.status}
                         </span>
                     </div>
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                            <div className="flex w-32 flex-shrink-0">
-                                <button className="flex items-center gap-1 rounded border bg-white py-1 pl-4 pr-2">
-                                    <span>{article.visibility}</span>
-                                    <img
-                                        className="h-4 w-4"
-                                        src="/assets/icons/arrow-down.svg"
-                                        alt=""
-                                    />
-                                </button>
-                            </div>
-                        </DropdownMenu.Trigger>
-                        <DropdownMenu.Portal>
-                            <DropdownMenu.Content
-                                className="w-32 rounded-md border-2 bg-white p-1 text-sm"
-                                sideOffset={5}>
-                                <DropdownMenu.Item className="flex gap-2 rounded-sm px-2 py-1 hover:cursor-pointer hover:bg-gray-100">
-                                    Public
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Item className="flex gap-2 rounded-sm px-2 py-1 hover:cursor-pointer hover:bg-gray-100">
-                                    Unlisted
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Item className="flex gap-2 rounded-sm px-2 py-1 hover:cursor-pointer hover:bg-gray-100">
-                                    Review
-                                </DropdownMenu.Item>
-                            </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
+
+                    <div className="w-32 flex-shrink-0 px-4 py-2">
+                        <span className="h-fit w-fit rounded border bg-white px-3 py-0.5">
+                            {article.visibility}
+                        </span>
+                    </div>
+
                     <span className="w-32 flex-shrink-0 px-4 py-2">{article.date}</span>
                     <span className="w-32 flex-shrink-0 px-4 py-2">{article.views}</span>
                 </div>

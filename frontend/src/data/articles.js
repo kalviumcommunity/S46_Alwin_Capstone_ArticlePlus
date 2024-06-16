@@ -13,7 +13,7 @@ export const articles = [
             type: "individual",
         },
         paywall: true,
-        timestamp: "March 24, 2024",
+        datestamp: "March 24, 2024",
         category: "culture-desk",
         image: {
             url: "https://media.newyorker.com/photos/65fc513fa938d6709b3d8be7/master/w_1920,c_limit/WonderCityOfTheWorld_p067a_web.jpg",
@@ -59,7 +59,7 @@ export const articles = [
                 id: "new-yorker",
             },
         },
-        timestamp: "October 2, 2023",
+        datestamp: "October 2, 2023",
         category: "society",
         image: {
             url: "https://media.newyorker.com/photos/6515db190594858673379e91/master/w_1920,c_limit/231009_r43127.jpg",
@@ -103,7 +103,7 @@ export const articles = [
             id: "jay-caspian-kang",
             type: "individual",
         },
-        timestamp: "March 22, 2024",
+        datestamp: "March 22, 2024",
         category: "society",
         image: {
             url: "https://media.newyorker.com/photos/65fe046cbf325d4728e66eeb/2:2/w_1920,c_limit/01_final_2.jpg",
@@ -150,7 +150,7 @@ export const articles = [
                 id: "new-yorker",
             },
         },
-        timestamp: "March 18, 2024",
+        datestamp: "March 18, 2024",
         category: "journal",
         image: {
             url: "https://media.newyorker.com/photos/65f2135ebf04e4ed39ab6b01/master/w_1920,c_limit/r43943.png",
@@ -198,7 +198,7 @@ export const articles = [
                 id: "the-new-york-times",
             },
         },
-        timestamp: "March 31, 2024",
+        datestamp: "March 31, 2024",
         category: "opinion",
         image: {
             url: "https://static01.nyt.com/images/2024/03/31/opinion/31bernstein/31bernstein-superJumbo.png?quality=75&auto=webp",

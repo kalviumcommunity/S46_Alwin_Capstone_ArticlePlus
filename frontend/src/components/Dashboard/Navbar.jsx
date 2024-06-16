@@ -97,12 +97,14 @@ function DashboardNavbar() {
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                             <DropdownMenu.Content
-                                className="z-50 min-w-52 rounded-md border-2 bg-white"
+                                className="z-50 w-64 min-w-52 rounded-md border-2 bg-white"
                                 align="end"
                                 sideOffset={5}>
                                 <div className="mx-3 my-2 flex flex-col px-2 py-1">
                                     <span className="font-medium">{user.name}</span>
-                                    <span className="text-sm text-gray-600">{user.email}</span>
+                                    <span className="truncate text-sm text-gray-600">
+                                        {user.email}
+                                    </span>
                                 </div>
                                 <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                                 {(user && user.creator) || (user && isUserCreator.value) ? (

@@ -1,10 +1,13 @@
 import { createContext, useCallback, useEffect, useRef, useState } from "react"
 import { useSignals } from "@preact/signals-react/runtime"
 import clsx from "clsx"
+import { toast, Toaster } from "sonner"
 import { z } from "zod"
 
 import useKeyPress from "@/helpers/hooks/useKeyPress"
 import axiosInstance from "@/axios"
+
+import ToastAlert from "@/components/ui/ToastAlert"
 
 import AddContentButton from "./AddContentButton"
 import ArticlePreview from "./ArticlePreview"
@@ -39,7 +42,6 @@ const authorSchema = z.object({
 })
 
 const articleSchema = z.object({
-    status: z.enum(["draft", "published", "for-review"]),
     for: z.enum(["all", "subscribers"]),
     display: z.enum(["header", "square"]),
     flow: z.enum(["default", "reverse"]),
@@ -51,7 +53,7 @@ const articleSchema = z.object({
     }),
     subtitle: z.string().min(1, "Subtitle is required"),
     author: authorSchema,
-    timestamp: z.string(),
+    datestamp: z.string(),
     content: z.array(contentBlockSchema),
 })
 
@@ -98,7 +100,7 @@ function Playground({ articleId }) {
     const getArticle = useCallback(() => {
         setIsLoading(true)
         axiosInstance
-            .get(`article/${articleId}`)
+            .get(`article/editor/${articleId}/content`)
             .then((res) => {
                 setArticle(res.data)
                 setSavedArticle(res.data)
@@ -116,7 +118,7 @@ function Playground({ articleId }) {
         if (validateArticle()) {
             setIsLoading(true)
             axiosInstance
-                .patch(`article/${articleId}`, article)
+                .patch(`article/editor/${articleId}/content`, article)
                 .then((res) => {
                     setArticle(res.data.article)
                     setSavedArticle(res.data.article)
@@ -141,7 +143,7 @@ function Playground({ articleId }) {
     const validateArticle = () => {
         const validation = articleSchema.safeParse(article)
         if (!validation.success) {
-            alert("Article data does not follow the schema. Please correct the errors.")
+            toast.custom((t) => <ToastAlert message="Article is missing required fields" />)
             console.log(validation.error.errors)
             return false
         }
@@ -332,6 +334,7 @@ function Playground({ articleId }) {
                                 </div>
                             </div>
                         </div>
+                        <Toaster richColors position="top-center" />
                     </SelectedElementRefContext.Provider>
                 </SelectedElementContext.Provider>
             </PlaygroundArticleContext.Provider>

@@ -33,18 +33,26 @@ const authorSchema = new mongoose.Schema({
 
 // Article schema
 const articleSchema = new mongoose.Schema({
-    status: {
-        type: String,
-        required: true,
-        enum: ["draft", "published", "for-review"],
-        default: "draft",
+    flags: {
+        status: {
+            type: String,
+            required: true,
+            enum: ["draft", "published", "for-review"],
+            default: "draft",
+        },
+        access: { type: String, required: true, enum: ["all", "subscribers"], default: "all" },
+        creator: { type: String, required: true },
+        author: {
+            userRef: { type: String, required: true },
+            type: { type: String, required: true, enum: ["individual", "organization"] },
+        },
+        slugHash: { type: String, required: true },
     },
     for: { type: String, required: true, enum: ["all", "subscribers"], default: "all" },
     display: { type: String, required: true, enum: ["header", "square"], default: "header" },
     flow: { type: String, required: true, enum: ["default", "reverse"], default: "default" },
     slug: {
         type: String,
-        default: "here-goes-your-title-for-the-article",
         required: function () {
             return this.status === "published" || this.status === "for-review"
         },
@@ -67,7 +75,7 @@ const articleSchema = new mongoose.Schema({
     },
     subtitle: { type: String, default: "Write what is the short summary/hook for the article" },
     author: authorSchema,
-    timestamp: {
+    datestamp: {
         type: String,
         required: true,
         default: new Date().toLocaleString("en-US", {

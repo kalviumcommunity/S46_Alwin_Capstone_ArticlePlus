@@ -88,7 +88,7 @@ function ArticleDetails({
                         </div>
                     )}
                     <p className="mt-0.5 text-xs font-normal text-gray-500">
-                        {article.timestamp}
+                        {article.datestamp}
                     </p>
                 </div>
             )}

@@ -61,7 +61,7 @@ function Article({ data }) {
                                 </div>
                             )}
                             <p className="mt-0.5 text-sm font-normal text-gray-500">
-                                {article.timestamp}
+                                {article.datestamp}
                             </p>
                         </div>
                     </div>
@@ -140,7 +140,7 @@ function Article({ data }) {
                                 </div>
                             )}
                             <p className="mt-0.5 text-sm font-normal text-gray-500">
-                                {article.timestamp}
+                                {article.datestamp}
                             </p>
                         </div>
                     </div>
