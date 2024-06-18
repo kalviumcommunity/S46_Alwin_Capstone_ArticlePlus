@@ -117,6 +117,8 @@ function OnboardingCreator() {
             formData.append(key, creatorForm[key])
         }
 
+        console.log("called")
+
         axiosInstance
             .post("/creator/onboarding", formData, {
                 headers: {
@@ -124,18 +126,18 @@ function OnboardingCreator() {
                 },
             })
             .then((response) => {
-                setIsLoading(false)
+                console.log(response)
                 isUserCreator.value = true
                 creatorInfo.value = response.data
                 redirect("/dashboard")
                 alert("Creator onboarding successful")
             })
             .catch((error) => {
-                setIsLoading(false)
                 console.error(error)
                 redirect("/onboarding")
                 alert("Failed creator onboarding. Please try again")
             })
+            .finally(() => setIsLoading(false))
     }
 
     const handleNextStep = (event) => {

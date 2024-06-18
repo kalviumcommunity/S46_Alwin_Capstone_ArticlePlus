@@ -59,6 +59,12 @@ const onboardCreator = async (req, res) => {
         delete creatorDetails.subscriptions
     }
 
+    // Check if ID is unique
+    const existingCreator = await Creator.findOne({ id })
+    if (existingCreator) {
+        return res.status(400).json({ status: "failed", message: "ID already in use" })
+    }
+
     const user = await User.findById(userId)
     if (user.creator) {
         return res.json({ status: "failed", message: "User is already a creator" })
@@ -75,36 +81,47 @@ const onboardCreator = async (req, res) => {
         },
     ]
 
-    const webpDisplayPictureFile = await convertToWebp(displayPictureFile, 80, 1920, 1920)
+    try {
+        const webpDisplayPictureFile = await convertToWebp(displayPictureFile, 80, 1920, 1920)
 
-    const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
-    const blobStream = imageRef.createWriteStream({
-        metadata: {
-            contentType: "image/webp",
-        },
-    })
-
-    blobStream.on("error", (err) => {
-        return res.status(500).send("Error uploading file")
-    })
-
-    blobStream.on("finish", async () => {
-        const displayPictureUrl = await getDownloadURL(imageRef)
-
-        creatorDetails.displayPicture = displayPictureUrl
-        creatorDetails.owner = userId
-
-        const newCreator = await Creator(creatorDetails).save()
-
-        await User.findByIdAndUpdate(userId, {
-            creator: true,
-            creatorId: newCreator._id.toString(),
+        const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
+        const blobStream = imageRef.createWriteStream({
+            metadata: {
+                contentType: "image/webp",
+            },
         })
 
-        return res.json({ onboarding: "success" })
-    })
+        blobStream.on("error", (err) => {
+            return res.status(500).send("Error uploading file")
+        })
 
-    blobStream.end(webpDisplayPictureFile)
+        blobStream.on("finish", async () => {
+            const displayPictureUrl = await getDownloadURL(imageRef)
+
+            creatorDetails.displayPicture = displayPictureUrl
+            creatorDetails.owner = userId
+
+            try {
+                const newCreator = await new Creator(creatorDetails).save()
+                await User.findByIdAndUpdate(userId, {
+                    creator: true,
+                    creatorId: newCreator._id.toString(),
+                })
+
+                return res.json({ onboarding: "success" })
+            } catch (e) {
+                return res
+                    .status(500)
+                    .json({ status: "failed", message: "Error saving creator details" })
+            }
+        })
+
+        blobStream.end(webpDisplayPictureFile)
+    } catch (e) {
+        return res
+            .status(500)
+            .json({ status: "failed", message: "Error processing display picture" })
+    }
 }
 
 const authCreatorInfo = async (req, res) => {

@@ -39,7 +39,7 @@ function DashboardSettings() {
                 value={activeTab}
                 onValueChange={setActiveTab}>
                 <Tabs.List
-                    className={`mt-4 flex flex-col sm:mt-0 sm:max-w-48 sm:flex-1 sm:gap-1 sm:pr-5 ${
+                    className={`mt-4 flex h-72 flex-col sm:mt-0 sm:max-w-48 sm:flex-1 sm:gap-1 sm:pr-5 ${
                         activeTab !== "" && window.innerWidth < 640 ? "hidden" : ""
                     }`}>
                     <Tabs.Trigger
@@ -184,7 +184,7 @@ function DashboardSettings() {
                                     <div className="flex flex-col overflow-hidden rounded border">
                                         <div className="flex flex-col items-center gap-4 border-b px-4 py-4 text-sm text-gray-800 sm:flex-row sm:gap-1.5 sm:px-8 sm:py-3">
                                             <span>
-                                                Your are owner of the{" "}
+                                                You are owner of the{" "}
                                                 <Link
                                                     to="/organization/new-yorker"
                                                     className="font-medium underline">

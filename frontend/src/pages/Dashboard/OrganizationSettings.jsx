@@ -48,7 +48,7 @@ function OrganizationSettings() {
                 value={activeTab}
                 onValueChange={setActiveTab}>
                 <Tabs.List
-                    className={`mt-4 flex flex-col sm:mt-0 sm:w-max sm:max-w-48 sm:flex-1 sm:gap-1 sm:pr-5 ${
+                    className={`mt-4 flex h-72 flex-col sm:mt-0 sm:w-max sm:max-w-48 sm:flex-1 sm:gap-1 sm:pr-5 ${
                         activeTab !== "" && window.innerWidth < 640 ? "hidden" : ""
                     }`}>
                     <Tabs.Trigger

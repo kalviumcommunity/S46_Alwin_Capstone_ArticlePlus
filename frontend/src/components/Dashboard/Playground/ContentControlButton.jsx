@@ -5,7 +5,7 @@ import axiosInstance from "@/axios"
 
 import { LoadingContext, PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
-function ContentControlButton({ type, label, ...rest }) {
+function ContentControlButton({ type, label, handleArticleDBUpdate, ...rest }) {
     const { setIsLoading } = useContext(LoadingContext)
     const { article, setArticle } = useContext(PlaygroundArticleContext)
     const { selectedElementType, setSelectedElementType } = useContext(SelectedElementContext)
@@ -49,7 +49,7 @@ function ContentControlButton({ type, label, ...rest }) {
 
         setIsLoading(true)
         try {
-            await axiosInstance.post(`/article/addimage/${type}`, formData, {
+            await axiosInstance.post(`/article/addimage/${article._id}/${type}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             })
             console.log("Image uploaded successfully")

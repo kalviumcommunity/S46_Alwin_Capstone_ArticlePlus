@@ -47,7 +47,7 @@ const SelectButton = ({ label, type, handleArticleDBUpdate, selectionRef, ...res
 
         setIsLoading(true)
         axiosInstance
-            .post(`/article/addimage/${selectionRef}`, formData, {
+            .post(`/article/addimage/${article._id}/${selectionRef}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

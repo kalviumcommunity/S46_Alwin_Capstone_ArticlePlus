@@ -50,11 +50,8 @@ function useLogic() {
     const handleLogout = () => {
         const refreshTokenId = getCookie("refreshTokenId")
         axiosInstance
-            .post("session/remove", { refreshTokenId })
+            .post("session/remove", { refreshTokenId, isCurrentSession: true })
             .then((res) => {
-                setCookie("accessToken", null)
-                setCookie("refreshToken", null)
-                setCookie("refreshTokenId", null)
                 userExists.value = false
             })
             .catch((err) => console.error(err))

@@ -142,7 +142,10 @@ function Playground({ articleId }) {
 
     const validateArticle = () => {
         const validation = articleSchema.safeParse(article)
+        console.log(validation)
+        console.log("validation running")
         if (!validation.success) {
+            console.log("validation failed")
             toast.custom((t) => <ToastAlert message="Article is missing required fields" />)
             console.log(validation.error.errors)
             return false
@@ -279,6 +282,7 @@ function Playground({ articleId }) {
                                                     <SelectButton
                                                         label="Upload header image"
                                                         type="header-image-upload"
+                                                        selectionRef="header-image"
                                                         handleArticleDBUpdate={
                                                             handleArticleDBUpdate
                                                         }
@@ -320,6 +324,9 @@ function Playground({ articleId }) {
                                                     <ContentControlButton
                                                         label={`[${index + 1}] ${content.type}`}
                                                         type={`content-${index}-${content.type}`}
+                                                        {...(content.type === "image" && {
+                                                            handleArticleDBUpdate,
+                                                        })}
                                                     />
                                                 </div>
                                             ))}

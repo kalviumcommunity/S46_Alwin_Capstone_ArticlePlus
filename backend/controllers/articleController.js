@@ -90,6 +90,10 @@ const createNewArticle = async (req, res) => {
     }
 }
 
+const allowAccessArticle = async (req, res) => {
+    return res.json({ access: true })
+}
+
 const accessArticle = async (req, res) => {
     const { id } = req.params
     console.log(id)
@@ -107,47 +111,92 @@ const accessArticle = async (req, res) => {
     }
 }
 
+const uploadImageToStorage = (imageFile, imagePath) => {
+    return new Promise((resolve, reject) => {
+        const imageRef = storage.bucket().file(imagePath)
+        const blobStream = imageRef.createWriteStream({
+            metadata: {
+                contentType: "image/webp",
+            },
+        })
+
+        blobStream.on("error", (err) => {
+            console.error("Error uploading file:", err)
+            resolve({ error: "Error uploading file" })
+        })
+
+        blobStream.on("finish", async () => {
+            try {
+                const url = await getDownloadURL(imageRef)
+                resolve({ url })
+            } catch (err) {
+                console.error("Error getting download URL:", err)
+                resolve({ error: "Error getting download URL" })
+            }
+        })
+
+        blobStream.end(imageFile)
+    })
+}
+
 const addArticleImage = async (req, res) => {
     const { articleId } = req.body
     const { ref } = req.params
-
-    console.log(ref)
-
     const articleImageFile = req.file
-    let article = await Article.findById(articleId)
 
-    const creator = await Creator.findOne({ "contributors.id": article.author.id })
+    try {
+        const article = await Article.findById(articleId)
+        if (!article) {
+            return res.status(404).json({ error: "Article not found" })
+        }
 
-    if (!creator) {
-        return res
-            .status(403)
-            .json({ error: "You are not authorized to update this article's image." })
-    }
+        const creator = await Creator.findOne({ "contributors.id": article.author.id })
+        if (!creator) {
+            return res
+                .status(403)
+                .json({ error: "You are not authorized to update this article's image." })
+        }
 
-    const webpArticleImageFile = await convertToWebp(articleImageFile)
+        const webpArticleImageFile = await convertToWebp(articleImageFile)
 
-    const imageRef = storage.bucket().file(`article/${articleId}/header-image`)
-    const blobStream = imageRef.createWriteStream({
-        metadata: {
-            contentType: "image/webp",
-        },
-    })
+        const uploadResult = await uploadImageToStorage(
+            webpArticleImageFile,
+            `article/${articleId}/${ref}`,
+        )
+        if (uploadResult.error) {
+            return res.status(500).json({ error: uploadResult.error })
+        }
 
-    blobStream.on("error", (err) => {
-        return res.status(500).json({ error: "Error uploading file" })
-    })
-
-    blobStream.on("finish", async () => {
-        const articleImageUrl = await getDownloadURL(imageRef)
-
-        article.image = { url: articleImageUrl, caption: "", credit: "" }
+        if (ref === "header-image") {
+            article.image = { url: uploadResult.url, caption: "", credit: "" }
+        } else {
+            const [prefix, index, type] = ref.split("-")
+            if (prefix === "content" && type === "image" && !isNaN(parseInt(index))) {
+                const contentIndex = parseInt(index)
+                if (
+                    contentIndex >= 0 &&
+                    contentIndex < article.content.length &&
+                    article.content[contentIndex].type === "image"
+                ) {
+                    article.content[contentIndex].url = uploadResult.url
+                } else {
+                    return res
+                        .status(400)
+                        .json({ error: "Invalid content reference or content type mismatch." })
+                }
+            } else {
+                return res.status(400).json({ error: "Invalid reference format." })
+            }
+        }
 
         await article.save()
-        console.log(article)
-        return res.json({ success: true })
-    })
-
-    blobStream.end(webpArticleImageFile)
+        return res.json({ success: true, imageUrl: uploadResult.url })
+    } catch (error) {
+        console.error(error)
+        return res
+            .status(500)
+            .json({ error: "An error occurred while updating the article image." })
+    }
 }
 
 const updateArticle = async (req, res) => {
@@ -237,6 +286,7 @@ const updateArticleSettings = async (req, res) => {
 
 module.exports = {
     createNewArticle,
+    allowAccessArticle,
     accessArticle,
     addArticleImage,
     updateArticle,

@@ -12,9 +12,9 @@ export function Session({ session }) {
     const [actionStatus, setActionStatus] = useState()
     const [timeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone)
 
-    const removeSession = (refreshTokenId, isCurrenSession) => {
+    const removeSession = (refreshTokenId, isCurrentSession) => {
         axiosInstance
-            .post("session/remove", { refreshTokenId, isCurrenSession })
+            .post("session/remove", { refreshTokenId, isCurrentSession })
             .then((res) => setActionStatus(res.data))
             .catch((err) => setActionStatus(err.response.data))
             .finally(() => setLoader(false))

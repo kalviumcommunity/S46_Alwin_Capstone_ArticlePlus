@@ -12,6 +12,7 @@ const {
     accessArticle,
     getArticleSettings,
     updateArticleSettings,
+    allowAccessArticle,
 } = require("../controllers/articleController")
 
 const Creator = require("../models/creator")
@@ -65,23 +66,49 @@ const checkEditorAuthorization = async (req, res, next) => {
                 .json({ message: "You are not authorized to access this route" })
         }
 
-        return res.json({ access: true })
+        next()
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
 }
 
 router.post("/create", verifyToken, asyncHandler(createNewArticle))
-router.get("/editor/:id/access", verifyToken, asyncHandler(checkEditorAuthorization))
-
-router.get("/editor/:id/content", verifyToken, asyncHandler(accessArticle))
-router.patch("/editor/:id/content", verifyToken, asyncHandler(updateArticle))
-
-router.get("/editor/:id/settings", verifyToken, asyncHandler(getArticleSettings))
-router.patch("/editor/:id/settings", verifyToken, asyncHandler(updateArticleSettings))
-router.post(
-    "/addimage/:ref",
+router.get(
+    "/editor/:id/access",
     verifyToken,
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(allowAccessArticle),
+)
+
+router.get(
+    "/editor/:id/content",
+    verifyToken,
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(accessArticle),
+)
+router.patch(
+    "/editor/:id/content",
+    verifyToken,
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(updateArticle),
+)
+
+router.get(
+    "/editor/:id/settings",
+    verifyToken,
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(getArticleSettings),
+)
+router.patch(
+    "/editor/:id/settings",
+    verifyToken,
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(updateArticleSettings),
+)
+router.post(
+    "/addimage/:id/:ref",
+    verifyToken,
+    asyncHandler(checkEditorAuthorization),
     upload.single("articleImage"),
     asyncHandler(addArticleImage),
 )

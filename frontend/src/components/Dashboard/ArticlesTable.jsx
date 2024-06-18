@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 function ArticlesTable({ articles }) {
     return (
@@ -10,7 +9,6 @@ function ArticlesTable({ articles }) {
                 <span className="w-32 flex-shrink-0 px-4 py-2">Status</span>
                 <span className="w-32 flex-shrink-0 px-4 py-2">Visibility</span>
                 <span className="w-32 flex-shrink-0 px-4 py-2">Date</span>
-                <span className="w-32 flex-shrink-0 px-4 py-2">Views</span>
             </div>
             {articles.map((article, index) => (
                 <div
@@ -25,21 +23,17 @@ function ArticlesTable({ articles }) {
                         to="/dashboard/team/alwin">
                         @{article.authorId}
                     </Link>
-
                     <div className="w-32 flex-shrink-0 px-4 py-2">
                         <span className="h-fit w-fit rounded border border-green-200 bg-green-100 px-3 py-0.5 font-medium text-green-600">
                             {article.status}
                         </span>
                     </div>
-
                     <div className="w-32 flex-shrink-0 px-4 py-2">
                         <span className="h-fit w-fit rounded border bg-white px-3 py-0.5">
                             {article.visibility}
                         </span>
                     </div>
-
                     <span className="w-32 flex-shrink-0 px-4 py-2">{article.date}</span>
-                    <span className="w-32 flex-shrink-0 px-4 py-2">{article.views}</span>
                 </div>
             ))}
         </div>
