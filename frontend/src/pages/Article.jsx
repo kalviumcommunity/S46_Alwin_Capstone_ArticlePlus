@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 
-import { convertCategoryFormat } from "@/utils/ui/convertCategoryFormat"
+import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
 
 import Loader from "@/components/ui/Loader"
 
 import { articles } from "@/data/articles"
 
-function Article() {
+function Article({ data }) {
     const { slug } = useParams()
 
     const [article, setArticle] = useState()
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        setArticle(articles.find((article) => article.slug === slug))
+        if (data) {
+            setArticle(data)
+        } else {
+            setArticle(articles.find((article) => article.slug === slug))
+        }
     }, [slug])
 
     if (article && article.display === "header") {
@@ -57,27 +61,21 @@ function Article() {
                                 </div>
                             )}
                             <p className="mt-0.5 text-sm font-normal text-gray-500">
-                                {article.timestamp}
+                                {article.datestamp}
                             </p>
                         </div>
                     </div>
                     <img
                         className="w-full md:w-1/3"
                         src={article.image.url}
-                        alt={article.image.caption}
+                        alt={article.title}
                         loading="lazy"
                     />
                 </div>
-
-                <div className="space-x-2 px-4 pt-3 text-sm md:px-16 lg:px-32">
-                    <span>{article.image.caption}</span>
-                    <span className="text-gray-500">{article.image.credit}</span>
-                </div>
-
                 <div className="m-auto flex max-w-xl flex-col px-5 pt-12">
                     {article.content.map((block, index) => (
                         <div key={index} className="mb-6">
-                            {block.type === "text" && (
+                            {block.type === "paragraph" && (
                                 <p className="font-serif text-lg leading-relaxed text-black">
                                     {block.text}
                                 </p>
@@ -92,7 +90,7 @@ function Article() {
                                     />
                                     <div className="space-x-2 text-sm leading-5">
                                         <span>{block.caption}</span>
-                                        <span className="text-gray-500">{block.credit}</span>
+                                        <span className="text-gray-500">{block?.credit}</span>
                                     </div>
                                 </div>
                             )}
@@ -142,7 +140,7 @@ function Article() {
                                 </div>
                             )}
                             <p className="mt-0.5 text-sm font-normal text-gray-500">
-                                {article.timestamp}
+                                {article.datestamp}
                             </p>
                         </div>
                     </div>
@@ -150,21 +148,16 @@ function Article() {
                         <img
                             className="h-full w-full object-cover"
                             src={article.image.url}
-                            alt={article.image.caption}
+                            alt={article.title}
                             loading="lazy"
                         />
                     </div>
                 </div>
 
-                <div className="space-x-2 px-4 pt-3 text-sm md:px-16 lg:px-32">
-                    <span>{article.image.caption}</span>
-                    <span className="text-gray-500">{article.image.credit}</span>
-                </div>
-
                 <div className="m-auto flex max-w-xl flex-col px-5 pt-12">
                     {article.content.map((block, index) => (
                         <div key={index} className="mb-6">
-                            {block.type === "text" && (
+                            {block.type === "paragraph" && (
                                 <p className="font-serif text-lg leading-relaxed text-black">
                                     {block.text}
                                 </p>
@@ -174,12 +167,12 @@ function Article() {
                                     <img
                                         className="h-full"
                                         src={block.url}
-                                        alt={block.caption}
+                                        alt={block?.caption}
                                         loading="lazy"
                                     />
                                     <div className="space-x-2 text-sm leading-5">
-                                        <span>{block.caption}</span>
-                                        <span className="text-gray-500">{block.credit}</span>
+                                        <span>{block?.caption}</span>
+                                        <span className="text-gray-500">{block?.credit}</span>
                                     </div>
                                 </div>
                             )}

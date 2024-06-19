@@ -1,5 +1,6 @@
 require("dotenv").config()
-require("./firebase")
+require("./lib/firebase")
+require("./lib/cron")
 
 const express = require("express")
 const cors = require("cors")

@@ -14,7 +14,7 @@ const oAuth2Client = new OAuth2Client(
 const generateGoogleOauthLink = async (req, res) => {
     const authorizeUrl = oAuth2Client.generateAuthUrl({
         access_type: "offline",
-        scope: "https://www.googleapis.com/auth/userinfo.profile email openid ",
+        scope: "https://www.googleapis.com/auth/userinfo.profile email openid",
     })
 
     res.json({ url: authorizeUrl })
@@ -46,7 +46,7 @@ const googleOauthCallback = async (req, res) => {
                 name,
                 email,
                 provider: "google",
-                picture,
+                displayPicture: picture,
             })
         }
 

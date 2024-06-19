@@ -3,10 +3,7 @@ import { OTPInput, OTPInputContext } from "input-otp"
 
 import { cn } from "@/utils/cn"
 
-const InputOTP = React.forwardRef<
-    React.ElementRef<typeof OTPInput>,
-    React.ComponentPropsWithoutRef<typeof OTPInput>
->(({ className, containerClassName, ...props }, ref) => (
+const InputOTP = React.forwardRef(({ className, containerClassName, ...props }, ref) => (
     <OTPInput
         ref={ref}
         containerClassName={cn(
@@ -19,21 +16,14 @@ const InputOTP = React.forwardRef<
 ))
 InputOTP.displayName = "InputOTP"
 
-const InputOTPGroup = React.forwardRef<
-    React.ElementRef<"div">,
-    React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => (
+const InputOTPGroup = React.forwardRef(({ className, ...props }, ref) => (
     <div ref={ref} className={cn("flex items-center gap-3", className)} {...props} />
 ))
 InputOTPGroup.displayName = "InputOTPGroup"
 
-const InputOTPSlot = React.forwardRef<
-    React.ElementRef<"div">,
-    React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
+const InputOTPSlot = React.forwardRef(({ index, className, ...props }, ref) => {
     const inputOTPContext = React.useContext(OTPInputContext)
     const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
-
     return (
         <div
             ref={ref}

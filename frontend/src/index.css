@@ -30,13 +30,31 @@ body {
     overflow-x: hidden;
 }
 
+.highlight::after {
+    content: attr(data-selected);
+    width: max-content;
+    position: absolute;
+    text-transform: capitalize;
+    font-style: normal;
+    top: -1rem;
+    left: -2px;
+    background-color: red;
+    font-size: 12px;
+    font-weight: 400;
+    color: white;
+    z-index: 100;
+    font-family: "Poppins";
+    padding: 0 4px;
+    line-height: 16px;
+}
+
 @layer components {
     .wrapper {
         @apply flex flex-col px-6 py-4 sm:flex-row sm:px-8 lg:px-16;
     }
 
     .input {
-        @apply w-full rounded-xl border-2 bg-gray-50 px-4 py-2 focus:outline-none;
+        @apply w-full rounded-md border-2 bg-gray-50 px-4 py-2 focus:outline-none;
     }
 
     .on-input {

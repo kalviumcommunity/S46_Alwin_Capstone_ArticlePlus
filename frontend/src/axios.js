@@ -3,24 +3,37 @@ import axios from "axios"
 import { getCookie, setCookie } from "./helpers/cookies"
 import { userExists } from "./signals/user"
 
-let accessToken = getCookie("accessToken")
-
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
 })
 
+let alertShown = false
+const alertTimeout = 3000 // Time in ms to reset alertShown state
+
 const forceLogoutUser = () => {
     userExists.value = false
-    setCookie("accessToken", null)
-    setCookie("refreshToken", null)
-    setCookie("refreshTokenId", null)
+    const refreshTokenId = getCookie("refreshTokenId")
+    axiosInstance
+        .post("session/remove", { refreshTokenId, isCurrentSession: true })
+        .then((res) => {
+            if (!alertShown) {
+                alert("Your session has expired. Please login again.")
+                alertShown = true
+                setTimeout(() => {
+                    alertShown = false
+                }, alertTimeout)
+            }
+        })
+        .catch((err) => console.lerr(err))
 }
 
 instance.interceptors.request.use(
     (config) => {
-        accessToken = getCookie("accessToken")
+        const accessToken = getCookie("accessToken")
         config.withCredentials = true
-        config.headers.Authorization = `Bearer ${accessToken}`
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`
+        }
         return config
     },
     (error) => Promise.reject(error),
@@ -30,29 +43,22 @@ instance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config
-
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true
-
             try {
-                const response = await instance.post("/auth/refresh")
-
+                const response = await instance.post("/auth/refresh", null, {
+                    withCredentials: true,
+                })
                 const newAccessToken = response.data.accessToken
-
+                setCookie("accessToken", newAccessToken)
                 userExists.value = true
-
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-
-                return axios(originalRequest)
-            } catch (error) {
+                return instance(originalRequest) // Use instance instead of axios to preserve interceptors
+            } catch (refreshError) {
                 forceLogoutUser()
-                return Promise.reject(error)
+                return Promise.reject(refreshError)
             }
-        } else if (error.response.status === 403) {
-            forceLogoutUser()
-            alert("Your session has expired. Please login again.")
         }
-
         return Promise.reject(error)
     },
 )

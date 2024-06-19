@@ -1,6 +1,7 @@
 import { useState } from "react"
 import * as Dialog from "@radix-ui/react-dialog"
 
+import { userDetailsUpdate } from "@/signals/user"
 import axiosInstance from "@/axios"
 
 import Loader from "@/components/ui/Loader"
@@ -22,7 +23,10 @@ function VerifyAccount() {
             .catch((err) => {
                 setVerficationStatus(err.response.data)
             })
-            .finally(() => setLoader(false))
+            .finally(() => {
+                userDetailsUpdate.value += 1
+                setLoader(false)
+            })
     }
 
     const sendVerificationCode = () => {
@@ -35,7 +39,6 @@ function VerifyAccount() {
             })
             .catch((err) => {
                 console.error(err)
-                sendEmailStatus(err.response.data)
             })
     }
 

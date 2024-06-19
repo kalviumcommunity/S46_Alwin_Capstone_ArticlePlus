@@ -12,9 +12,9 @@ export function Session({ session }) {
     const [actionStatus, setActionStatus] = useState()
     const [timeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone)
 
-    const removeSession = (refreshTokenId) => {
+    const removeSession = (refreshTokenId, isCurrentSession) => {
         axiosInstance
-            .post("session/remove", { refreshTokenId })
+            .post("session/remove", { refreshTokenId, isCurrentSession })
             .then((res) => setActionStatus(res.data))
             .catch((err) => setActionStatus(err.response.data))
             .finally(() => setLoader(false))
@@ -27,7 +27,8 @@ export function Session({ session }) {
             const confirmLogout = confirm(
                 "This session is your current device. Are you sure you want to log out?",
             )
-            if (confirmLogout) removeSession(refreshTokenId)
+            if (confirmLogout)
+                removeSession(refreshTokenId, currentRefreshTokenId === refreshTokenId)
             else setLoader(false)
         } else {
             removeSession(refreshTokenId)
@@ -68,7 +69,7 @@ export function Session({ session }) {
             </span>
             <div className="flex justify-end md:col-start-4 md:col-end-5 lg:col-start-3 lg:col-end-4 lg:justify-start">
                 <Dialog.Root>
-                    <Dialog.Trigger className="w-fit rounded-full bg-red-50 px-5 py-1 font-medium text-red-500 hover:bg-red-500 hover:text-white">
+                    <Dialog.Trigger className="w-fit rounded-full bg-red-50 px-5 py-1 font-medium leading-5 text-red-500 hover:bg-red-500 hover:text-white">
                         Log out
                     </Dialog.Trigger>
                     <Dialog.Portal>
@@ -142,7 +143,7 @@ export function Session({ session }) {
                                         </div>
                                     </div>
                                     <button
-                                        className="ml-auto w-fit  rounded-full bg-red-500 px-5 py-1 font-medium text-white hover:bg-red-600"
+                                        className="ml-auto w-fit rounded-full bg-red-500 px-5 py-1 font-medium text-white hover:bg-red-600"
                                         onClick={() => handleSessionLogout(session._id)}>
                                         Log out
                                     </button>

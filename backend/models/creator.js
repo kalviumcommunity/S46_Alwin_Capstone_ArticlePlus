@@ -16,7 +16,16 @@ const CreatorSchema = new mongoose.Schema({
     description: { type: String, required: true },
     type: { type: String, required: true, enum: ["individual", "organization"] },
     subscription: { type: Boolean, required: true },
-    contributors: [{ type: Array }],
+    contributors: {
+        type: [
+            {
+                name: { type: String, required: true },
+                id: { type: String, required: true },
+                role: { type: String, required: true, enum: ["owner", "author", "editor"] },
+                userRef: { type: String, required: true },
+            },
+        ],
+    },
     subscriptions: {
         type: [
             {

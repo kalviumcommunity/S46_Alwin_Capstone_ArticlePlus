@@ -34,7 +34,7 @@ function App() {
     })
 
     return (
-        <div className="flex min-h-screen w-[100vw] flex-col sm:w-[calc(100vw-1rem)] 2xl:max-w-[1920px]">
+        <div className="flex min-h-screen w-screen flex-col sm:w-[calc(100vw-1rem)] 2xl:max-w-[1920px]">
             {userExists.value ? <UserRoutes /> : <GuestRoutes />}
             <Footer />
         </div>

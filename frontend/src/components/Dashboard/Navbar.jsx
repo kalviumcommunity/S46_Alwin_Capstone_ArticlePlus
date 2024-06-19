@@ -4,47 +4,64 @@ import { useSignalEffect } from "@preact/signals-react"
 import { useSignals } from "@preact/signals-react/runtime"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
-import { userDetails } from "@/signals/user"
+import { creatorInfo, isUserCreator } from "@/signals/creator"
+import { userDetails, userExists } from "@/signals/user"
+import { getCookie, setCookie } from "@/helpers/cookies"
+import axiosInstance from "@/axios"
 
-function DashboardNavbar() {
+function useLogic() {
     useSignals()
-    const currentPath = useLocation().pathname
+
+    const { pathname: currentPath } = useLocation()
 
     const [user, setUser] = useState()
     const [isSubNavActive, setIsSubNavActive] = useState(true)
-
-    useSignalEffect(() => setUser(userDetails.value))
-
-    const handleLogout = () => {
-        const refreshTokenId = getCookie("refreshTokenId")
-        axiosInstance
-            .post("session/remove", { refreshTokenId })
-            .then((res) => {
-                setCookie("accessToken", null)
-                setCookie("refreshToken", null)
-                setCookie("refreshTokenId", null)
-                userExists.value = false
-            })
-            .catch((err) => console.error(err))
-    }
 
     const navLinks = [
         { path: "/dashboard", label: "Dashboard" },
         { path: "/dashboard/articles", label: "Articles" },
         { path: "/dashboard/analytics", label: "Analytics" },
         { path: "/dashboard/settings", label: "Settings" },
+        creatorInfo.value.type === "organization" && {
+            path: "/dashboard/organization-settings",
+            label: "Organization Settings",
+        },
     ]
 
+    const linksWithoutSubNav = ["/dashboard/editor", "/dashboard/new-article"]
+
+    useSignalEffect(() => setUser(userDetails.value))
+
     useEffect(() => {
-        let isActive = false
         for (const link of navLinks) {
             if (currentPath === link.path) {
-                isActive = true
+                setIsSubNavActive(true)
                 break
             }
         }
-        setIsSubNavActive(isActive)
+        for (const link of linksWithoutSubNav) {
+            if (currentPath.includes(link)) {
+                setIsSubNavActive(false)
+                break
+            }
+        }
     }, [currentPath])
+
+    const handleLogout = () => {
+        const refreshTokenId = getCookie("refreshTokenId")
+        axiosInstance
+            .post("session/remove", { refreshTokenId, isCurrentSession: true })
+            .then((res) => {
+                userExists.value = false
+            })
+            .catch((err) => console.error(err))
+    }
+
+    return { user, isSubNavActive, navLinks, currentPath, handleLogout }
+}
+
+function DashboardNavbar() {
+    const { user, isSubNavActive, navLinks, currentPath, handleLogout } = useLogic()
 
     return (
         <nav className="sticky top-0 z-40 flex flex-col bg-white">
@@ -77,19 +94,16 @@ function DashboardNavbar() {
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
                             <DropdownMenu.Content
-                                className="z-50 min-w-52 rounded-md border-2 bg-white"
+                                className="z-50 w-64 min-w-52 rounded-md border-2 bg-white"
                                 align="end"
                                 sideOffset={5}>
                                 <div className="mx-3 my-2 flex flex-col px-2 py-1">
                                     <span className="font-medium">{user.name}</span>
-                                    <span className="text-sm text-gray-600">{user.email}</span>
+                                    <span className="truncate text-sm text-gray-600">
+                                        {user.email}
+                                    </span>
                                 </div>
                                 <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
-                                <Link to="/account">
-                                    <DropdownMenu.Item className="dropdown-item mb-0">
-                                        Account & Settings
-                                    </DropdownMenu.Item>
-                                </Link>
                                 {(user && user.creator) || (user && isUserCreator.value) ? (
                                     <Link to="/dashboard">
                                         <DropdownMenu.Item className="dropdown-item text-black hover:bg-black hover:text-white">
@@ -103,7 +117,11 @@ function DashboardNavbar() {
                                         </DropdownMenu.Item>
                                     </Link>
                                 )}
-
+                                <Link to="/account">
+                                    <DropdownMenu.Item className="dropdown-item mb-0">
+                                        Account & Settings
+                                    </DropdownMenu.Item>
+                                </Link>
                                 <DropdownMenu.Separator className="mx-1 h-px bg-gray-100" />
                                 <DropdownMenu.Item
                                     className="dropdown-item bg-red-100 font-semibold text-red-500 hover:bg-red-500 hover:text-white"

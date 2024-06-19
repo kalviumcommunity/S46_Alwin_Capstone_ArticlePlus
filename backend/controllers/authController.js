@@ -19,6 +19,7 @@ const getUserDetails = async (req, res) => {
 
     const { name, email, creator, verified, provider, picture, refreshTokens } = user
     res.status(200).json({
+        id: user._id,
         name,
         email,
         creator,
@@ -41,7 +42,7 @@ const refreshAccessToken = async (req, res) => {
         const user = await User.findOne({ _id: decoded.userId })
         const refreshTokenObj = user.refreshTokens.find((token) => token.token === refreshToken)
         if (!refreshTokenObj) {
-            return res.status(403).json({ message: "Invalid refresh token" })
+            return res.status(401).json({ message: "Invalid refresh token" })
         }
 
         // Generate a new access token
@@ -58,7 +59,7 @@ const refreshAccessToken = async (req, res) => {
 
         res.status(200).json({ accessToken })
     } catch (error) {
-        res.status(403).json({ message: "Invalid refresh token" })
+        res.status(401).json({ message: "Invalid refresh token" })
     }
 }
 

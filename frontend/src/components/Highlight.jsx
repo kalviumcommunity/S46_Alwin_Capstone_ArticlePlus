@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
-import { randomGradient } from "@/utils/ui/randomGradient"
+import { randomGradient } from "@/helpers/ui/randomGradient"
 
 function Highlight({ article }) {
     const [gradient, setGradient] = useState("")

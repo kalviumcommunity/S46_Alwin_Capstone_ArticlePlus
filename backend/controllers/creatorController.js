@@ -4,6 +4,8 @@ const Joi = require("joi")
 const Creator = require("../models/creator")
 const User = require("../models/user")
 
+const { convertToWebp } = require("../lib/sharp")
+
 const storage = getStorage()
 
 const creatorDetailsSchema = Joi.object({
@@ -18,6 +20,13 @@ const creatorDetailsSchema = Joi.object({
     subscription: Joi.boolean().required(),
     subscriptions: Joi.any(),
 })
+
+const convertDisplayNameToId = (name) => {
+    return name
+        .toLowerCase()
+        .replace(/[^\w\s]/gi, "")
+        .replace(/\s/g, "-")
+}
 
 const onboardCreator = async (req, res) => {
     const { userId } = req
@@ -50,39 +59,72 @@ const onboardCreator = async (req, res) => {
         delete creatorDetails.subscriptions
     }
 
+    // Check if ID is unique
+    const existingCreator = await Creator.findOne({ id })
+    if (existingCreator) {
+        return res.status(400).json({ status: "failed", message: "ID already in use" })
+    }
+
     const user = await User.findById(userId)
     if (user.creator) {
         return res.json({ status: "failed", message: "User is already a creator" })
     }
 
-    const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
-    const blobStream = imageRef.createWriteStream({
-        metadata: {
-            contentType: displayPictureFile.mimetype,
+    const ownerId = convertDisplayNameToId(user.name)
+
+    creatorDetails.contributors = [
+        {
+            name: user.name,
+            id: ownerId,
+            role: "owner",
+            userRef: user._id.toString(),
         },
-    })
+    ]
 
-    blobStream.on("error", (err) => {
-        return res.status(500).send("Error uploading file")
-    })
+    try {
+        const webpDisplayPictureFile = await convertToWebp(displayPictureFile, 80, 1920, 1920)
 
-    blobStream.on("finish", async () => {
-        const displayPictureUrl = await getDownloadURL(imageRef)
+        const imageRef = storage.bucket().file(`creators/${id}/${id}-dp.jpg`)
+        const blobStream = imageRef.createWriteStream({
+            metadata: {
+                contentType: "image/webp",
+            },
+        })
 
-        creatorDetails.displayPicture = displayPictureUrl
-        creatorDetails.owner = userId
+        blobStream.on("error", (err) => {
+            return res.status(500).send("Error uploading file")
+        })
 
-        const newCreator = await Creator(creatorDetails).save()
+        blobStream.on("finish", async () => {
+            const displayPictureUrl = await getDownloadURL(imageRef)
 
-        await User.findByIdAndUpdate(userId, { creator: true, creatorId: newCreator.id })
+            creatorDetails.displayPicture = displayPictureUrl
+            creatorDetails.owner = userId
 
-        return res.json({ onboarding: "success" })
-    })
+            try {
+                const newCreator = await new Creator(creatorDetails).save()
+                await User.findByIdAndUpdate(userId, {
+                    creator: true,
+                    creatorId: newCreator._id.toString(),
+                })
 
-    blobStream.end(displayPictureFile.buffer)
+                return res.json({ onboarding: "success" })
+            } catch (e) {
+                return res
+                    .status(500)
+                    .json({ status: "failed", message: "Error saving creator details" })
+            }
+        })
+
+        blobStream.end(webpDisplayPictureFile)
+    } catch (e) {
+        return res
+            .status(500)
+            .json({ status: "failed", message: "Error processing display picture" })
+    }
 }
 
-const settingsCreatorInfo = async (req, res) => {
+const authCreatorInfo = async (req, res) => {
     const { userId } = req
 
     const user = await User.findById(userId)
@@ -95,12 +137,22 @@ const settingsCreatorInfo = async (req, res) => {
         return res.status(403).json({ message: "User is not a creator" })
     }
 
-    const creator = await Creator.findOne({ owner: userId })
+    const creator = await Creator.findOne(
+        { contributors: { $elemMatch: { userRef: userId } } },
+        { contributors: { $elemMatch: { userRef: userId } }, __v: 0 },
+    )
+
     if (!creator) {
         return res.status(404).json({ message: "Creator not found" })
     }
 
-    return res.json(creator)
+    const creatorDetails = creator.toObject()
+
+    creatorDetails.user = creatorDetails.contributors[0]
+
+    delete creatorDetails.contributors
+
+    return res.json(creatorDetails)
 }
 
-module.exports = { onboardCreator, settingsCreatorInfo }
+module.exports = { onboardCreator, authCreatorInfo }

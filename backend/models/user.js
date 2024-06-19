@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         },
     ],
     verified: { type: Boolean, required: true, default: false },
-    provider: { type: String, required: true, default: "email" },
+    provider: { type: String, required: true, default: "email", enum: ["email", "google"] },
     displayPicture: { type: String },
     creator: { type: Boolean, default: false },
     creatorId: {
