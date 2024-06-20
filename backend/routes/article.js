@@ -21,7 +21,6 @@ const Article = require("../models/article")
 const router = express.Router()
 const upload = initMulter()
 
-// GET all articles
 router.get("/:id", async (req, res) => {
     try {
         const article = await Article.findById(req.params.id)
@@ -72,42 +71,39 @@ const checkEditorAuthorization = async (req, res, next) => {
     }
 }
 
+// Verify token for all routes that are protected
+router.use(asyncHandler(verifyToken))
+
 router.post("/create", verifyToken, asyncHandler(createNewArticle))
 router.get(
     "/editor/:id/access",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(allowAccessArticle),
 )
 
 router.get(
     "/editor/:id/content",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(accessArticle),
 )
 router.patch(
     "/editor/:id/content",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(updateArticle),
 )
 
 router.get(
     "/editor/:id/settings",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(getArticleSettings),
 )
 router.patch(
     "/editor/:id/settings",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(updateArticleSettings),
 )
 router.post(
     "/addimage/:id/:ref",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     upload.single("articleImage"),
     asyncHandler(addArticleImage),

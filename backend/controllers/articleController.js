@@ -96,7 +96,6 @@ const allowAccessArticle = async (req, res) => {
 
 const accessArticle = async (req, res) => {
     const { id } = req.params
-    console.log(id)
 
     try {
         const article = await Article.findById(id).select("-flags")

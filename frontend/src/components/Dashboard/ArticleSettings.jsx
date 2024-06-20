@@ -98,12 +98,12 @@ function ArticleSettings({ articleId }) {
                     <div className="mt-3 flex flex-col gap-1">
                         <span className="font-medium">Article status:</span>
                         {article?.status === "draft" && (
-                            <span className="w-fit rounded-sm border border-red-200 bg-red-100 px-3 py-0.5 text-sm font-semibold text-red-800">
+                            <span className="w-fit rounded-sm border border-red-200 bg-red-100 px-3 py-0.5 text-sm font-medium text-red-800">
                                 Draft
                             </span>
                         )}
                         {article?.status === "published" && (
-                            <span className="w-fit rounded-sm border border-green-200 bg-green-100 px-3 py-0.5 text-sm font-semibold text-green-800">
+                            <span className="w-fit rounded-sm border border-green-200 bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
                                 Published
                             </span>
                         )}
