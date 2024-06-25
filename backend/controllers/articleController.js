@@ -9,9 +9,39 @@ const { convertToWebp } = require("../lib/sharp")
 
 const storage = getStorage()
 
+// helper function to generate a random 4-character hash
 const generateSlugHash = () => {
     const hash = crypto.randomBytes(4).toString("hex") // Generate 8-character hash
     return hash
+}
+
+// helper function to upload an image to storage and get the download URL
+const uploadImageToStorage = (imageFile, imagePath) => {
+    return new Promise((resolve, reject) => {
+        const imageRef = storage.bucket().file(imagePath)
+        const blobStream = imageRef.createWriteStream({
+            metadata: {
+                contentType: "image/webp",
+            },
+        })
+
+        blobStream.on("error", (err) => {
+            console.error("Error uploading file:", err)
+            resolve({ error: "Error uploading file" })
+        })
+
+        blobStream.on("finish", async () => {
+            try {
+                const url = await getDownloadURL(imageRef)
+                resolve({ url })
+            } catch (err) {
+                console.error("Error getting download URL:", err)
+                resolve({ error: "Error getting download URL" })
+            }
+        })
+
+        blobStream.end(imageFile)
+    })
 }
 
 const createNewArticle = async (req, res) => {
@@ -110,94 +140,6 @@ const accessArticle = async (req, res) => {
     }
 }
 
-const uploadImageToStorage = (imageFile, imagePath) => {
-    return new Promise((resolve, reject) => {
-        const imageRef = storage.bucket().file(imagePath)
-        const blobStream = imageRef.createWriteStream({
-            metadata: {
-                contentType: "image/webp",
-            },
-        })
-
-        blobStream.on("error", (err) => {
-            console.error("Error uploading file:", err)
-            resolve({ error: "Error uploading file" })
-        })
-
-        blobStream.on("finish", async () => {
-            try {
-                const url = await getDownloadURL(imageRef)
-                resolve({ url })
-            } catch (err) {
-                console.error("Error getting download URL:", err)
-                resolve({ error: "Error getting download URL" })
-            }
-        })
-
-        blobStream.end(imageFile)
-    })
-}
-
-const addArticleImage = async (req, res) => {
-    const { articleId } = req.body
-    const { ref } = req.params
-    const articleImageFile = req.file
-
-    try {
-        const article = await Article.findById(articleId)
-        if (!article) {
-            return res.status(404).json({ error: "Article not found" })
-        }
-
-        const creator = await Creator.findOne({ "contributors.id": article.author.id })
-        if (!creator) {
-            return res
-                .status(403)
-                .json({ error: "You are not authorized to update this article's image." })
-        }
-
-        const webpArticleImageFile = await convertToWebp(articleImageFile)
-
-        const uploadResult = await uploadImageToStorage(
-            webpArticleImageFile,
-            `article/${articleId}/${ref}`,
-        )
-        if (uploadResult.error) {
-            return res.status(500).json({ error: uploadResult.error })
-        }
-
-        if (ref === "header-image") {
-            article.image = { url: uploadResult.url, caption: "", credit: "" }
-        } else {
-            const [prefix, index, type] = ref.split("-")
-            if (prefix === "content" && type === "image" && !isNaN(parseInt(index))) {
-                const contentIndex = parseInt(index)
-                if (
-                    contentIndex >= 0 &&
-                    contentIndex < article.content.length &&
-                    article.content[contentIndex].type === "image"
-                ) {
-                    article.content[contentIndex].url = uploadResult.url
-                } else {
-                    return res
-                        .status(400)
-                        .json({ error: "Invalid content reference or content type mismatch." })
-                }
-            } else {
-                return res.status(400).json({ error: "Invalid reference format." })
-            }
-        }
-
-        await article.save()
-        return res.json({ success: true, imageUrl: uploadResult.url })
-    } catch (error) {
-        console.error(error)
-        return res
-            .status(500)
-            .json({ error: "An error occurred while updating the article image." })
-    }
-}
-
 const updateArticle = async (req, res) => {
     const { id } = req.params
     const newArticleData = { ...req.body }
@@ -283,12 +225,89 @@ const updateArticleSettings = async (req, res) => {
     }
 }
 
+const addArticleImage = async (req, res) => {
+    const { articleId } = req.body
+    const { ref } = req.params
+    const articleImageFile = req.file
+
+    try {
+        const article = await Article.findById(articleId)
+        if (!article) {
+            return res.status(404).json({ error: "Article not found" })
+        }
+
+        const creator = await Creator.findOne({ "contributors.id": article.author.id })
+        if (!creator) {
+            return res
+                .status(403)
+                .json({ error: "You are not authorized to update this article's image." })
+        }
+
+        const webpArticleImageFile = await convertToWebp(articleImageFile)
+
+        const uploadResult = await uploadImageToStorage(
+            webpArticleImageFile,
+            `article/${articleId}/${ref}`,
+        )
+        if (uploadResult.error) {
+            return res.status(500).json({ error: uploadResult.error })
+        }
+
+        if (ref === "header-image") {
+            article.image = { url: uploadResult.url, caption: "", credit: "" }
+        } else {
+            const [prefix, index, type] = ref.split("-")
+            if (prefix === "content" && type === "image" && !isNaN(parseInt(index))) {
+                const contentIndex = parseInt(index)
+                if (
+                    contentIndex >= 0 &&
+                    contentIndex < article.content.length &&
+                    article.content[contentIndex].type === "image"
+                ) {
+                    article.content[contentIndex].url = uploadResult.url
+                } else {
+                    return res
+                        .status(400)
+                        .json({ error: "Invalid content reference or content type mismatch." })
+                }
+            } else {
+                return res.status(400).json({ error: "Invalid reference format." })
+            }
+        }
+
+        await article.save()
+        return res.json({ success: true, imageUrl: uploadResult.url })
+    } catch (error) {
+        console.error(error)
+        return res
+            .status(500)
+            .json({ error: "An error occurred while updating the article image." })
+    }
+}
+
+const deleteArticle = async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const article = await Article.findByIdAndDelete(id)
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        res.json({ success: true, message: "Article deleted" })
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message })
+    }
+}
+
 module.exports = {
     createNewArticle,
     allowAccessArticle,
     accessArticle,
-    addArticleImage,
     updateArticle,
     getArticleSettings,
     updateArticleSettings,
+    addArticleImage,
+    deleteArticle,
 }

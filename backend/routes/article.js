@@ -13,6 +13,7 @@ const {
     getArticleSettings,
     updateArticleSettings,
     allowAccessArticle,
+    deleteArticle,
 } = require("../controllers/articleController")
 
 const Creator = require("../models/creator")
@@ -107,6 +108,11 @@ router.post(
     asyncHandler(checkEditorAuthorization),
     upload.single("articleImage"),
     asyncHandler(addArticleImage),
+)
+router.delete(
+    "/editor/:id",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(deleteArticle),
 )
 
 module.exports = router

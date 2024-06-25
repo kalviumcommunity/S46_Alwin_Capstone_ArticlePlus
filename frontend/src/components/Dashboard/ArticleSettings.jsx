@@ -28,6 +28,25 @@ function ArticleSettings({ articleId }) {
             })
     }
 
+    const handleDeleteArticle = () => {
+        if (window.confirm("Are you sure you want to delete this article?")) {
+            setIsLoading(true)
+            axiosInstance
+                .delete(`article/editor/${articleId}`)
+                .then((res) => {
+                    alert("Article deleted successfully")
+                    navigate(`/dashboard/articles`)
+                })
+                .catch((err) => {
+                    alert("Failed to delete the article. Please try again.")
+                    console.error(err)
+                })
+                .finally(() => {
+                    setIsLoading(false)
+                })
+        }
+    }
+
     const handleSaveAsDraft = () => {
         setIsLoading(true)
         axiosInstance
@@ -167,6 +186,11 @@ function ArticleSettings({ articleId }) {
                     </div>
                 </div>
                 <div className="mt-auto flex w-full justify-end gap-2 border-t pt-4">
+                    <button
+                        className="mr-auto rounded-full border bg-red-500 px-5 py-1 font-medium text-white hover:bg-red-600"
+                        onClick={handleDeleteArticle}>
+                        Delete article
+                    </button>
                     <button
                         className="rounded-full border px-5 py-1 font-medium text-gray-800 hover:bg-gray-100"
                         onClick={handleSaveAsDraft}>
