@@ -12,9 +12,10 @@ import Editor from "@/pages/Dashboard/Editor"
 import DashboardLayout from "@/pages/Dashboard/Layout"
 import NewArticle from "@/pages/Dashboard/NewArticle"
 import OrganizationSettings from "@/pages/Dashboard/OrganizationSettings"
+import Explore from "@/pages/Explore"
+import ForYou from "@/pages/ForYou"
 import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
-import Read from "@/pages/Read"
 import Navbar from "@/components/Navbar"
 import SuspenseLoader from "@/components/ui/SuspenseLoader"
 
@@ -42,7 +43,9 @@ function UserRoutes() {
     return (
         <Routes>
             <Route path="/" element={<UserLayout />}>
-                <Route index element={<Read isLoggedin={true} />} />
+                <Route index element={<Explore isLoggedin={true} />} />
+                <Route path="foryou" element={<ForYou />} />
+                <Route path="foryou/subscriptions" element={<ForYou />} />
                 <Route path="account" element={<Account />} />
                 <Route path="account/subscriptions" element={<Account />} />
                 <Route path="article/:slug" element={<Article />} />

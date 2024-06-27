@@ -12,4 +12,9 @@ const {
 router.get("/verify", verifyToken, asyncHandler(sendVerificationEmail))
 router.post("/verify", verifyToken, asyncHandler(confirmOtpForVerification))
 
+router.get("/following", asyncHandler(verifyToken))
+router.get("/subscriptions", asyncHandler(verifyToken))
+
+router.get("/subscribed/articles", asyncHandler(verifyToken))
+
 module.exports = router

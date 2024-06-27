@@ -91,7 +91,7 @@ function Account() {
                 </Tabs.List>
                 <div className="flex-auto px-4 sm:pl-4">
                     <Tabs.Content value="account" className="flex flex-col gap-2">
-                        <div className="my-2 flex flex-col gap-2 sm:mx-4">
+                        <div className="my-2 flex flex-col gap-2 sm:mx-3">
                             <span className="text-2xl font-semibold">Authentication</span>
                             <div className="grid auto-cols-auto divide-y">
                                 <div className="flex flex-1 items-center gap-4 py-4 sm:gap-0">
@@ -145,7 +145,7 @@ function Account() {
                                 </div>
                             </div>
                         </div>
-                        <div className="my-2 flex flex-col gap-3 sm:mx-4">
+                        <div className="my-2 flex flex-col gap-2 sm:mx-3">
                             <span className="text-2xl font-semibold">Your devices</span>
                             <div className="grid auto-cols-auto divide-y">
                                 <div className="hidden w-full grid-rows-1 px-2 py-3 text-base font-semibold md:grid md:grid-cols-4 lg:grid-cols-3">
@@ -162,7 +162,7 @@ function Account() {
                         </div>
                     </Tabs.Content>
                     <Tabs.Content value="subscriptions">
-                        <div className="my-2 flex flex-col gap-2 sm:mx-4">
+                        <div className="my-2 flex flex-col gap-2 sm:mx-3">
                             <span className="mb-2 text-2xl font-semibold">Subscriptions</span>
                         </div>
                     </Tabs.Content>

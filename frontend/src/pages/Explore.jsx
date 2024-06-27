@@ -8,7 +8,7 @@ import TagRibbion from "@/components/TagRibbion"
 
 import { articles } from "@/data/articles"
 
-function Read({ isLoggedin }) {
+function Explore({ isLoggedin }) {
     useSignals()
     const [searchParams] = useSearchParams()
 
@@ -50,4 +50,4 @@ function Read({ isLoggedin }) {
     )
 }
 
-export default Read
+export default Explore
