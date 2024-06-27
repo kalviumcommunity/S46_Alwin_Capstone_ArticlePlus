@@ -41,7 +41,7 @@ function NewArticle() {
     }, [location.state])
 
     return (
-        <div className="">
+        <div>
             <h1 className="mt-8 border-b px-8 pb-5 text-2xl font-semibold">
                 New article{" "}
                 <span className="text-sm font-normal">

@@ -20,12 +20,12 @@ const router = express.Router()
 router.post("/signup", asyncHandler(signup))
 router.post("/login", asyncHandler(login))
 
-router.get("/", verifyToken, asyncHandler(getUserDetails))
-router.patch("/reset-password", verifyToken, asyncHandler(resetPassword))
-
 router.post("/refresh", asyncHandler(refreshAccessToken))
 
 router.get("/google/redirect", asyncHandler(generateGoogleOauthLink))
 router.get("/google/callback", asyncHandler(googleOauthCallback))
+
+router.get("/", verifyToken, asyncHandler(getUserDetails))
+router.patch("/reset-password", verifyToken, asyncHandler(resetPassword))
 
 module.exports = router

@@ -117,8 +117,6 @@ function OnboardingCreator() {
             formData.append(key, creatorForm[key])
         }
 
-        console.log("called")
-
         axiosInstance
             .post("/creator/onboarding", formData, {
                 headers: {

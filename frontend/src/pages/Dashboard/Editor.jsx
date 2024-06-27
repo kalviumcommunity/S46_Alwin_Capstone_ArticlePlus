@@ -8,7 +8,7 @@ import ArticleSettings from "@/components/Dashboard/ArticleSettings"
 import Playground from "@/components/Dashboard/Playground"
 import Loader from "@/components/ui/Loader"
 
-function EditorPage() {
+function Editor() {
     const location = useLocation()
 
     const { articleId } = useParams()
@@ -54,7 +54,11 @@ function EditorPage() {
         <div>
             <h1 className="mt-8 border-b px-8 pb-5 text-2xl font-semibold">
                 Editor for {isArticleNew ? "new article" : "article"}{" "}
-                <span className="text-sm font-normal">#{articleId}</span>
+                <Link
+                    to={`/dashboard/article/${articleId}`}
+                    className="ml-1 text-sm font-normal underline">
+                    #{articleId}
+                </Link>
             </h1>
 
             {isArticleAccessible ? (
@@ -138,4 +142,4 @@ function EditorPage() {
     )
 }
 
-export default EditorPage
+export default Editor

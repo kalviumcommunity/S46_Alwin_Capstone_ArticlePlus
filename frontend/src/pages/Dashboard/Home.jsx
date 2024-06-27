@@ -1,19 +1,7 @@
 import { Link } from "react-router-dom"
 
 import ArticlesTable from "@/components/Dashboard/ArticlesTable"
-
-const articles = [
-    {
-        id: 1,
-        img: "https://source.unsplash.com/random",
-        title: "Lorem Ipsum is simply dummy text",
-        authorId: "alwin",
-        date: "20 Aug, 2023",
-        status: "Published",
-        visibility: "Public",
-        views: 100,
-    },
-]
+import RecentArticlesActivity from "@/components/Dashboard/RecentArticlesActivity"
 
 function DashboardHome() {
     return (
@@ -54,17 +42,7 @@ function DashboardHome() {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:gap-4 lg:w-fit">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-semibold">Recent articles activity</h1>
-                    <Link
-                        className="h-fit rounded-full border bg-gray-50 px-3 py-1 text-center text-sm font-medium leading-none text-black"
-                        to="articles">
-                        View all Articles
-                    </Link>
-                </div>
-                <ArticlesTable articles={articles} />
-            </div>
+            <RecentArticlesActivity />
         </div>
     )
 }
