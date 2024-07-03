@@ -2,23 +2,27 @@ import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 
 import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
+import axiosInstance from "@/axios"
 
 import Loader from "@/components/ui/Loader"
-
-import { articles } from "@/data/articles"
 
 function Article({ data }) {
     const { slug } = useParams()
 
     const [article, setArticle] = useState()
+    const [articleNotFound, setArticleNotFound] = useState(false)
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        if (data) {
-            setArticle(data)
-        } else {
-            setArticle(articles.find((article) => article.slug === slug))
-        }
+        axiosInstance
+            .get(`/article/${slug}`)
+            .then((response) => {
+                setArticle(response.data)
+            })
+            .catch((error) => {
+                setArticleNotFound(true)
+                console.error("Error fetching article:", error)
+            })
     }, [slug])
 
     if (article && article.display === "header") {

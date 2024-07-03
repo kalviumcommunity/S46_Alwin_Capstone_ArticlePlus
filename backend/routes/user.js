@@ -7,14 +7,22 @@ const { verifyToken } = require("../middlewares/verifyToken")
 const {
     sendVerificationEmail,
     confirmOtpForVerification,
+    followCreator,
+    subscribeCreator,
 } = require("../controllers/userController")
 
-router.get("/verify", verifyToken, asyncHandler(sendVerificationEmail))
-router.post("/verify", verifyToken, asyncHandler(confirmOtpForVerification))
+router.use(asyncHandler(verifyToken))
 
-router.get("/following", asyncHandler(verifyToken))
-router.get("/subscriptions", asyncHandler(verifyToken))
+router.get("/verify", asyncHandler(sendVerificationEmail))
+router.post("/verify", asyncHandler(confirmOtpForVerification))
 
-router.get("/subscribed/articles", asyncHandler(verifyToken))
+router.get("/following")
+router.get("/subscriptions")
+
+router.get("/following/articles")
+router.get("/subscriptions/articles")
+
+router.post("/follow/:id", asyncHandler(followCreator))
+router.get("/subscribe/:id", asyncHandler(subscribeCreator))
 
 module.exports = router

@@ -35,9 +35,6 @@ export const ArticleList = ({ article }) => {
                             <span className="text-sm font-semibold leading-4">
                                 {article.author.name}
                             </span>
-                            <span className="text-sm leading-4 text-gray-800">
-                                {article.views} views
-                            </span>
                         </>
                     ) : (
                         <span className="text-sm font-semibold">

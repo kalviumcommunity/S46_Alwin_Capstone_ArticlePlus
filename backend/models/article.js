@@ -48,7 +48,6 @@ const articleSchema = new mongoose.Schema({
         },
         slugHash: { type: String, required: true },
     },
-    for: { type: String, required: true, enum: ["all", "subscribers"], default: "all" },
     display: { type: String, required: true, enum: ["header", "square"], default: "header" },
     flow: { type: String, required: true, enum: ["default", "reverse"], default: "default" },
     slug: {
