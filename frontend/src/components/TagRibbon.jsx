@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom"
 import clsx from "clsx"
 
-function TagRibbion({ isLoggedin }) {
+function TagRibbon({ isLoggedin }) {
     const location = useLocation()
     const isForYouPage = location.pathname.includes("/foryou")
 
@@ -97,4 +97,4 @@ function TagRibbion({ isLoggedin }) {
     )
 }
 
-export default TagRibbion
+export default TagRibbon

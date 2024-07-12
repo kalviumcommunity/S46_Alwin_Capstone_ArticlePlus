@@ -9,28 +9,19 @@ const SelectButton = ({ label, type, handleArticleDBUpdate, selectionRef, ...res
     const { article } = useContext(PlaygroundArticleContext)
     const { selectedElementType, setSelectedElementType } = useContext(SelectedElementContext)
 
+    const fileInputRef = useRef(null)
+
     const isSelected = selectedElementType === type
     const baseClasses =
         "capitalize w-full flex-1 rounded border px-4 py-1.5 text-sm font-medium hover:bg-black hover:text-white"
-    const selectedClasses = "!bg-rose-500 text-white"
-    const unselectedClasses = "bg-white"
-    const mergedClasses = `${baseClasses} ${isSelected ? selectedClasses : unselectedClasses}`
+    const buttonClasses = `${baseClasses} ${isSelected ? "!bg-rose-500 text-white" : "bg-white"}`
 
-    const fileInputRef = useRef(null)
+    const handleSelectElement = () => setSelectedElementType(type)
 
-    const handleSelectElement = () => {
+    const handleUploadDialog = useCallback(() => {
+        fileInputRef.current?.click()
         setSelectedElementType(type)
-    }
-
-    const handleUploadDialog = useCallback(
-        (event) => {
-            if (event.target !== fileInputRef.current) {
-                fileInputRef.current.click()
-                setSelectedElementType(type)
-            }
-        },
-        [setSelectedElementType, type],
-    )
+    }, [setSelectedElementType, type])
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0]
@@ -46,46 +37,45 @@ const SelectButton = ({ label, type, handleArticleDBUpdate, selectionRef, ...res
         formData.append("articleId", article._id)
 
         setIsLoading(true)
-        axiosInstance
-            .post(`/article/addimage/${article._id}/${selectionRef}`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
+        try {
+            await axiosInstance.post(
+                `/article/addimage/${article._id}/${selectionRef}`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
                 },
-            })
-            .then(() => {
-                console.log("Image uploaded successfully")
-            })
-            .catch((error) => {
-                console.error("Error uploading image:", error)
-            })
-            .then(() => {
-                handleArticleDBUpdate()
-                setIsLoading(false)
-                fileInputRef.current.value = null
-            })
+            )
+            console.log("Image uploaded successfully")
+        } catch (error) {
+            console.error("Error uploading image:", error)
+        } finally {
+            handleArticleDBUpdate()
+            setIsLoading(false)
+            if (fileInputRef.current) fileInputRef.current.value = null
+        }
+    }
+
+    if (type === "header-image-upload") {
+        return (
+            <button
+                className={`${baseClasses} overflow-hidden !px-2.5 !py-1.5 !text-start`}
+                onClick={handleUploadDialog}
+                {...rest}>
+                <input
+                    className="label mt-1.5 cursor-pointer file:mb-1.5 file:mr-2 file:flex file:cursor-pointer file:flex-col file:rounded file:border-0 file:bg-rose-500 file:text-white"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                />
+            </button>
+        )
     }
 
     return (
-        <>
-            {type === "header-image-upload" ? (
-                <button
-                    className={`${baseClasses} overflow-hidden !px-2.5 !py-1.5 !text-start`}
-                    onClick={handleUploadDialog}
-                    {...rest}>
-                    <input
-                        className="label mt-1.5 cursor-pointer file:mb-1.5 file:mr-2 file:flex file:cursor-pointer file:flex-col file:rounded file:border-0 file:bg-rose-500 file:text-white"
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                    />
-                </button>
-            ) : (
-                <button className={mergedClasses} onClick={handleSelectElement} {...rest}>
-                    {label}
-                </button>
-            )}
-        </>
+        <button className={buttonClasses} onClick={handleSelectElement} {...rest}>
+            {label}
+        </button>
     )
 }
 

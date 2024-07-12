@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import * as Tabs from "@radix-ui/react-tabs"
 
-import TagRibbion from "@/components/TagRibbion"
+import TagRibbon from "@/components/TagRibbon"
 
 function ForYou() {
     const location = useLocation()
@@ -19,7 +19,7 @@ function ForYou() {
 
     return (
         <>
-            <TagRibbion isLoggedin={true} />
+            <TagRibbon isLoggedin={true} />
             <div className="flex-col border-t pb-10 pt-4">
                 <Tabs.Root
                     className="wrapper flex divide-x py-6"

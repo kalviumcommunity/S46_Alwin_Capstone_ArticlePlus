@@ -56,7 +56,24 @@ const articleSchema = new mongoose.Schema({
             return this.status === "published" || this.status === "for-review"
         },
     },
-    category: { type: String, required: true, default: "category-of-article" },
+    category: {
+        type: String,
+        required: true,
+        default: "category-of-article",
+        enum: [
+            "category-of-article",
+            "technology",
+            "health",
+            "business-&-finance",
+            "science",
+            "politics",
+            "arts-&-culture",
+            "travel",
+            "environment",
+            "education",
+            "sports",
+        ],
+    },
     title: {
         type: String,
         default: "Here goes your title for the article",

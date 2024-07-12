@@ -175,6 +175,27 @@ const updateArticle = async (req, res) => {
     }
 }
 
+const updateArticleCategory = async (req, res) => {
+    const { id } = req.params
+    const newCategory = req.body.category
+
+    try {
+        const article = await Article.findById(id)
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        article.category = newCategory
+
+        await article.save()
+
+        res.json({ success: true, message: "Article category updated" })
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message })
+    }
+}
+
 const getArticleSettings = async (req, res) => {
     const { id } = req.params
 
@@ -306,6 +327,7 @@ module.exports = {
     allowAccessArticle,
     accessArticle,
     updateArticle,
+    updateArticleCategory,
     getArticleSettings,
     updateArticleSettings,
     addArticleImage,

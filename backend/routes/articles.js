@@ -1,30 +1,12 @@
 const express = require("express")
-const { verifyToken } = require("../middlewares/verifyToken")
+const Joi = require("joi")
+
 const User = require("../models/user") // Adjust the path as needed
 const Article = require("../models/article") // Adjust the path as needed
 
+const { isLoggedIn } = require("../middlewares/isLoggedIn")
+
 const router = express.Router()
-
-const isLoggedIn = (req, res, next) => {
-    const accessToken = req.headers.authorization?.split(" ")[1]
-
-    if (!accessToken) {
-        req.isUserLoggedIn = false
-        return next()
-    }
-
-    // Define a custom callback for verifyToken to set req.isUserLoggedIn and req.userId
-    verifyToken(req, res, (err) => {
-        if (err) {
-            req.isUserLoggedIn = false
-            return next()
-        }
-
-        req.isUserLoggedIn = true
-        req.userId = req.userId // Ensure userId is set
-        return next()
-    })
-}
 
 const exploreArticles = async (req, res) => {
     const isUserLoggedIn = req.isUserLoggedIn
@@ -34,7 +16,6 @@ const exploreArticles = async (req, res) => {
     try {
         let articlesQuery = {
             "flags.status": "published",
-            "flags.access": "all",
         }
 
         if (isUserLoggedIn) {
@@ -59,8 +40,17 @@ const exploreArticles = async (req, res) => {
             // Construct query for articles
             articlesQuery = {
                 "flags.status": "published",
-                $or: [{ "flags.access": "all" }, { "flags.creator": { $in: creatorIds } }],
+                $or: [
+                    { "flags.access": "all" },
+                    {
+                        "flags.access": "subscribers",
+                        "flags.creator": { $in: subscribedCreatorIds },
+                    },
+                    { "flags.creator": { $in: followingCreatorIds } },
+                ],
             }
+        } else {
+            articlesQuery["flags.access"] = "all"
         }
 
         const totalArticles = await Article.countDocuments(articlesQuery)
@@ -85,6 +75,121 @@ const exploreArticles = async (req, res) => {
     }
 }
 
+const categorySchema = Joi.string()
+    .valid(
+        "technology",
+        "health",
+        "business-&-finance",
+        "science",
+        "politics",
+        "arts-&-culture",
+        "travel",
+        "environment",
+        "education",
+        "sports",
+    )
+    .required()
+
+const suggestSimilarArticles = async (req, res) => {
+    const isUserLoggedIn = req.isUserLoggedIn
+    const currentArticleSlug = req.query.slug
+    const currentArticleCategory = req.query.category
+
+    // Validate the category
+    const { error } = categorySchema.validate(currentArticleCategory)
+    if (error) {
+        return res.status(400).json({ message: "Invalid category" })
+    }
+
+    try {
+        let articlesQuery = {
+            "flags.status": "published",
+        }
+
+        if (isUserLoggedIn) {
+            const userId = req.userId
+            const user = await User.findById(userId).lean()
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found" })
+            }
+
+            // Extract the list of subscriptions and following creators
+            const subscribedCreatorIds = user.actions.subscriptions.map(
+                (subscription) => subscription.creatorId,
+            )
+
+            const followingCreatorIds = user.actions.following.map(
+                (following) => following.creatorId,
+            )
+
+            // Update query for articles
+            articlesQuery = {
+                "flags.status": "published",
+                $or: [
+                    { "flags.access": "all" },
+                    {
+                        "flags.access": "subscribers",
+                        "flags.creator": { $in: subscribedCreatorIds },
+                    },
+                    { "flags.creator": { $in: followingCreatorIds } },
+                ],
+            }
+        } else {
+            articlesQuery["flags.access"] = "all"
+        }
+
+        const suggestedArticles = []
+
+        // Fetch up to 2 articles from the specified category excluding the current article
+        let sameCategoryArticles = await Article.find({
+            ...articlesQuery,
+            category: currentArticleCategory,
+            slug: { $ne: currentArticleSlug },
+        })
+            .sort({ datestamp: -1 })
+            .limit(2)
+            .lean()
+            .select("-content -flow -display -category -__v -flags")
+
+        suggestedArticles.push(...sameCategoryArticles)
+
+        // Calculate remaining articles needed
+        const remainingNeeded = 3 - sameCategoryArticles.length
+
+        // Fetch additional random articles if needed
+        if (remainingNeeded > 0) {
+            const excludeSlugs = sameCategoryArticles
+                .map((a) => a.slug)
+                .concat(currentArticleSlug)
+            const randomArticles = await Article.aggregate([
+                { $match: { ...articlesQuery, slug: { $nin: excludeSlugs } } },
+                { $sample: { size: remainingNeeded } },
+                {
+                    $project: {
+                        __v: 0,
+                        flags: 0,
+                        content: 0,
+                        flow: 0,
+                        display: 0,
+                        category: 0,
+                    },
+                },
+            ])
+
+            suggestedArticles.push(...randomArticles)
+        }
+
+        res.json({
+            suggestedArticles,
+        })
+    } catch (error) {
+        console.error("Error serving suggested articles:", error)
+        res.status(500).json({ message: "Error serving suggested articles" })
+    }
+}
+
 router.get("/explore", isLoggedIn, exploreArticles)
+router.get("/suggested/similar", isLoggedIn, suggestSimilarArticles)
 
 module.exports = router

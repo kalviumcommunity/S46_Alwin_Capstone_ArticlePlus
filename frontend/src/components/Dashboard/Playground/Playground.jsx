@@ -42,7 +42,6 @@ const authorSchema = z.object({
 })
 
 const articleSchema = z.object({
-    for: z.enum(["all", "subscribers"]),
     display: z.enum(["header", "square"]),
     flow: z.enum(["default", "reverse"]),
     slug: z.string(),
@@ -104,6 +103,7 @@ function Playground({ articleId }) {
             .then((res) => {
                 setArticle(res.data)
                 setSavedArticle(res.data)
+                console.log(res.data)
             })
             .catch((err) => {
                 console.error(err)
@@ -138,6 +138,7 @@ function Playground({ articleId }) {
 
     const handleSave = () => {
         updateArticle()
+        setSelectedElementType(null)
     }
 
     const validateArticle = () => {
@@ -179,6 +180,29 @@ function Playground({ articleId }) {
 
         setIsSaved(isEqual)
     }, [article, savedArticle])
+    const handleCategoryChange = async (event) => {
+        const newCategory = event.target.value
+        setSelectedCategory(newCategory)
+
+        try {
+            setIsLoading(true)
+            await axiosInstance.patch(`article/editor/${article._id}/category`, {
+                category: newCategory,
+            })
+            setArticle((prevArticle) => ({
+                ...prevArticle,
+                category: newCategory,
+            }))
+            toast.success("Category updated successfully")
+        } catch (error) {
+            console.error("Error updating category:", error)
+            toast.error("Failed to update category")
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const [selectedCategory, setSelectedCategory] = useState(article?.category || "")
 
     return (
         <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
@@ -245,7 +269,7 @@ function Playground({ articleId }) {
                                     <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
                                         <span>Header</span>
                                         <div className="flex flex-col gap-1.5">
-                                            <div className="flex items-center gap-2 rounded border bg-white px-4 py-2">
+                                            <div className="flex items-center gap-2 rounded border bg-white px-3.5 py-1.5">
                                                 <p>Layout:</p>
                                                 <select
                                                     name="layout"
@@ -262,20 +286,48 @@ function Playground({ articleId }) {
                                                     </option>
                                                 </select>
                                             </div>
+                                            <div className="flex items-center gap-2 rounded border bg-white px-3.5 py-1.5">
+                                                <p>Category:</p>
+                                                <select
+                                                    className="w-full flex-1 rounded border bg-white px-2 py-1 text-sm font-medium"
+                                                    value={selectedCategory}
+                                                    onChange={handleCategoryChange}>
+                                                    <option
+                                                        value="category-of-article"
+                                                        disabled>
+                                                        Select
+                                                    </option>
+                                                    <option value="technology">
+                                                        Technology
+                                                    </option>
+                                                    <option value="health">Health</option>
+                                                    <option value="business-&-finance">
+                                                        Business & Finance
+                                                    </option>
+                                                    <option value="science">Science</option>
+                                                    <option value="politics">Politics</option>
+                                                    <option value="arts-&-culture">
+                                                        Arts & Culture
+                                                    </option>
+                                                    <option value="travel">Travel</option>
+                                                    <option value="environment">
+                                                        Environment
+                                                    </option>
+                                                    <option value="education">Education</option>
+                                                    <option value="sports">Sports</option>
+                                                </select>
+                                            </div>
                                             <div className="flex gap-1.5">
                                                 <SelectButton
                                                     label="Title"
                                                     type="header-title"
                                                 />
                                                 <SelectButton
-                                                    label="Tag"
-                                                    type="header-category"
+                                                    label="Subtitle"
+                                                    type="header-subtitle"
                                                 />
                                             </div>
-                                            <SelectButton
-                                                label="Subtitle"
-                                                type="header-subtitle"
-                                            />
+
                                             <div className="flex flex-col gap-2 rounded border bg-white p-2.5">
                                                 Upload Header Image
                                                 <div className="flex flex-col gap-2">
