@@ -5,7 +5,8 @@ import { creatorInfo, isUserCreator } from "@/signals/creator"
 import axiosInstance from "@/axios"
 
 import OnboardingOptions from "@/components/OnboardingOptions"
-import Loader from "@/components/ui/Loader"
+
+import Loader from "@/ui/Loader"
 
 function OnboardingCreator() {
     const [step, setStep] = useState(1)

@@ -4,7 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog"
 
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/ui/Loader"
+import Loader from "@/ui/Loader"
 
 function ChangePassword() {
     const [resetStatus, setResetStatus] = useState()

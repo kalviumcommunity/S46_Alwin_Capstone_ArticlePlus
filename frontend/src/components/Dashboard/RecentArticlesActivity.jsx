@@ -34,7 +34,7 @@ function RecentArticlesActivity() {
                     View all Articles
                 </Link>
             </div>
-            <ArticlesTable articles={articles} loading={isLoading} />
+            <ArticlesTable articles={articles} loading={isLoading} isDashboard={true} />
         </div>
     )
 }

@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom"
 
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/ui/Loader"
+import Loader from "@/ui/Loader"
 
 function ArticleOverview() {
     const { articleId } = useParams()
@@ -16,7 +16,6 @@ function ArticleOverview() {
             .get(`article/editor/${articleId}/settings`)
             .then((res) => {
                 setArticle(res.data)
-                setAccessLevel(res.data.access)
             })
             .catch((err) => {
                 console.error(err)

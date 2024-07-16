@@ -11,7 +11,11 @@ const storage = getStorage()
 
 // helper function to generate a random 4-character hash
 const generateSlugHash = () => {
-    const hash = crypto.randomBytes(4).toString("hex") // Generate 8-character hash
+    let hash
+    do {
+        hash = crypto.randomBytes(4).toString("hex") // Generate 8-character hash
+    } while (hash.includes("-")) // Check if hash contains '-'
+
     return hash
 }
 
@@ -224,9 +228,47 @@ const getArticleSettings = async (req, res) => {
     }
 }
 
+const validateArticleForPublishing = (article) => {
+    const checks = [
+        {
+            condition:
+                article.content.length > 0 &&
+                article.content.some((block) => block.type !== undefined),
+            message: "At least one content block should exist in an article to publish.",
+        },
+        {
+            condition:
+                article.image.url !==
+                "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
+            message: "Article must have an header image to publish (not default)",
+        },
+        {
+            condition: article.title !== "Here goes your title for the article",
+            message: "Article must have a title to publish (not default text)",
+        },
+        {
+            condition:
+                article.subtitle !== "Write what is the short summary/hook for the article",
+            message: "Article must have a subtitle to publish (not default text)",
+        },
+        {
+            condition: article.category !== "category-of-article",
+            message: "Article must have a valid category to publish (not default)",
+        },
+    ]
+
+    for (const check of checks) {
+        if (!check.condition) {
+            return { isValid: false, message: check.message }
+        }
+    }
+
+    return { isValid: true }
+}
+
 const updateArticleSettings = async (req, res) => {
     const { id } = req.params
-    const newSettings = { ...req.body }
+    const { status, access } = req.body
 
     try {
         const article = await Article.findById(id)
@@ -235,12 +277,43 @@ const updateArticleSettings = async (req, res) => {
             return res.status(404).json({ message: "Article not found" })
         }
 
-        article.flags.access = newSettings.access
-        article.flags.status = newSettings.status
+        const updates = {}
+        let responseMessage = ""
 
-        await article.save()
+        if (status && article.flags.status !== status) {
+            updates["flags.status"] = status
 
-        res.json({ success: true, message: "Article Settings updated" })
+            if (status === "published") {
+                const validationResult = validateArticleForPublishing(article)
+                if (!validationResult.isValid) {
+                    return res.status(400).json({
+                        success: false,
+                        message: validationResult.message,
+                    })
+                }
+                updates.datePublished = new Date().toLocaleString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                })
+            }
+
+            responseMessage +=
+                status === "published" ? "Article published. " : "Article saved as draft. "
+        }
+
+        if (access && article.flags.access !== access) {
+            updates["flags.access"] = access
+            responseMessage += `Access updated to ${access === "all" ? "all" : "subscribers"}. `
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return res.json({ success: true, message: "No changes to settings to be made." })
+        }
+
+        await Article.findByIdAndUpdate(id, updates, { new: true })
+
+        res.json({ success: true, message: responseMessage.trim() })
     } catch (err) {
         res.status(500).json({ success: false, message: err.message })
     }

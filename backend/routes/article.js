@@ -122,22 +122,54 @@ const checkEditorAuthorization = async (req, res, next) => {
 
 // Verify token for all routes that are protected
 router.use(asyncHandler(verifyToken))
-router.use(asyncHandler(checkEditorAuthorization))
 
 router.post("/create", asyncHandler(createNewArticle))
 
-router.get("/editor/:id/access", asyncHandler(allowAccessArticle))
+router.get(
+    "/editor/:id/access",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(allowAccessArticle),
+)
 
-router.get("/editor/:id/content", asyncHandler(accessArticle))
-router.patch("/editor/:id/content", asyncHandler(updateArticle))
+router.get(
+    "/editor/:id/content",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(accessArticle),
+)
+router.patch(
+    "/editor/:id/content",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(updateArticle),
+)
 
-router.patch("/editor/:id/category", asyncHandler(updateArticleCategory))
+router.patch(
+    "/editor/:id/category",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(updateArticleCategory),
+)
 
-router.get("/editor/:id/settings", asyncHandler(getArticleSettings))
-router.patch("/editor/:id/settings", asyncHandler(updateArticleSettings))
+router.get(
+    "/editor/:id/settings",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(getArticleSettings),
+)
+router.patch(
+    "/editor/:id/settings",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(updateArticleSettings),
+)
 
-router.post("/addimage/:id/:ref", upload.single("articleImage"), asyncHandler(addArticleImage))
+router.post(
+    "/editor/addimage/:id/:ref",
+    asyncHandler(checkEditorAuthorization),
+    upload.single("articleImage"),
+    asyncHandler(addArticleImage),
+)
 
-router.delete("/editor/:id", asyncHandler(deleteArticle))
+router.delete(
+    "/editor/:id",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(deleteArticle),
+)
 
 module.exports = router

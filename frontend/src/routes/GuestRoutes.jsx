@@ -28,7 +28,7 @@ function GuestRoutes() {
                     element={
                         <>
                             <Hero />
-                            <Explore isLoggedin={false} />
+                            <Explore isLoggedIn={false} />
                         </>
                     }
                 />

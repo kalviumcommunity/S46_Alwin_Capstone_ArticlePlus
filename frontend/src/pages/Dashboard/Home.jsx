@@ -16,7 +16,7 @@ function DashboardHome() {
                             className="flex w-fit items-center gap-2 rounded-full bg-rose-500 py-1.5 pl-2 pr-3 font-medium leading-5 text-white">
                             <img src="/assets/icons/add-circle.svg" alt="" /> New article
                         </Link>
-                        <p className="text-sm text-gray-600">Draft new article now in editor</p>
+                        <p className="text-sm text-gray-700">Draft new article now in editor</p>
                     </div>
                 </div>
 
@@ -35,9 +35,6 @@ function DashboardHome() {
 
                         <span className="col-span-2">Subscribers</span>
                         <span className="text-center font-medium text-black">30</span>
-
-                        <span className="col-span-2">Views in last 1 month</span>
-                        <span className="text-center font-medium text-black">482</span>
                     </div>
                 </div>
             </div>

@@ -17,7 +17,8 @@ import ForYou from "@/pages/ForYou"
 import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
 import Navbar from "@/components/Navbar"
-import SuspenseLoader from "@/components/ui/SuspenseLoader"
+
+import SuspenseLoader from "@/ui/SuspenseLoader"
 
 const DashboardHome = React.lazy(() => import("@/pages/Dashboard/Home"))
 const DashboardArticles = React.lazy(() => import("@/pages/Dashboard/Articles"))
@@ -43,7 +44,7 @@ function UserRoutes() {
     return (
         <Routes>
             <Route path="/" element={<UserLayout />}>
-                <Route index element={<Explore isLoggedin={true} />} />
+                <Route index element={<Explore isLoggedIn={true} />} />
                 <Route path="foryou" element={<ForYou />} />
                 <Route path="foryou/subscriptions" element={<ForYou />} />
                 <Route path="account" element={<Account />} />

@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import { set } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/ui/Loader"
+import { EditorActiveTabContext } from "@/pages/Dashboard/Editor"
+
+import Loader from "@/ui/Loader"
 
 function ArticleSettings({ articleId }) {
     const navigate = useNavigate()
+
+    const { setActiveTab } = useContext(EditorActiveTabContext)
 
     const [isLoading, setIsLoading] = useState(true)
     const [article, setArticle] = useState(null)
@@ -56,6 +61,7 @@ function ArticleSettings({ articleId }) {
             })
             .then((res) => {
                 console.log("Saved as draft")
+                alert(res.data.message)
                 navigate(`/dashboard/articles`)
             })
             .catch((err) => {
@@ -75,10 +81,16 @@ function ArticleSettings({ articleId }) {
             })
             .then((res) => {
                 console.log("Published")
+                alert(res.data.message)
                 navigate(`/dashboard/articles`)
             })
             .catch((err) => {
                 console.error(err)
+                if (err.response.status === 400) {
+                    setActiveTab("compose")
+                    alert(err.response.data.message)
+                }
+                console.log("error", err.response)
             })
             .finally(() => {
                 setIsLoading(false)

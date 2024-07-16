@@ -199,6 +199,7 @@ const getCreatorArticles = async (req, res) => {
             .skip(skip)
             .limit(limit)
             .select("-content -slug -flow -display -category -flags.slugHash -subtitle")
+            .sort({ createdAt: -1 })
 
         // If recent flag is true, sort by date descending to get the most recent 4 articles
         if (recent) {

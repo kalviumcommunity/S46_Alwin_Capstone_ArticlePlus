@@ -32,10 +32,6 @@ function DashboardAnalytics() {
                                 {creatorAnalytics.subscribers}
                             </span>
                         </div>
-                        <div className="flex w-full">
-                            <span className="w-4/5">Views in last 1 month</span>
-                            <span className="w-1/5 text-center font-medium">482</span>
-                        </div>
                     </div>
                 )}
             </div>

@@ -6,7 +6,8 @@ import { convertCategoryFormat } from "@/helpers/ui/convertCategoryFormat"
 import axiosInstance from "@/axios"
 
 import { ArticleCard } from "@/components/ArticleCard"
-import Loader from "@/components/ui/Loader"
+
+import Loader from "@/ui/Loader"
 
 function Article() {
     const { slug } = useParams()

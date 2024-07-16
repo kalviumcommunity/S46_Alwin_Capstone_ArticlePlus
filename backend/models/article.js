@@ -64,10 +64,10 @@ const articleSchema = new mongoose.Schema({
             "category-of-article",
             "technology",
             "health",
-            "business-&-finance",
+            "business-and-finance",
             "science",
             "politics",
-            "arts-&-culture",
+            "arts-and-culture",
             "travel",
             "environment",
             "education",
@@ -101,6 +101,8 @@ const articleSchema = new mongoose.Schema({
         }),
     },
     content: [contentBlockSchema],
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
 })
 
 const Article = mongoose.model("article", articleSchema)

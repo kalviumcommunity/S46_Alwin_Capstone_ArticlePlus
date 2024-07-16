@@ -39,7 +39,7 @@ const SelectButton = ({ label, type, handleArticleDBUpdate, selectionRef, ...res
         setIsLoading(true)
         try {
             await axiosInstance.post(
-                `/article/addimage/${article._id}/${selectionRef}`,
+                `/article/editor/addimage/${article._id}/${selectionRef}`,
                 formData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },

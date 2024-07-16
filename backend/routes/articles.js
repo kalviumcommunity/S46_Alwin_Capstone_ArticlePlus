@@ -8,14 +8,40 @@ const { isLoggedIn } = require("../middlewares/isLoggedIn")
 
 const router = express.Router()
 
+const categorySchema = Joi.string()
+    .valid(
+        "technology",
+        "health",
+        "business-and-finance",
+        "science",
+        "politics",
+        "arts-and-culture",
+        "travel",
+        "environment",
+        "education",
+        "sports",
+    )
+    .required()
+
 const exploreArticles = async (req, res) => {
     const isUserLoggedIn = req.isUserLoggedIn
     const page = parseInt(req.query.page, 10) || 1 // Default to page 1
     const pageSize = 8
 
+    const category = req.query.category
+
     try {
         let articlesQuery = {
             "flags.status": "published",
+        }
+
+        // Validate category if provided
+        if (category) {
+            const { error } = categorySchema.validate(category)
+            if (error) {
+                return res.status(400).json({ message: "Invalid category" })
+            }
+            articlesQuery.category = category
         }
 
         if (isUserLoggedIn) {
@@ -39,7 +65,7 @@ const exploreArticles = async (req, res) => {
 
             // Construct query for articles
             articlesQuery = {
-                "flags.status": "published",
+                ...articlesQuery, // Include the existing query conditions
                 $or: [
                     { "flags.access": "all" },
                     {
@@ -74,21 +100,6 @@ const exploreArticles = async (req, res) => {
         res.status(500).json({ message: "Error serving explore articles" })
     }
 }
-
-const categorySchema = Joi.string()
-    .valid(
-        "technology",
-        "health",
-        "business-&-finance",
-        "science",
-        "politics",
-        "arts-&-culture",
-        "travel",
-        "environment",
-        "education",
-        "sports",
-    )
-    .required()
 
 const suggestSimilarArticles = async (req, res) => {
     const isUserLoggedIn = req.isUserLoggedIn

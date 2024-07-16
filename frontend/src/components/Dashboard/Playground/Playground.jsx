@@ -7,8 +7,7 @@ import { z } from "zod"
 import useKeyPress from "@/helpers/hooks/useKeyPress"
 import axiosInstance from "@/axios"
 
-import ToastAlert from "@/components/ui/ToastAlert"
-
+import ToastAlert from "@/ui/ToastAlert"
 import AddContentButton from "./AddContentButton"
 import ArticlePreview from "./ArticlePreview"
 import ContentControlButton from "./ContentControlButton"
@@ -143,11 +142,12 @@ function Playground({ articleId }) {
 
     const validateArticle = () => {
         const validation = articleSchema.safeParse(article)
-        console.log(validation)
         console.log("validation running")
         if (!validation.success) {
             console.log("validation failed")
-            toast.custom((t) => <ToastAlert message="Article is missing required fields" />)
+            toast.custom((t) => (
+                <ToastAlert message="Article is missing required fields. Failed to save." />
+            ))
             console.log(validation.error.errors)
             return false
         }
@@ -180,6 +180,7 @@ function Playground({ articleId }) {
 
         setIsSaved(isEqual)
     }, [article, savedArticle])
+
     const handleCategoryChange = async (event) => {
         const newCategory = event.target.value
         setSelectedCategory(newCategory)
@@ -230,7 +231,7 @@ function Playground({ articleId }) {
                                 </div>
                                 <div className="flex h-full w-1/5 flex-col gap-2 overflow-x-hidden overflow-y-scroll pr-2.5">
                                     <div className="sticky top-0 flex flex-col gap-1.5 border-b border-gray-300 bg-gray-100">
-                                        <div className="flex w-full gap-2">
+                                        <div className="flex w-full gap-1.5">
                                             <button
                                                 className="flex flex-auto items-center justify-center rounded border bg-green-500 px-3 py-2 text-sm font-medium leading-none text-white hover:bg-green-600 lg:gap-2"
                                                 onClick={handleSave}>
@@ -239,9 +240,15 @@ function Playground({ articleId }) {
                                                     src="/assets/icons/cloud-upload.svg"
                                                     alt=""
                                                 />
-                                                <span className="line-clamp-1 w-fit">
-                                                    Save as draft
-                                                </span>
+                                                {article?.flags?.status === "draft" ? (
+                                                    <span className="line-clamp-1 w-fit">
+                                                        Save as draft
+                                                    </span>
+                                                ) : (
+                                                    <span className="line-clamp-1 w-fit">
+                                                        Save
+                                                    </span>
+                                                )}
                                             </button>
                                             <button
                                                 className="flex justify-center rounded border bg-white p-2 hover:bg-slate-50"
@@ -253,17 +260,37 @@ function Playground({ articleId }) {
                                                 />
                                             </button>
                                         </div>
-                                        <div className="mt-0.5 flex justify-between gap-2 px-1 pb-2 text-sm">
-                                            <div className="flex flex-col items-end justify-center gap-0.5 text-sm font-medium">
-                                                <span>Status</span>
-                                            </div>
-                                            <span className="flex items-center rounded border bg-white px-2 py-0.5">
-                                                <span
-                                                    className={`mr-1 ${isSaved ? "text-green-500" : "text-red-500"}`}>
-                                                    ⦿
-                                                </span>
-                                                {isSaved ? "Saved" : "To be saved"}
+                                        <div className="mt-1.5 flex flex-col justify-between gap-1 pb-2.5 text-sm">
+                                            <span className="text-sm font-semibold">
+                                                Status
                                             </span>
+                                            <div className="flex w-full gap-1.5">
+                                                <span className="flex w-fit items-center rounded border bg-white px-2 py-0.5 text-sm font-medium">
+                                                    <span
+                                                        className={`mr-1 ${isSaved ? "text-green-500" : "text-red-500"}`}>
+                                                        ⦿
+                                                    </span>
+                                                    {isSaved ? "Saved" : "To be saved"}
+                                                </span>
+                                                {article?.flags?.status && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span
+                                                            className={clsx(
+                                                                "flex items-center justify-center rounded border bg-white px-3 py-1 text-center text-sm font-medium capitalize",
+                                                                {
+                                                                    "text-red-600":
+                                                                        article.flags.status ===
+                                                                        "draft",
+                                                                    " text-green-600":
+                                                                        article.flags.status ===
+                                                                        "published",
+                                                                },
+                                                            )}>
+                                                            {article.flags.status}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="mt-1 flex flex-col gap-2 text-sm font-semibold">
@@ -301,12 +328,12 @@ function Playground({ articleId }) {
                                                         Technology
                                                     </option>
                                                     <option value="health">Health</option>
-                                                    <option value="business-&-finance">
+                                                    <option value="business-and-finance">
                                                         Business & Finance
                                                     </option>
                                                     <option value="science">Science</option>
                                                     <option value="politics">Politics</option>
-                                                    <option value="arts-&-culture">
+                                                    <option value="arts-and-culture">
                                                         Arts & Culture
                                                     </option>
                                                     <option value="travel">Travel</option>

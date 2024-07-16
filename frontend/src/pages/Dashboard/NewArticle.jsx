@@ -5,7 +5,7 @@ import { useSignals } from "@preact/signals-react/runtime"
 import { newArticleId } from "@/signals/articles"
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/ui/Loader"
+import Loader from "@/ui/Loader"
 
 function NewArticle() {
     useSignals()

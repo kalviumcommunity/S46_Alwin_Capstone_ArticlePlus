@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom"
 
-import Loader from "../ui/Loader"
+import Loader from "../../ui/Loader"
 
-function ArticlesTable({ articles, loading }) {
+function ArticlesTable({ articles, loading, isDashboard = false }) {
     return (
         <div className="flex w-full flex-col divide-y overflow-x-scroll rounded border text-sm">
             {/* Table Header */}
@@ -19,6 +19,24 @@ function ArticlesTable({ articles, loading }) {
                     <div className="absolute right-0 top-0 z-50 flex h-full w-full items-center justify-center bg-white/80 backdrop-blur-[2px]">
                         <Loader />
                     </div>
+                </div>
+            )}
+
+            {!loading && articles.length === 0 && (
+                <div className="flex w-full flex-col items-center justify-center gap-2.5 px-4 py-24 sm:px-0">
+                    <span className="text-base font-medium leading-5">
+                        You haven't created any articles yet
+                    </span>
+                    {!isDashboard && (
+                        <div className="flex w-fit items-center gap-2 rounded-full border bg-white px-1 py-1 pr-5 font-medium leading-5 text-gray-800">
+                            <Link
+                                to="/dashboard"
+                                className="flex h-fit w-fit items-center gap-2 rounded-full bg-rose-500 px-4 py-1.5 font-medium leading-5 text-white">
+                                Go to dashboard
+                            </Link>
+                            <span className="font-medium">to create your first article</span>
+                        </div>
+                    )}
                 </div>
             )}
 
