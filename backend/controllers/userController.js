@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 
 const { resend } = require("../services/resend")
+
 const User = require("../models/user")
+const Creator = require("../models/creator")
 
 function generatePin() {
     // Generate a cryptographically secure random number
@@ -86,7 +88,72 @@ const confirmOtpForVerification = async (req, res) => {
     res.status(200).json({ success: true, message: "User verified successfully" })
 }
 
+const followCreator = async (req, res) => {
+    const { id } = req.params
+    const userId = req.userId
+
+    const user = await User.findById(userId)
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" })
+    }
+
+    const creator = await Creator.findById(id)
+    if (!creator) {
+        return res.status(404).json({ success: false, message: "Creator not found" })
+    }
+
+    if (user.actions.following.find((item) => item.userId === id)) {
+        return res.status(400).json({ success: false, message: "Already following" })
+    }
+
+    user.actions.following.push({
+        creatorRef: creator._id,
+        creatorId: id,
+        creatorName: creator.name,
+    })
+    await user.save()
+
+    res.status(200).json({ success: true, message: "Followed successfully" })
+}
+
+const subscribeCreator = async (req, res) => {
+    const { id } = req.params
+    const userId = req.userId
+
+    const user = await User.findById(userId)
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" })
+    }
+
+    const creator = await Creator.findById(id)
+    if (!creator) {
+        return res.status(404).json({ success: false, message: "Creator not found" })
+    }
+
+    if (!creator.subscription) {
+        return res
+            .status(400)
+            .json({ success: false, message: "Creator doesn't have subscription enabled" })
+    }
+
+    if (user.actions.subscriptions.find((item) => item.creatorId === id)) {
+        return res.status(400).json({ success: false, message: "Already subscribed" })
+    }
+
+    user.actions.subscriptions.push({
+        creatorRef: creator._id,
+        creatorId: id,
+        creatorName: creator.name,
+        autoRenew: false,
+    })
+    await user.save()
+
+    res.status(200).json({ success: true, message: "Subscribed successfully" })
+}
+
 module.exports = {
     sendVerificationEmail,
     confirmOtpForVerification,
+    followCreator,
+    subscribeCreator,
 }

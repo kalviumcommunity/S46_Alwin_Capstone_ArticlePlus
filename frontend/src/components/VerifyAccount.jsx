@@ -4,8 +4,8 @@ import * as Dialog from "@radix-ui/react-dialog"
 import { userDetailsUpdate } from "@/signals/user"
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/ui/Loader"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/OtpInput"
+import Loader from "@/ui/Loader"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/ui/OtpInput"
 
 function VerifyAccount() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)

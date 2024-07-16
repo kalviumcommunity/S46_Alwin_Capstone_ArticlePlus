@@ -12,7 +12,7 @@ function Highlight({ article }) {
 
     return (
         <Link to={`/article/${article.slug}`} className="flex" style={{ background: gradient }}>
-            <div className="group flex flex-col gap-8 bg-gradient-to-t from-white to-transparent px-4 pb-10 pt-20 hover:cursor-pointer sm:flex-row sm:gap-4">
+            <div className="group flex flex-col justify-between gap-8 border-b border-gray-50 bg-gradient-to-t from-white to-transparent px-4 pb-10 pt-16 hover:cursor-pointer sm:flex-row sm:gap-4">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
                         <span className="font-serif text-3xl font-medium group-hover:underline group-hover:underline-offset-4 sm:text-2xl lg:text-3xl">
@@ -29,9 +29,6 @@ function Highlight({ article }) {
                                 to={`/creator/${article.author.id}`}>
                                 <span>{article.author.name}</span>
                             </Link>
-                            <span className="text-base leading-4 text-gray-500">
-                                {article.views} views
-                            </span>
                         </>
                     ) : (
                         <div className="flex items-center gap-1.5 ">

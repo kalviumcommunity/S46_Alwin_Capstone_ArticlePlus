@@ -3,9 +3,9 @@ import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import Article from "@/pages/Article"
 import AuthGoogle from "@/pages/AuthGoogle"
 import Creator from "@/pages/Creator"
+import Explore from "@/pages/Explore"
 import Login from "@/pages/Login"
 import Organization from "@/pages/Organization"
-import Read from "@/pages/Read"
 import Signup from "@/pages/Signup"
 import Hero from "@/components/Hero"
 import Navbar from "@/components/Navbar"
@@ -28,7 +28,7 @@ function GuestRoutes() {
                     element={
                         <>
                             <Hero />
-                            <Read isLoggedin={false} />
+                            <Explore isLoggedIn={false} />
                         </>
                     }
                 />

@@ -1,19 +1,7 @@
 import { Link } from "react-router-dom"
 
 import ArticlesTable from "@/components/Dashboard/ArticlesTable"
-
-const articles = [
-    {
-        id: 1,
-        img: "https://source.unsplash.com/random",
-        title: "Lorem Ipsum is simply dummy text",
-        authorId: "alwin",
-        date: "20 Aug, 2023",
-        status: "Published",
-        visibility: "Public",
-        views: 100,
-    },
-]
+import RecentArticlesActivity from "@/components/Dashboard/RecentArticlesActivity"
 
 function DashboardHome() {
     return (
@@ -28,7 +16,7 @@ function DashboardHome() {
                             className="flex w-fit items-center gap-2 rounded-full bg-rose-500 py-1.5 pl-2 pr-3 font-medium leading-5 text-white">
                             <img src="/assets/icons/add-circle.svg" alt="" /> New article
                         </Link>
-                        <p className="text-sm text-gray-600">Draft new article now in editor</p>
+                        <p className="text-sm text-gray-700">Draft new article now in editor</p>
                     </div>
                 </div>
 
@@ -47,24 +35,11 @@ function DashboardHome() {
 
                         <span className="col-span-2">Subscribers</span>
                         <span className="text-center font-medium text-black">30</span>
-
-                        <span className="col-span-2">Views in last 1 month</span>
-                        <span className="text-center font-medium text-black">482</span>
                     </div>
                 </div>
             </div>
 
-            <div className="flex flex-col sm:gap-4 lg:w-fit">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-semibold">Recent articles activity</h1>
-                    <Link
-                        className="h-fit rounded-full border bg-gray-50 px-3 py-1 text-center text-sm font-medium leading-none text-black"
-                        to="articles">
-                        View all Articles
-                    </Link>
-                </div>
-                <ArticlesTable articles={articles} />
-            </div>
+            <RecentArticlesActivity />
         </div>
     )
 }

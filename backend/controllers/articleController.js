@@ -9,9 +9,43 @@ const { convertToWebp } = require("../lib/sharp")
 
 const storage = getStorage()
 
+// helper function to generate a random 4-character hash
 const generateSlugHash = () => {
-    const hash = crypto.randomBytes(4).toString("hex") // Generate 8-character hash
+    let hash
+    do {
+        hash = crypto.randomBytes(4).toString("hex") // Generate 8-character hash
+    } while (hash.includes("-")) // Check if hash contains '-'
+
     return hash
+}
+
+// helper function to upload an image to storage and get the download URL
+const uploadImageToStorage = (imageFile, imagePath) => {
+    return new Promise((resolve, reject) => {
+        const imageRef = storage.bucket().file(imagePath)
+        const blobStream = imageRef.createWriteStream({
+            metadata: {
+                contentType: "image/webp",
+            },
+        })
+
+        blobStream.on("error", (err) => {
+            console.error("Error uploading file:", err)
+            resolve({ error: "Error uploading file" })
+        })
+
+        blobStream.on("finish", async () => {
+            try {
+                const url = await getDownloadURL(imageRef)
+                resolve({ url })
+            } catch (err) {
+                console.error("Error getting download URL:", err)
+                resolve({ error: "Error getting download URL" })
+            }
+        })
+
+        blobStream.end(imageFile)
+    })
 }
 
 const createNewArticle = async (req, res) => {
@@ -96,7 +130,6 @@ const allowAccessArticle = async (req, res) => {
 
 const accessArticle = async (req, res) => {
     const { id } = req.params
-    console.log(id)
 
     try {
         const article = await Article.findById(id).select("-flags")
@@ -111,32 +144,179 @@ const accessArticle = async (req, res) => {
     }
 }
 
-const uploadImageToStorage = (imageFile, imagePath) => {
-    return new Promise((resolve, reject) => {
-        const imageRef = storage.bucket().file(imagePath)
-        const blobStream = imageRef.createWriteStream({
-            metadata: {
-                contentType: "image/webp",
-            },
-        })
+const updateArticle = async (req, res) => {
+    const { id } = req.params
+    const newArticleData = { ...req.body }
 
-        blobStream.on("error", (err) => {
-            console.error("Error uploading file:", err)
-            resolve({ error: "Error uploading file" })
-        })
+    if (newArticleData.flags) {
+        delete newArticleData.flags
+    }
 
-        blobStream.on("finish", async () => {
-            try {
-                const url = await getDownloadURL(imageRef)
-                resolve({ url })
-            } catch (err) {
-                console.error("Error getting download URL:", err)
-                resolve({ error: "Error getting download URL" })
+    try {
+        let article = await Article.findByIdAndUpdate(
+            id,
+            { ...newArticleData, status: "draft" },
+            { new: true, runValidators: true },
+        )
+
+        const slugHash = article.flags.slugHash
+        const slug = `${article.title
+            .replace(/[^a-zA-Z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .toLowerCase()}-${slugHash}`
+
+        article.slug = slug
+
+        await article.save()
+
+        if (!article) {
+            return res.status(404).json({ success: false, message: "Article not found" })
+        }
+
+        return res.json({ success: true, article })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+const updateArticleCategory = async (req, res) => {
+    const { id } = req.params
+    const newCategory = req.body.category
+
+    try {
+        const article = await Article.findById(id)
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        article.category = newCategory
+
+        await article.save()
+
+        res.json({ success: true, message: "Article category updated" })
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message })
+    }
+}
+
+const getArticleSettings = async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const article = await Article.findById(id)
+
+        const articleSettings = {}
+
+        articleSettings.title = article.title
+        articleSettings.subtitle = article.subtitle
+        articleSettings.datestamp = article.datestamp
+        articleSettings.image = article.image.url
+
+        if (article.flags) {
+            articleSettings.access = article.flags.access
+            articleSettings.status = article.flags.status
+        }
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        res.json(articleSettings)
+    } catch (err) {
+        res.status(500).json({ message: err.message })
+    }
+}
+
+const validateArticleForPublishing = (article) => {
+    const checks = [
+        {
+            condition:
+                article.content.length > 0 &&
+                article.content.some((block) => block.type !== undefined),
+            message: "At least one content block should exist in an article to publish.",
+        },
+        {
+            condition:
+                article.image.url !==
+                "https://placehold.co/960x1400/fafafa/222222/svg?text=Image+Goes+Here&font=Lato",
+            message: "Article must have an header image to publish (not default)",
+        },
+        {
+            condition: article.title !== "Here goes your title for the article",
+            message: "Article must have a title to publish (not default text)",
+        },
+        {
+            condition:
+                article.subtitle !== "Write what is the short summary/hook for the article",
+            message: "Article must have a subtitle to publish (not default text)",
+        },
+        {
+            condition: article.category !== "category-of-article",
+            message: "Article must have a valid category to publish (not default)",
+        },
+    ]
+
+    for (const check of checks) {
+        if (!check.condition) {
+            return { isValid: false, message: check.message }
+        }
+    }
+
+    return { isValid: true }
+}
+
+const updateArticleSettings = async (req, res) => {
+    const { id } = req.params
+    const { status, access } = req.body
+
+    try {
+        const article = await Article.findById(id)
+
+        if (!article) {
+            return res.status(404).json({ message: "Article not found" })
+        }
+
+        const updates = {}
+        let responseMessage = ""
+
+        if (status && article.flags.status !== status) {
+            updates["flags.status"] = status
+
+            if (status === "published") {
+                const validationResult = validateArticleForPublishing(article)
+                if (!validationResult.isValid) {
+                    return res.status(400).json({
+                        success: false,
+                        message: validationResult.message,
+                    })
+                }
+                updates.datePublished = new Date().toLocaleString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                })
             }
-        })
 
-        blobStream.end(imageFile)
-    })
+            responseMessage +=
+                status === "published" ? "Article published. " : "Article saved as draft. "
+        }
+
+        if (access && article.flags.access !== access) {
+            updates["flags.access"] = access
+            responseMessage += `Access updated to ${access === "all" ? "all" : "subscribers"}. `
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return res.json({ success: true, message: "No changes to settings to be made." })
+        }
+
+        await Article.findByIdAndUpdate(id, updates, { new: true })
+
+        res.json({ success: true, message: responseMessage.trim() })
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message })
+    }
 }
 
 const addArticleImage = async (req, res) => {
@@ -199,86 +379,17 @@ const addArticleImage = async (req, res) => {
     }
 }
 
-const updateArticle = async (req, res) => {
-    const { id } = req.params
-    const newArticleData = { ...req.body }
-
-    if (newArticleData.flags) {
-        delete newArticleData.flags
-    }
-
-    try {
-        let article = await Article.findByIdAndUpdate(
-            id,
-            { ...newArticleData, status: "draft" },
-            { new: true, runValidators: true },
-        )
-
-        const slugHash = article.flags.slugHash
-        const slug = `${article.title
-            .replace(/[^a-zA-Z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .toLowerCase()}-${slugHash}`
-
-        article.slug = slug
-
-        await article.save()
-
-        if (!article) {
-            return res.status(404).json({ success: false, message: "Article not found" })
-        }
-
-        return res.json({ success: true, article })
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message })
-    }
-}
-
-const getArticleSettings = async (req, res) => {
+const deleteArticle = async (req, res) => {
     const { id } = req.params
 
     try {
-        const article = await Article.findById(id)
-
-        const articleSettings = {}
-
-        articleSettings.title = article.title
-        articleSettings.subtitle = article.subtitle
-        articleSettings.datestamp = article.datestamp
-        articleSettings.image = article.image.url
-
-        if (article.flags) {
-            articleSettings.access = article.flags.access
-            articleSettings.status = article.flags.status
-        }
+        const article = await Article.findByIdAndDelete(id)
 
         if (!article) {
             return res.status(404).json({ message: "Article not found" })
         }
 
-        res.json(articleSettings)
-    } catch (err) {
-        res.status(500).json({ message: err.message })
-    }
-}
-
-const updateArticleSettings = async (req, res) => {
-    const { id } = req.params
-    const newSettings = { ...req.body }
-
-    try {
-        const article = await Article.findById(id)
-
-        if (!article) {
-            return res.status(404).json({ message: "Article not found" })
-        }
-
-        article.flags.access = newSettings.access
-        article.flags.status = newSettings.status
-
-        await article.save()
-
-        res.json({ success: true, message: "Article Settings updated" })
+        res.json({ success: true, message: "Article deleted" })
     } catch (err) {
         res.status(500).json({ success: false, message: err.message })
     }
@@ -288,8 +399,10 @@ module.exports = {
     createNewArticle,
     allowAccessArticle,
     accessArticle,
-    addArticleImage,
     updateArticle,
+    updateArticleCategory,
     getArticleSettings,
     updateArticleSettings,
+    addArticleImage,
+    deleteArticle,
 }

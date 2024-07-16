@@ -48,7 +48,6 @@ const articleSchema = new mongoose.Schema({
         },
         slugHash: { type: String, required: true },
     },
-    for: { type: String, required: true, enum: ["all", "subscribers"], default: "all" },
     display: { type: String, required: true, enum: ["header", "square"], default: "header" },
     flow: { type: String, required: true, enum: ["default", "reverse"], default: "default" },
     slug: {
@@ -57,7 +56,24 @@ const articleSchema = new mongoose.Schema({
             return this.status === "published" || this.status === "for-review"
         },
     },
-    category: { type: String, required: true, default: "category-of-article" },
+    category: {
+        type: String,
+        required: true,
+        default: "category-of-article",
+        enum: [
+            "category-of-article",
+            "technology",
+            "health",
+            "business-and-finance",
+            "science",
+            "politics",
+            "arts-and-culture",
+            "travel",
+            "environment",
+            "education",
+            "sports",
+        ],
+    },
     title: {
         type: String,
         default: "Here goes your title for the article",
@@ -85,6 +101,8 @@ const articleSchema = new mongoose.Schema({
         }),
     },
     content: [contentBlockSchema],
+    createdAt: { type: Date, default: Date.now, required: true },
+    updatedAt: { type: Date, default: Date.now, required: true },
 })
 
 const Article = mongoose.model("article", articleSchema)

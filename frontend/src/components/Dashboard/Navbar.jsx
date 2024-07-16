@@ -33,6 +33,7 @@ function useLogic() {
     useSignalEffect(() => setUser(userDetails.value))
 
     useEffect(() => {
+        setIsSubNavActive(true)
         for (const link of navLinks) {
             if (currentPath === link.path) {
                 setIsSubNavActive(true)

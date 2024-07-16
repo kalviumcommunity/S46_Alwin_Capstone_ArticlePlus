@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react"
 import clsx from "clsx"
 
-import Loader from "@/components/ui/Loader"
-
+import Loader from "@/ui/Loader"
 import ArticleDetails from "./ArticleDetails"
 import { LoadingContext, PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
@@ -77,7 +76,6 @@ function ArticlePreview() {
             }
         } else if (selectedElement?.startsWith("content")) {
             console.log(selectedElement)
-            console.log(elementRefs)
             const index = selectedElement.split("-")[1]
             const elementRef = elementRefs.current[index]?.element
             if (elementRef) {

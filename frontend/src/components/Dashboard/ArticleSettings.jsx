@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import { set } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 import axiosInstance from "@/axios"
 
-import Loader from "@/components/ui/Loader"
+import { EditorActiveTabContext } from "@/pages/Dashboard/Editor"
+
+import Loader from "@/ui/Loader"
 
 function ArticleSettings({ articleId }) {
     const navigate = useNavigate()
+
+    const { setActiveTab } = useContext(EditorActiveTabContext)
 
     const [isLoading, setIsLoading] = useState(true)
     const [article, setArticle] = useState(null)
@@ -28,6 +33,25 @@ function ArticleSettings({ articleId }) {
             })
     }
 
+    const handleDeleteArticle = () => {
+        if (window.confirm("Are you sure you want to delete this article?")) {
+            setIsLoading(true)
+            axiosInstance
+                .delete(`article/editor/${articleId}`)
+                .then((res) => {
+                    alert("Article deleted successfully")
+                    navigate(`/dashboard/articles`)
+                })
+                .catch((err) => {
+                    alert("Failed to delete the article. Please try again.")
+                    console.error(err)
+                })
+                .finally(() => {
+                    setIsLoading(false)
+                })
+        }
+    }
+
     const handleSaveAsDraft = () => {
         setIsLoading(true)
         axiosInstance
@@ -37,6 +61,7 @@ function ArticleSettings({ articleId }) {
             })
             .then((res) => {
                 console.log("Saved as draft")
+                alert(res.data.message)
                 navigate(`/dashboard/articles`)
             })
             .catch((err) => {
@@ -56,10 +81,16 @@ function ArticleSettings({ articleId }) {
             })
             .then((res) => {
                 console.log("Published")
+                alert(res.data.message)
                 navigate(`/dashboard/articles`)
             })
             .catch((err) => {
                 console.error(err)
+                if (err.response.status === 400) {
+                    setActiveTab("compose")
+                    alert(err.response.data.message)
+                }
+                console.log("error", err.response)
             })
             .finally(() => {
                 setIsLoading(false)
@@ -98,12 +129,12 @@ function ArticleSettings({ articleId }) {
                     <div className="mt-3 flex flex-col gap-1">
                         <span className="font-medium">Article status:</span>
                         {article?.status === "draft" && (
-                            <span className="w-fit rounded-sm border border-red-200 bg-red-100 px-3 py-0.5 text-sm font-semibold text-red-800">
+                            <span className="w-fit rounded-sm border border-red-200 bg-red-100 px-3 py-0.5 text-sm font-medium text-red-800">
                                 Draft
                             </span>
                         )}
                         {article?.status === "published" && (
-                            <span className="w-fit rounded-sm border border-green-200 bg-green-100 px-3 py-0.5 text-sm font-semibold text-green-800">
+                            <span className="w-fit rounded-sm border border-green-200 bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
                                 Published
                             </span>
                         )}
@@ -167,6 +198,11 @@ function ArticleSettings({ articleId }) {
                     </div>
                 </div>
                 <div className="mt-auto flex w-full justify-end gap-2 border-t pt-4">
+                    <button
+                        className="mr-auto rounded-full border bg-red-500 px-5 py-1 font-medium text-white hover:bg-red-600"
+                        onClick={handleDeleteArticle}>
+                        Delete article
+                    </button>
                     <button
                         className="rounded-full border px-5 py-1 font-medium text-gray-800 hover:bg-gray-100"
                         onClick={handleSaveAsDraft}>

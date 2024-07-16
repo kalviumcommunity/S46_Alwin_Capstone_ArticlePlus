@@ -7,16 +7,18 @@ import { creatorInfo, isUserCreator } from "@/signals/creator"
 import Account from "@/pages/Account"
 import Article from "@/pages/Article"
 import Creator from "@/pages/Creator"
+import ArticleOverview from "@/pages/Dashboard/ArticleOverview"
 import Editor from "@/pages/Dashboard/Editor"
-import EditorPage from "@/pages/Dashboard/Editor"
 import DashboardLayout from "@/pages/Dashboard/Layout"
 import NewArticle from "@/pages/Dashboard/NewArticle"
 import OrganizationSettings from "@/pages/Dashboard/OrganizationSettings"
+import Explore from "@/pages/Explore"
+import ForYou from "@/pages/ForYou"
 import OnboardingCreator from "@/pages/OnboardingCreator"
 import Organization from "@/pages/Organization"
-import Read from "@/pages/Read"
 import Navbar from "@/components/Navbar"
-import SuspenseLoader from "@/components/ui/SuspenseLoader"
+
+import SuspenseLoader from "@/ui/SuspenseLoader"
 
 const DashboardHome = React.lazy(() => import("@/pages/Dashboard/Home"))
 const DashboardArticles = React.lazy(() => import("@/pages/Dashboard/Articles"))
@@ -42,7 +44,9 @@ function UserRoutes() {
     return (
         <Routes>
             <Route path="/" element={<UserLayout />}>
-                <Route index element={<Read isLoggedin={true} />} />
+                <Route index element={<Explore isLoggedIn={true} />} />
+                <Route path="foryou" element={<ForYou />} />
+                <Route path="foryou/subscriptions" element={<ForYou />} />
                 <Route path="account" element={<Account />} />
                 <Route path="account/subscriptions" element={<Account />} />
                 <Route path="article/:slug" element={<Article />} />
@@ -80,7 +84,8 @@ function UserRoutes() {
                             path="new-article"
                             element={<SuspenseHandler component={<NewArticle />} />}
                         />
-                        <Route path="editor/:articleId" element={<EditorPage />} />
+                        <Route path="article/:articleId" element={<ArticleOverview />} />
+                        <Route path="editor/:articleId" element={<Editor />} />
                         <Route
                             path="organization-settings"
                             element={<OrganizationSettings />}

@@ -49,9 +49,13 @@ function ContentControlButton({ type, label, handleArticleDBUpdate, ...rest }) {
 
         setIsLoading(true)
         try {
-            await axiosInstance.post(`/article/addimage/${article._id}/${type}`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            })
+            await axiosInstance.post(
+                `/article/editor/addimage/${article._id}/${type}`,
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                },
+            )
             console.log("Image uploaded successfully")
             handleArticleDBUpdate()
         } catch (error) {

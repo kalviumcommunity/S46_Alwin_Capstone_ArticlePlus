@@ -29,6 +29,25 @@ const userSchema = new mongoose.Schema({
             return this.creator === true
         },
     },
+    actions: {
+        following: [
+            {
+                creatorRef: { type: String, required: true },
+                creatorId: { type: String, required: true },
+                creatorName: { type: String, required: true },
+                createdAt: { type: Date, required: true, default: Date.now },
+            },
+        ],
+        subscriptions: [
+            {
+                creatorRef: { type: String, required: true },
+                creatorId: { type: String, required: true },
+                creatorName: { type: String, required: true },
+                createdAt: { type: Date, required: true, default: Date.now },
+                autoRenew: { type: Boolean, required: true, default: false },
+            },
+        ],
+    },
 })
 
 const User = mongoose.model("users", userSchema)

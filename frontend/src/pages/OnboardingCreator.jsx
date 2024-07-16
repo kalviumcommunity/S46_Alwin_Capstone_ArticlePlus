@@ -5,7 +5,8 @@ import { creatorInfo, isUserCreator } from "@/signals/creator"
 import axiosInstance from "@/axios"
 
 import OnboardingOptions from "@/components/OnboardingOptions"
-import Loader from "@/components/ui/Loader"
+
+import Loader from "@/ui/Loader"
 
 function OnboardingCreator() {
     const [step, setStep] = useState(1)
@@ -116,8 +117,6 @@ function OnboardingCreator() {
         for (const key in creatorForm) {
             formData.append(key, creatorForm[key])
         }
-
-        console.log("called")
 
         axiosInstance
             .post("/creator/onboarding", formData, {

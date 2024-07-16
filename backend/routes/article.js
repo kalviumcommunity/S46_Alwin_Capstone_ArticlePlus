@@ -13,26 +13,74 @@ const {
     getArticleSettings,
     updateArticleSettings,
     allowAccessArticle,
+    deleteArticle,
+    updateArticleCategory,
 } = require("../controllers/articleController")
 
-const Creator = require("../models/creator")
 const Article = require("../models/article")
+const Creator = require("../models/creator")
+const User = require("../models/user")
+
+const { isLoggedIn } = require("../middlewares/isLoggedIn")
 
 const router = express.Router()
 const upload = initMulter()
 
-// GET all articles
-router.get("/:id", async (req, res) => {
+router.get("/:slug", isLoggedIn, async (req, res) => {
     try {
-        const article = await Article.findById(req.params.id)
+        const article = await Article.findOne({
+            slug: req.params.slug,
+            "flags.status": "published",
+        }).lean()
 
         if (!article) {
             return res.status(404).json({ message: "Article not found" })
         }
 
-        res.json(article)
+        const { flags, ...articleObject } = article
+        const { access: accessType, creator: creatorId } = flags
+
+        articleObject.accessType = accessType
+
+        const articlePreview = {
+            title: article.title,
+            subtitle: article.subtitle,
+            datestamp: article.datestamp,
+            author: article.author,
+            image: article.image.url,
+            accessType,
+        }
+
+        if (accessType === "all") {
+            return res.json({ message: "Article fetched successfully", article: articleObject })
+        }
+
+        if (!req.isUserLoggedIn) {
+            return res.status(403).json({
+                message: "Please log in to view this article",
+                articlePreview,
+            })
+        }
+
+        const user = await User.findById(req.userId, { "actions.subscriptions": 1 })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        const isSubscribed = user.actions.subscriptions.some(
+            (sub) => sub.creatorId.toString() === creatorId.toString(),
+        )
+
+        if (isSubscribed) {
+            return res.json({ message: "Article fetched successfully", article: articleObject })
+        } else {
+            return res.status(403).json({
+                message: "Subscribe to access article",
+                articlePreview,
+            })
+        }
     } catch (err) {
-        res.status(500).json({ message: err.message })
+        res.status(500).json({ message: "Internal server error", error: err.message })
     }
 })
 
@@ -72,45 +120,56 @@ const checkEditorAuthorization = async (req, res, next) => {
     }
 }
 
-router.post("/create", verifyToken, asyncHandler(createNewArticle))
+// Verify token for all routes that are protected
+router.use(asyncHandler(verifyToken))
+
+router.post("/create", asyncHandler(createNewArticle))
+
 router.get(
     "/editor/:id/access",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(allowAccessArticle),
 )
 
 router.get(
     "/editor/:id/content",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(accessArticle),
 )
 router.patch(
     "/editor/:id/content",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(updateArticle),
 )
 
+router.patch(
+    "/editor/:id/category",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(updateArticleCategory),
+)
+
 router.get(
     "/editor/:id/settings",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(getArticleSettings),
 )
 router.patch(
     "/editor/:id/settings",
-    verifyToken,
     asyncHandler(checkEditorAuthorization),
     asyncHandler(updateArticleSettings),
 )
+
 router.post(
-    "/addimage/:id/:ref",
-    verifyToken,
+    "/editor/addimage/:id/:ref",
     asyncHandler(checkEditorAuthorization),
     upload.single("articleImage"),
     asyncHandler(addArticleImage),
+)
+
+router.delete(
+    "/editor/:id",
+    asyncHandler(checkEditorAuthorization),
+    asyncHandler(deleteArticle),
 )
 
 module.exports = router

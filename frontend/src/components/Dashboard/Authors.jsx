@@ -1,6 +1,6 @@
 import React from "react"
 
-import ComingSoonBanner from "@/components/ui/ComingSoonBanner"
+import ComingSoonBanner from "@/ui/ComingSoonBanner"
 
 function Authors() {
     return (
