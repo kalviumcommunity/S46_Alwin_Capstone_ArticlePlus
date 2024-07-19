@@ -4,7 +4,11 @@ const CreatorSchema = new mongoose.Schema({
     owner: { type: String, required: true },
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
-    displayPicture: { type: String, required: true },
+    displayPicture: {
+        large: { type: String, required: true },
+        medium: { type: String },
+        small: { type: String },
+    },
     followers: { type: Number, required: true, default: 0 },
     subscribers: { type: Number, required: true, default: 0 },
     articles: {

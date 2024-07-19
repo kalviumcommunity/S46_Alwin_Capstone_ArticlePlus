@@ -465,6 +465,18 @@ const deleteArticle = async (req, res) => {
             )
         }
 
+        // Deleting the article's image folder from Firebase Storage
+        const bucket = getStorage().bucket()
+        const folderPath = `article/${id}`
+
+        try {
+            await bucket.deleteFiles({
+                prefix: folderPath,
+            })
+        } catch (error) {
+            console.error(`Error deleting folder ${folderPath}:`, error)
+        }
+
         await Article.findByIdAndDelete(id)
 
         res.json({ success: true, message: "Article deleted" })

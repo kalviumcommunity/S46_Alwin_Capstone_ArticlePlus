@@ -59,7 +59,7 @@ function ArticlesTable({ articles, loading, isDashboard = false }) {
                     {/* Author Link */}
                     <Link
                         className="line-clamp-1 w-32 flex-shrink-0 px-4 leading-4 hover:underline"
-                        to={`/dashboard/team/${article?.author?.id}`}>
+                        to={`/dashboard/settings`}>
                         @{article?.author?.id}
                     </Link>
 

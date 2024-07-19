@@ -29,6 +29,47 @@ const convertDisplayNameToId = (name) => {
         .replace(/\s/g, "-")
 }
 
+async function generateResizedImages(displayPictureFile, id, creatorDetails) {
+    try {
+        const mediumBuffer = await convertToWebp(displayPictureFile, 80, 400, 400)
+        const smallBuffer = await convertToWebp(displayPictureFile, 80, 200, 200)
+
+        const mediumImageRef = storage.bucket().file(`creators/${id}/${id}-dp-medium.jpg`)
+        const smallImageRef = storage.bucket().file(`creators/${id}/${id}-dp-small.jpg`)
+
+        await uploadImage(mediumImageRef, mediumBuffer)
+        await uploadImage(smallImageRef, smallBuffer)
+
+        const mediumDisplayPictureUrl = await getDownloadURL(mediumImageRef)
+        const smallDisplayPictureUrl = await getDownloadURL(smallImageRef)
+
+        // Updating creator details with medium and small image URLs in the database
+        await Creator.findOneAndUpdate(
+            { id },
+            {
+                "displayPicture.medium": mediumDisplayPictureUrl,
+                "displayPicture.small": smallDisplayPictureUrl,
+            },
+        )
+    } catch (err) {
+        console.error("Error generating resized images:", err)
+    }
+}
+
+async function uploadImage(imageRef, buffer) {
+    const stream = imageRef.createWriteStream({
+        metadata: {
+            contentType: "image/webp",
+        },
+    })
+
+    return new Promise((resolve, reject) => {
+        stream.on("error", reject)
+        stream.on("finish", resolve)
+        stream.end(buffer)
+    })
+}
+
 const onboardCreator = async (req, res) => {
     const { userId } = req
     const { id, name, description, type, subscription, subscriptions } = req.body
@@ -37,7 +78,9 @@ const onboardCreator = async (req, res) => {
     const creatorDetails = {
         id,
         name,
-        displayPicture: null,
+        displayPicture: {
+            large: null,
+        },
         description,
         type,
         subscription,
@@ -99,7 +142,7 @@ const onboardCreator = async (req, res) => {
         blobStream.on("finish", async () => {
             const displayPictureUrl = await getDownloadURL(imageRef)
 
-            creatorDetails.displayPicture = displayPictureUrl
+            creatorDetails.displayPicture.large = displayPictureUrl
             creatorDetails.owner = userId
 
             try {
@@ -108,6 +151,8 @@ const onboardCreator = async (req, res) => {
                     creator: true,
                     creatorId: newCreator._id.toString(),
                 })
+
+                generateResizedImages(displayPictureFile, id, creatorDetails)
 
                 return res.json({ onboarding: "success" })
             } catch (e) {
@@ -148,6 +193,12 @@ const authCreatorInfo = async (req, res) => {
     }
 
     const creatorDetails = creator.toObject()
+
+    if (creator.displayPicture.small) {
+        creatorDetails.displayPicture = creator.displayPicture.small
+    } else {
+        creatorDetails.displayPicture = creator.displayPicture.large
+    }
 
     creatorDetails.user = creatorDetails.contributors[0]
 
@@ -247,8 +298,17 @@ const getCreatorProfile = async (req, res) => {
             )
         }
 
-        // Return the creator profile with the appropriate flags
-        return res.json({ creator, isFollowing, isSubscribed })
+        let displayPicture = creator.displayPicture.large
+        if (creator.displayPicture.small) {
+            displayPicture = creator.displayPicture.small
+        }
+
+        const creatorProfile = {
+            ...creator.toObject(),
+            displayPicture,
+        }
+
+        return res.json({ creator: creatorProfile, isFollowing, isSubscribed })
     } catch (error) {
         console.error("Error fetching creator profile:", error)
         return res.status(500).json({ message: "Failed to fetch creator profile" })
