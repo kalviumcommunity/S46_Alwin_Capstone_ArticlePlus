@@ -43,11 +43,21 @@ function ArticlePreview() {
         selection.addRange(range)
     }
 
-    const handlePaste = (e) => {
+    const handlePaste = (e, type) => {
         e.preventDefault()
         const text = e.clipboardData.getData("text/plain")
-        const currentContent = e.currentTarget.textContent
-        e.currentTarget.textContent = currentContent + text
+        const selection = window.getSelection()
+        const range = selection.getRangeAt(0)
+        range.deleteContents()
+        const textNode = document.createTextNode(text)
+        range.insertNode(textNode)
+        range.setStartAfter(textNode)
+        range.setEndAfter(textNode)
+        selection.removeAllRanges()
+        selection.addRange(range)
+
+        // Triggering the handleHeaderEditable function to update the state
+        handleHeaderEditable(e, type)
     }
 
     const handleEditElement = (type, value, index) => {
@@ -65,7 +75,6 @@ function ArticlePreview() {
         if (selectedElement?.startsWith("header")) {
             const refMap = {
                 "header-title": titleRef,
-                "header-category": categoryRef,
                 "header-subtitle": subTitleRef,
             }
             const selectedRef = refMap[selectedElement]
@@ -124,7 +133,7 @@ function ArticlePreview() {
                         />
                     </div>
                 ) : (
-                    <div className="grid h-3/4 grid-cols-2 items-center justify-center overflow-hidden border-b">
+                    <div className="grid h-3/4 grid-cols-2 items-center justify-center overflow-clip border-b">
                         <div
                             className={clsx(
                                 "flex max-w-[90vw] flex-1 flex-col px-16 text-center sm:max-w-lg",

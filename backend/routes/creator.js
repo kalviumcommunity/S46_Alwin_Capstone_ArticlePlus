@@ -9,7 +9,12 @@ const {
     onboardCreator,
     authCreatorInfo,
     getCreatorArticles,
+    getCreatorProfile,
+    getForFollowerArticles,
+    getForSubscriberArticles,
+    toggleFollow,
 } = require("../controllers/creatorController")
+const { isLoggedIn } = require("../middlewares/isLoggedIn")
 
 const router = express.Router()
 const upload = initMulter()
@@ -20,5 +25,12 @@ router.post("/onboarding", upload.single("displayPicture"), asyncHandler(onboard
 router.get("/auth/info", asyncHandler(authCreatorInfo))
 
 router.post("/articles", asyncHandler(getCreatorArticles))
+
+router.get("/profile/:id", isLoggedIn, asyncHandler(getCreatorProfile))
+
+router.get("/:id/articles/for-followers", isLoggedIn, asyncHandler(getForFollowerArticles))
+router.get("/:id/articles/for-subscribers", isLoggedIn, asyncHandler(getForSubscriberArticles))
+
+router.post("/:id/follow", isLoggedIn, asyncHandler(toggleFollow))
 
 module.exports = router

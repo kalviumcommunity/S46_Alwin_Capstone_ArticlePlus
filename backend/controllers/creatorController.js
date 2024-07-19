@@ -216,4 +216,200 @@ const getCreatorArticles = async (req, res) => {
     }
 }
 
-module.exports = { onboardCreator, authCreatorInfo, getCreatorArticles }
+const getCreatorProfile = async (req, res) => {
+    const { id } = req.params
+    const isLoggedIn = req.isUserLoggedIn
+
+    try {
+        const creator = await Creator.findOne({ id: id }).select("-contributors")
+
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        // Default values for isFollowing and isSubscribed
+        let isFollowing = false
+        let isSubscribed = false
+
+        if (isLoggedIn) {
+            const loggedInUser = await User.findOne({ _id: req.userId })
+
+            if (!loggedInUser) {
+                return res.status(404).json({ message: "Logged-in user not found" })
+            }
+
+            // Check if the creator ID is in the logged-in user's following or subscribed lists
+            isFollowing = loggedInUser.actions.following.some(
+                (follow) => follow.creatorId === id,
+            )
+            isSubscribed = loggedInUser.actions.subscriptions.some(
+                (subscription) => subscription.creatorId === id,
+            )
+        }
+
+        // Return the creator profile with the appropriate flags
+        return res.json({ creator, isFollowing, isSubscribed })
+    } catch (error) {
+        console.error("Error fetching creator profile:", error)
+        return res.status(500).json({ message: "Failed to fetch creator profile" })
+    }
+}
+
+const getForFollowerArticles = async (req, res) => {
+    const { id } = req.params
+    const page = parseInt(req.query.page, 10) || 1 // Default to page 1
+    const pageSize = 8
+
+    try {
+        const creator = await Creator.findOne({ id }).select("-contributors")
+
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const creatorArticles = await Article.find({
+            "flags.creator": creator._id,
+            "flags.status": "published",
+            "flags.access": "all",
+        })
+            .sort({ publishedAt: -1 })
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+            .select("-__v -_id -flags -content")
+            .lean()
+
+        const totalArticles = await Article.countDocuments({
+            "flags.creator": creator._id,
+            "flags.status": "published",
+            "flags.access": "all",
+        })
+
+        const moreArticlesExist = page * pageSize < totalArticles
+
+        res.json({
+            articles: creatorArticles,
+            page,
+            moreArticlesExist,
+        })
+    } catch (error) {
+        console.error("Error serving creator articles:", error)
+        res.status(500).json({ message: "Error serving creator articles" })
+    }
+}
+
+const getForSubscriberArticles = async (req, res) => {
+    if (!req.isLoggedIn) {
+        return res.status(401).json({ message: "Not Authorized" })
+    }
+
+    const { id } = req.params
+    const page = parseInt(req.query.page, 10) || 1 // Default to page 1
+    const pageSize = 8
+    const userId = req.userId
+
+    try {
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(401).json({ message: "User not found" })
+        }
+
+        const isSubscribed = user.actions.subscriptions.some((sub) => sub.creatorId === id)
+        if (!isSubscribed) {
+            return res.status(403).json({ message: "User not subscribed to this creator" })
+        }
+
+        const creator = await Creator.findOne({ id }).select("-contributors")
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const creatorArticles = await Article.find({
+            "flags.creator": creator._id,
+            "flags.status": "published",
+            "flags.access": "subscribers",
+        })
+            .sort({ publishedAt: -1 })
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+            .select("-__v -_id -flags -content")
+            .lean()
+
+        const totalArticles = await Article.countDocuments({
+            "flags.creator": creator._id,
+            "flags.status": "published",
+            "flags.access": "subscribers",
+        })
+
+        const moreArticlesExist = page * pageSize < totalArticles
+
+        res.json({
+            articles: creatorArticles,
+            page,
+            moreArticlesExist,
+        })
+    } catch (error) {
+        console.error("Error serving creator articles:", error)
+        res.status(500).json({ message: "Error serving creator articles" })
+    }
+}
+
+const toggleFollow = async (req, res) => {
+    const { id } = req.params
+    const userId = req.userId
+    const isUserLoggedIn = req.isUserLoggedIn
+
+    if (!isUserLoggedIn) {
+        return res.status(401).json({ message: "Login required" })
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+        return res.status(401).json({ message: "User not found" })
+    }
+
+    const creator = await Creator.findOne({ id })
+    if (!creator) {
+        return res.status(404).json({ message: "Creator not found" })
+    }
+
+    // Check if the user is already following the creator
+    const followingIndex = user.actions.following.findIndex(
+        (following) => following.creatorId === id,
+    )
+
+    let isFollowing = false
+    let message = ""
+
+    if (followingIndex !== -1) {
+        // If following, remove the creator from the following list
+        user.actions.following.splice(followingIndex, 1)
+        creator.followers--
+        message = `Unfollowed ${creator.name}`
+    } else {
+        user.actions.following.push({
+            creatorRefId: creator._id.toString(),
+            creatorId: creator.id,
+            creatorName: creator.name,
+            createdAt: new Date(),
+        })
+        creator.followers++
+        isFollowing = true
+        message = `Following ${creator.name}`
+    }
+
+    // Save the updated documents
+    await user.save()
+    await creator.save()
+
+    return res.json({ success: true, isFollowing, message })
+}
+
+module.exports = {
+    onboardCreator,
+    authCreatorInfo,
+    getCreatorArticles,
+    getCreatorProfile,
+    getForFollowerArticles,
+    getForSubscriberArticles,
+    toggleFollow,
+}

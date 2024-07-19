@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 
-export const ArticleList = ({ article }) => {
+const ArticleList = ({ article }) => {
     return (
         <Link
             to={`/article/${article.slug}`}
@@ -46,3 +46,5 @@ export const ArticleList = ({ article }) => {
         </Link>
     )
 }
+
+export default ArticleList

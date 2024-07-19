@@ -5,7 +5,7 @@ import * as Tabs from "@radix-ui/react-tabs"
 
 import { randomGradient } from "@/helpers/ui/randomGradient"
 
-import { ArticleList } from "@/components/ArticleList"
+import ArticleList from "@/components/ArticleList"
 import SubscribePortal from "@/components/SubscribePortal"
 
 import { articles as allArticles } from "@/data/articles"
@@ -15,14 +15,12 @@ function Organization() {
     const { id } = useParams()
     const navigate = useNavigate()
 
-    const [gradient, setGradient] = useState("")
     const [organization, setOrgansisation] = useState()
     const [articles, setArticles] = useState()
     const [isFollowing, setIsFollowing] = useState(false)
     const [isSubscribed, setIsSubscribed] = useState(false)
 
     useEffect(() => {
-        randomGradient(setGradient)
         setOrgansisation(organizations.find((organization) => organization.id === id))
         setArticles(
             allArticles.filter(
@@ -47,7 +45,9 @@ function Organization() {
     if (organization && articles) {
         return (
             <div>
-                <div className="w-full justify-end pt-16" style={{ background: gradient }}>
+                <div
+                    className="w-full justify-end pt-16"
+                    style={{ background: randomGradient() }}>
                     <div className="flex flex-col gap-4 bg-gradient-to-t from-white from-40% to-transparent">
                         <img
                             className="mx-4 h-20 w-fit rounded-full shadow sm:mx-8 lg:mx-16"

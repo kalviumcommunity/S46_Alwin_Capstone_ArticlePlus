@@ -9,7 +9,7 @@ const { convertToWebp } = require("../lib/sharp")
 
 const storage = getStorage()
 
-// helper function to generate a random 4-character hash
+// Helper function to generate a random 4-character hash
 const generateSlugHash = () => {
     let hash
     do {
@@ -19,7 +19,7 @@ const generateSlugHash = () => {
     return hash
 }
 
-// helper function to upload an image to storage and get the download URL
+// Helper function to upload an image to storage and get the download URL
 const uploadImageToStorage = (imageFile, imagePath) => {
     return new Promise((resolve, reject) => {
         const imageRef = storage.bucket().file(imagePath)
@@ -210,7 +210,7 @@ const getArticleSettings = async (req, res) => {
 
         articleSettings.title = article.title
         articleSettings.subtitle = article.subtitle
-        articleSettings.datestamp = article.datestamp
+        articleSettings.datePublished = article.datePublished
         articleSettings.image = article.image.url
 
         if (article.flags) {
@@ -280,10 +280,28 @@ const updateArticleSettings = async (req, res) => {
         const updates = {}
         let responseMessage = ""
 
+        // Handle status change
         if (status && article.flags.status !== status) {
+            if (article.flags.status === "published") {
+                // Article is currently published, so we need to decrement counts if status changes to draft
+                const decrementFields = { "articles.total": -1 }
+
+                if (article.flags.access === "all") {
+                    decrementFields["articles.free"] = -1
+                } else if (article.flags.access === "subscribers") {
+                    decrementFields["articles.subscription"] = -1
+                }
+
+                await Creator.findOneAndUpdate(
+                    { _id: article.flags.creator },
+                    { $inc: decrementFields },
+                )
+            }
+
             updates["flags.status"] = status
 
             if (status === "published") {
+                // Article is being published
                 const validationResult = validateArticleForPublishing(article)
                 if (!validationResult.isValid) {
                     return res.status(400).json({
@@ -296,13 +314,52 @@ const updateArticleSettings = async (req, res) => {
                     day: "numeric",
                     year: "numeric",
                 })
+                updates.publishedAt = new Date()
+
+                // Update creator's article counts when published
+                const incrementFields = { "articles.total": 1 }
+
+                if (article.flags.access === "all") {
+                    incrementFields["articles.free"] = 1
+                } else if (article.flags.access === "subscribers") {
+                    incrementFields["articles.subscription"] = 1
+                }
+
+                await Creator.findOneAndUpdate(
+                    { _id: article.flags.creator },
+                    { $inc: incrementFields },
+                )
             }
 
             responseMessage +=
                 status === "published" ? "Article published. " : "Article saved as draft. "
         }
 
+        // Handle access change
         if (access && article.flags.access !== access) {
+            const updateFields = {}
+            const currentAccess = article.flags.access
+
+            // Update access for new access level
+            if (access === "all") {
+                updateFields["articles.free"] = 1 // Increment free count
+            } else if (access === "subscribers") {
+                updateFields["articles.subscription"] = 1 // Increment subscription count
+            }
+
+            // Update access for old access level
+            if (currentAccess === "all") {
+                updateFields["articles.free"] = (updateFields["articles.free"] || 0) - 1 // Decrement free count
+            } else if (currentAccess === "subscribers") {
+                updateFields["articles.subscription"] =
+                    (updateFields["articles.subscription"] || 0) - 1 // Decrement subscription count
+            }
+
+            await Creator.findOneAndUpdate(
+                { id: article.flags.creator },
+                { $inc: updateFields },
+            )
+
             updates["flags.access"] = access
             responseMessage += `Access updated to ${access === "all" ? "all" : "subscribers"}. `
         }
@@ -383,11 +440,32 @@ const deleteArticle = async (req, res) => {
     const { id } = req.params
 
     try {
-        const article = await Article.findByIdAndDelete(id)
+        const article = await Article.findById(id)
 
         if (!article) {
             return res.status(404).json({ message: "Article not found" })
         }
+
+        if (article.flags.status === "published") {
+            const updateFields = {
+                "articles.total": -1,
+            }
+
+            // Determining the category of the article
+            if (article.flags.access === "all") {
+                updateFields["articles.free"] = -1
+            } else if (article.flags.access === "subscribers") {
+                updateFields["articles.subscription"] = -1
+            }
+
+            // Updating the creator's article counts
+            await Creator.findOneAndUpdate(
+                { id: article.flags.creator },
+                { $inc: updateFields },
+            )
+        }
+
+        await Article.findByIdAndDelete(id)
 
         res.json({ success: true, message: "Article deleted" })
     } catch (err) {

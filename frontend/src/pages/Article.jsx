@@ -88,7 +88,7 @@ function Article() {
                     <div>
                         <h2>{articlePreview.title}</h2>
                         <p>{articlePreview.subtitle}</p>
-                        <p>{articlePreview.datestamp}</p>
+                        <p>{articlePreview.datePublished}</p>
                         <img src={articlePreview.image} alt={articlePreview.title} />
                     </div>
                 )}
@@ -108,7 +108,7 @@ function Article() {
                         <div className="flex max-w-[90vw] flex-auto flex-col text-center sm:max-w-lg">
                             <Link
                                 className="mb-2 font-serif uppercase text-rose-500 hover:underline"
-                                to={`/?tag=${article.category}`}>
+                                to={`/?category=${article.category}`}>
                                 {convertCategoryFormat(article.category)}
                             </Link>
                             <h1 className="mb-4 font-serif text-4xl font-semibold">
@@ -140,7 +140,7 @@ function Article() {
                                     </div>
                                 )}
                                 <p className="mt-0.5 text-sm font-normal text-gray-500">
-                                    {article.datestamp}
+                                    {article.datePublished}
                                 </p>
                             </div>
                         </div>
@@ -152,15 +152,15 @@ function Article() {
                         />
                     </div>
                 ) : (
-                    <div className="grid h-3/4 grid-cols-2 items-center justify-center overflow-hidden border-b">
+                    <div className="mt-6 grid items-center justify-center gap-10 overflow-clip border-b sm:mt-0 sm:h-[28rem] sm:grid-cols-2 sm:gap-0">
                         <div
                             className={clsx(
-                                "flex max-w-[90vw] flex-1 flex-col px-16 text-center sm:max-w-lg",
+                                "m-auto flex max-w-[90vw] flex-1 flex-col text-center sm:px-16",
                                 article.flow === "reverse" && "order-1",
                             )}>
                             <Link
                                 className="mb-2 font-serif uppercase text-rose-500 hover:underline"
-                                to={`/?tag=${article.category}`}>
+                                to={`/?category=${article.category}`}>
                                 {convertCategoryFormat(article.category)}
                             </Link>
                             <h1 className="mb-4 font-serif text-4xl font-semibold">
@@ -192,7 +192,7 @@ function Article() {
                                     </div>
                                 )}
                                 <p className="mt-0.5 text-sm font-normal text-gray-500">
-                                    {article.datestamp}
+                                    {article.datePublished}
                                 </p>
                             </div>
                         </div>
@@ -262,19 +262,20 @@ function Article() {
                     ))}
                 </div>
 
-                <hr />
-
                 {suggestedArticles.length > 0 && (
-                    <div className="wrapper flex flex-col gap-5 pb-14 pt-10">
-                        <h2 className="font-serif text-2xl font-semibold">
-                            Suggested Articles
-                        </h2>
-                        <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-                            {suggestedArticles.map((suggestedArticle, idx) => (
-                                <ArticleCard key={idx} article={suggestedArticle} />
-                            ))}
+                    <>
+                        <hr />
+                        <div className="wrapper flex flex-col gap-5 pb-14 pt-10">
+                            <h2 className="font-serif text-2xl font-semibold">
+                                Suggested Articles
+                            </h2>
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+                                {suggestedArticles.map((suggestedArticle, idx) => (
+                                    <ArticleCard key={idx} article={suggestedArticle} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
         )

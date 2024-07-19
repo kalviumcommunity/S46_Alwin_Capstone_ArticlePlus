@@ -51,7 +51,7 @@ const articleSchema = z.object({
     }),
     subtitle: z.string().min(1, "Subtitle is required"),
     author: authorSchema,
-    datestamp: z.string(),
+    datePublished: z.string(),
     content: z.array(contentBlockSchema),
 })
 

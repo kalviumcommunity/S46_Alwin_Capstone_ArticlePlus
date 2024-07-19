@@ -7,7 +7,6 @@ import ControlledLink from "./ControlledLink"
 import { PlaygroundArticleContext, SelectedElementContext } from "./Playground"
 
 function ArticleDetails({
-    categoryRef,
     titleRef,
     subTitleRef,
     handleHeaderEditable,
@@ -21,26 +20,14 @@ function ArticleDetails({
 
     return (
         <>
-            <span
-                ref={categoryRef}
-                onPaste={handlePaste}
-                onInput={(e) => handleHeaderEditable(e, "category")}
-                contentEditable={isSelected("header-category")}
-                aria-rowspan={1}
-                data-selected={setDataSelected(selectedElement)}
-                className={clsx(
-                    "relative mb-1 font-serif text-sm uppercase text-rose-500 hover:underline",
-                    isSelected("header-category") &&
-                        "highlight absolute top-0 outline-dotted outline-2 outline-red-500",
-                )}
-                suppressContentEditableWarning>
+            <span className="relative mb-1 font-serif text-sm uppercase text-rose-500 hover:underline">
                 {convertCategoryFormat(article.category.replace(/(\r\n|\n|\r)/gm, ""))}
             </span>
             <h1
                 ref={titleRef}
                 onInput={(e) => handleHeaderEditable(e, "title")}
                 contentEditable={isSelected("header-title")}
-                onPaste={handlePaste}
+                onPaste={(e) => handlePaste(e, "title")}
                 data-selected={setDataSelected(selectedElement)}
                 className={clsx(
                     "relative mb-2 font-serif text-3xl font-semibold",
@@ -54,7 +41,7 @@ function ArticleDetails({
                 ref={subTitleRef}
                 onInput={(e) => handleHeaderEditable(e, "subtitle")}
                 contentEditable={isSelected("header-subtitle")}
-                onPaste={handlePaste}
+                onPaste={(e) => handlePaste(e, "subtitle")}
                 data-selected={setDataSelected(selectedElement)}
                 className={clsx(
                     "relative mb-3 text-sm italic text-gray-800",
@@ -88,7 +75,7 @@ function ArticleDetails({
                         </div>
                     )}
                     <p className="mt-0.5 text-xs font-normal text-gray-500">
-                        {article.datestamp}
+                        {article.datePublished}
                     </p>
                 </div>
             )}

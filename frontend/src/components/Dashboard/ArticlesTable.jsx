@@ -84,7 +84,9 @@ function ArticlesTable({ articles, loading, isDashboard = false }) {
                         </span>
                     </div>
 
-                    <span className="w-40 flex-shrink-0 px-4 py-2">{article?.datestamp}</span>
+                    <span className="w-40 flex-shrink-0 px-4 py-2">
+                        {article?.datePublished}
+                    </span>
                 </Link>
             ))}
         </div>

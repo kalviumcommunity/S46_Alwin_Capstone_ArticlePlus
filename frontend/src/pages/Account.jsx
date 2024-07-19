@@ -16,11 +16,9 @@ function Account() {
     const location = useLocation()
 
     const [user, setUser] = useState(userDetails.value)
-    const [gradient, setGradient] = useState("")
     const [activeTab, setActiveTab] = useState("account")
 
     useSignalEffect(() => {
-        randomGradient(setGradient)
         setUser(userDetails.value)
     })
 
@@ -36,7 +34,7 @@ function Account() {
         <div className="flex flex-col pb-10 pt-0">
             <div
                 className="flex items-end gap-4 border-b pt-16 backdrop-saturate-150"
-                style={{ background: gradient }}>
+                style={{ background: randomGradient() }}>
                 <div className="flex w-full flex-col gap-4 bg-gradient-to-t from-white via-white to-transparent px-4 py-4 sm:flex-row sm:items-center sm:px-16">
                     <div className="flex flex-1 flex-row items-center gap-3">
                         {user.picture ? (
