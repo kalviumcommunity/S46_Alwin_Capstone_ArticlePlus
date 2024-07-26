@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { redirect } from "react-router-dom"
+import { Link, redirect } from "react-router-dom"
 
 import { creatorInfo, isUserCreator } from "@/signals/creator"
 import axiosInstance from "@/axios"
@@ -115,7 +115,19 @@ function OnboardingCreator() {
 
         const formData = new FormData()
         for (const key in creatorForm) {
-            formData.append(key, creatorForm[key])
+            // Check if the value is an object and not a File or Blob
+            if (
+                creatorForm[key] &&
+                typeof creatorForm[key] === "object" &&
+                !(creatorForm[key] instanceof File) &&
+                !(creatorForm[key] instanceof Blob)
+            ) {
+                // Convert the object to a JSON string before appending
+                formData.append(key, JSON.stringify(creatorForm[key]))
+            } else {
+                // Append the value directly for strings, numbers, files, etc.
+                formData.append(key, creatorForm[key])
+            }
         }
 
         axiosInstance
@@ -414,6 +426,17 @@ function OnboardingCreator() {
                                 onClick={handleNextStep}>
                                 {step === 3 ? "Submit" : "Next"}
                             </button>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex w-full flex-col justify-center">
+                        <hr className="mb-8 w-full" />
+                        <div className="flex flex-col items-center">
+                            <p className="text-sm">Already part of an orgranization?</p>
+                            <Link
+                                className="text-sm font-semibold text-rose-500 underline decoration-wavy"
+                                to="/onboarding/join-organization">
+                                Join team
+                            </Link>
                         </div>
                     </div>
                 </div>

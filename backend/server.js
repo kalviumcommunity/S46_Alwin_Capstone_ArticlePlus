@@ -28,7 +28,6 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(logger)
 
-// Routes
 app.get("/db-status", (req, res) => {
     res.json({
         "📦 Database connection status": isDBConnected() ? "✅ Connected" : "❌ Not connected",
@@ -36,7 +35,6 @@ app.get("/db-status", (req, res) => {
 })
 app.use("/", apiRoutes)
 
-// Start the server
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)
 })

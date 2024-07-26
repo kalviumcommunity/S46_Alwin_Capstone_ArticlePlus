@@ -6,14 +6,21 @@ import axiosInstance from "@/axios"
 
 import DashboardNavbar from "@/components/Dashboard/Navbar"
 
+export const fetchCreatorInfo = async () => {
+    try {
+        const response = await axiosInstance.get("/creator/dashboard/auth/info")
+        creatorInfo.value = response.data
+        console.log(response.data)
+    } catch (error) {
+        console.error("Error fetching creator info:", error)
+    }
+}
+
 function DashboardLayout() {
     useSignals()
 
     useSignalEffect(() => {
-        axiosInstance.get("/creator/auth/info").then((response) => {
-            creatorInfo.value = response.data
-            console.log(response.data)
-        })
+        fetchCreatorInfo()
     })
 
     return (

@@ -19,6 +19,12 @@ const CreatorSchema = new mongoose.Schema({
     verified: { type: Boolean, required: true, default: false },
     description: { type: String, required: true },
     type: { type: String, required: true, enum: ["individual", "organization"] },
+    invite: {
+        type: {
+            code: { type: String, required: true, unique: true },
+            token: { type: String, required: true },
+        },
+    },
     subscription: { type: Boolean, required: true },
     contributors: {
         type: [
@@ -27,6 +33,26 @@ const CreatorSchema = new mongoose.Schema({
                 id: { type: String, required: true },
                 role: { type: String, required: true, enum: ["owner", "author", "editor"] },
                 userRef: { type: String, required: true },
+                displayPicture: { type: String },
+            },
+        ],
+    },
+    joinRequests: {
+        type: [
+            {
+                inviteCode: { type: String, required: true },
+                email: { type: String, required: true },
+                id: { type: String, required: true },
+                name: { type: String, required: true },
+                userRef: { type: String, required: true },
+                displayPicture: { type: String },
+                createdAt: { type: Date, default: Date.now },
+                role: {
+                    type: String,
+                    required: true,
+                    enum: ["author"],
+                    default: "author",
+                },
             },
         ],
     },
@@ -37,8 +63,10 @@ const CreatorSchema = new mongoose.Schema({
                 features: [{ type: String, required: true }],
                 monthlyPrice: { type: Number, required: true },
                 annualPrice: { type: Number, required: true },
-                sellingPrice: { type: Number, required: true },
-                offer: { type: { type: String }, value: { type: Number } },
+                annualOffer: {
+                    amount: { type: Number, required: true },
+                    basePrice: { type: Number, required: true },
+                },
             },
         ],
         required: function () {

@@ -27,7 +27,7 @@ function CreatorArticles({
                     </p>
                 </div>
             ) : (
-                articles.map((article) => <ArticleList article={article} key={article.id} />)
+                articles.map((article) => <ArticleList article={article} key={article.slug} />)
             )}
             {!loading && activeTab === "for-subscribers" && !isSubscribed && (
                 <div className="mt-6 flex flex-col items-start gap-1">

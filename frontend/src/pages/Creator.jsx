@@ -7,11 +7,13 @@ import { randomGradient } from "@/helpers/ui/randomGradient"
 import axiosInstance from "@/axios"
 
 import CreatorContent from "@/components/CreatorContent"
+import SubscribePortal from "@/components/SubscribePortal"
 
 import Loader from "@/ui/Loader"
 
 function Creator() {
-    const { creator: id } = useParams()
+    const { id, contributor } = useParams()
+
     const [creator, setCreator] = useState(null)
     const [isFollowing, setIsFollowing] = useState(false)
     const [isSubscribed, setIsSubscribed] = useState(false)
@@ -19,7 +21,10 @@ function Creator() {
 
     const fetchCreatorProfile = useCallback(async () => {
         try {
-            const { data } = await axiosInstance.get(`/creator/profile/${id}`)
+            const endpoint = contributor
+                ? `/creator/profile/${id}/${contributor}`
+                : `/creator/profile/${id}`
+            const { data } = await axiosInstance.get(endpoint)
             setCreator(data.creator)
             setIsFollowing(data.isFollowing)
             setIsSubscribed(data.isSubscribed)
@@ -29,7 +34,7 @@ function Creator() {
         } finally {
             setLoading(false)
         }
-    }, [id])
+    }, [id, contributor])
 
     useEffect(() => {
         fetchCreatorProfile()
@@ -45,13 +50,15 @@ function Creator() {
                 <div className="flex flex-col gap-4 bg-gradient-to-t from-white from-40% to-transparent">
                     {creator && (
                         <>
-                            <img
-                                className="mx-4 h-20 w-fit rounded-full shadow sm:mx-8 lg:mx-16"
-                                src={creator.displayPicture}
-                                alt={`${creator.name}'s profile`}
-                            />
+                            <div className="relative mx-4 flex w-fit flex-col sm:mx-8 lg:mx-16">
+                                <img
+                                    className="h-20 w-fit rounded-full shadow"
+                                    src={creator.displayPicture}
+                                    alt={`${creator.name}'s profile`}
+                                />
+                            </div>
                             <div className="flex flex-col gap-6 px-4 pb-8 sm:flex-row sm:px-8 lg:gap-8 lg:px-16">
-                                <div className="flex w-max flex-col">
+                                <div className="flex w-max flex-col gap-1">
                                     <div className="flex items-center gap-2">
                                         <h1 className="w-max text-2xl font-bold">
                                             {creator.name}
@@ -71,7 +78,21 @@ function Creator() {
                                         articles
                                     </p>
                                 </div>
-                                <div className="flex flex-col justify-end gap-3">
+                                <div className="relative -mt-2 flex flex-col justify-end gap-3 sm:mt-0">
+                                    <span className="-top-9 -mb-1 flex h-fit w-fit items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-0.5 text-sm font-medium text-black backdrop-blur sm:absolute">
+                                        <img
+                                            src={`/assets/icons/${creator.type === "organization" ? "organization" : "individual"}.svg`}
+                                            alt={
+                                                creator.type === "organization"
+                                                    ? "Organization"
+                                                    : "Individual"
+                                            }
+                                            className="h-4 w-4"
+                                        />
+                                        {creator.type === "organization"
+                                            ? "Organization"
+                                            : "Individual"}
+                                    </span>
                                     <span className="mt-1 lg:w-2/3">{creator.description}</span>
                                     <div className="flex gap-2">
                                         <FollowButton
@@ -115,7 +136,7 @@ function Creator() {
 }
 
 function FollowButton({ setCreator, isFollowing, setIsFollowing }) {
-    const { creator: id } = useParams()
+    const { id } = useParams()
 
     const handleFollow = async () => {
         try {
@@ -170,7 +191,7 @@ function SubscribeSection({ creator, isSubscribed, handleSubscribe }) {
                         {isSubscribed ? "Subscribed" : "Subscribe"}
                     </button>
                 </Dialog.Trigger>
-                {/* <SubscribePortal details={creator} /> */}
+                <SubscribePortal details={creator} />
             </Dialog.Root>
             <span className="text-sm font-medium leading-4">
                 Starting at ₹{defaultSubscription.monthlyPrice}/per month

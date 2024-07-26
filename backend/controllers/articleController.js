@@ -356,7 +356,7 @@ const updateArticleSettings = async (req, res) => {
             }
 
             await Creator.findOneAndUpdate(
-                { id: article.flags.creator },
+                { _id: article.flags.creator },
                 { $inc: updateFields },
             )
 

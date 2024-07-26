@@ -65,7 +65,7 @@ function CreatorContent({ creator, isSubscribed }) {
             <div className="pb-20 pt-2 sm:px-8 lg:px-16">
                 <Tabs.Root className="flex flex-col gap-2" defaultValue={activeTab}>
                     <Tabs.List
-                        className="sticky top-12 z-40 flex flex-1 flex-row items-center gap-1 border-b bg-white pt-1 lg:top-14"
+                        className="sticky top-12 z-30 flex flex-1 flex-row items-center gap-1 border-b bg-white pt-1 lg:top-14"
                         aria-label="creator tabs">
                         <Tabs.Trigger
                             className="creator-tab"
@@ -114,7 +114,7 @@ function CreatorContent({ creator, isSubscribed }) {
             <hr />
             <div className="flex flex-col gap-8 px-4 pt-6 lg:w-2/3">
                 {articles?.map((article) => (
-                    <ArticleList article={article} key={article.id} />
+                    <ArticleList article={article} key={article.slug} />
                 ))}
             </div>
         </div>

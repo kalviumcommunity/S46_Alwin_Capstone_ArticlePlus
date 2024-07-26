@@ -62,14 +62,14 @@ function ArticleDetails({
                     ) : (
                         <div className="flex items-center gap-1.5">
                             <ControlledLink
-                                to={`/organization/${article.author.organization.id}`}
+                                to={`/creator/${article.author.organization.id}`}
                                 className="text-xs font-semibold leading-4 hover:underline">
                                 {article.author.organization.name}
                             </ControlledLink>
                             <span>•</span>
                             <ControlledLink
                                 className="text-xs font-semibold leading-4 hover:underline"
-                                to={`/organization/${article.author.organization.id}/${article.author.id}`}>
+                                to={`/creator/${article.author.organization.id}/${article.author.id}`}>
                                 {article.author.name}
                             </ControlledLink>
                         </div>

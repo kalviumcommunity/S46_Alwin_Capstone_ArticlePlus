@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react"
 import * as Dialog from "@radix-ui/react-dialog"
+import clsx from "clsx"
 
 import Toggle from "@/ui/Toggle"
 
 function OnboardingOptions({ setCreatorForm }) {
     const [isSubscriptionOn, setIsSubscriptionOn] = useState(false)
-
-    const [features, setFeatures] = useState([])
-    const [monthlyPrice, setMonthlyPrice] = useState("")
-    const [annualPrice, setAnnualPrice] = useState("")
-    const [sellingPrice, setSellingPrice] = useState("")
-    const [offer, setOffer] = useState({ type: "amount", value: "" })
-    const [subscriptionDetails, setSubscriptionDetails] = useState(null)
+    const [subscriptionPlan, setSubscriptionPlan] = useState({
+        name: "default",
+        features: [],
+        monthlyPrice: "",
+        annualPrice: "",
+        annualOffer: {
+            amount: "0",
+            basePrice: "",
+        },
+    })
 
     const [openAddFeatureDialog, setOpenAddFeatureDialog] = useState(false)
     const [newFeature, setNewFeature] = useState("")
@@ -20,42 +24,55 @@ function OnboardingOptions({ setCreatorForm }) {
 
     const handleAddNewFeature = () => {
         if (newFeature.trim()) {
-            setFeatures([...features, newFeature.trim()])
+            setSubscriptionPlan((prev) => ({
+                ...prev,
+                features: [...prev.features, newFeature.trim()],
+            }))
             setNewFeature("")
             setOpenAddFeatureDialog(false)
         }
     }
 
     const calculateAnnualPrice = () => {
-        if (monthlyPrice) {
-            const monthly = parseInt(monthlyPrice)
-            setAnnualPrice(monthly * 12)
+        const monthly = parseInt(subscriptionPlan.monthlyPrice)
+        if (!isNaN(monthly) && monthly >= 0) {
+            const annual = monthly * 12
+            setSubscriptionPlan((prev) => ({
+                ...prev,
+                annualPrice: annual,
+                annualOffer: {
+                    ...prev.annualOffer,
+                    basePrice: annual,
+                },
+            }))
         } else {
-            setAnnualPrice("")
+            setSubscriptionPlan((prev) => ({
+                ...prev,
+                annualPrice: "",
+                annualOffer: {
+                    ...prev.annualOffer,
+                    basePrice: "",
+                },
+            }))
         }
     }
 
-    const calculateSellingPrice = () => {
-        if (annualPrice) {
-            let offerAmount = 0
-            if (offer.type === "amount" && offer.value) {
-                offerAmount = parseInt(offer.value)
-                if (isNaN(offerAmount) || offerAmount < 0) {
-                    setSellingPrice("")
-                    return
-                }
-            } else if (offer.type === "percentage" && offer.value) {
-                const offerPercentage = parseInt(offer.value)
-                if (isNaN(offerPercentage) || offerPercentage < 0 || offerPercentage > 100) {
-                    setSellingPrice("")
-                    return
-                }
-                offerAmount = annualPrice * (offerPercentage / 100)
-            }
+    const calculateOfferPrice = () => {
+        const { annualOffer } = subscriptionPlan
+        const basePrice = parseInt(annualOffer.basePrice)
+        const discountAmount = parseInt(annualOffer.amount)
 
-            setSellingPrice(annualPrice - offerAmount)
+        if (!isNaN(basePrice) && !isNaN(discountAmount) && discountAmount >= 0) {
+            const finalPrice = Math.max(basePrice - discountAmount, 0)
+            setSubscriptionPlan((prev) => ({
+                ...prev,
+                annualPrice: finalPrice,
+            }))
         } else {
-            setSellingPrice("")
+            setSubscriptionPlan((prev) => ({
+                ...prev,
+                annualPrice: basePrice,
+            }))
         }
     }
 
@@ -70,35 +87,27 @@ function OnboardingOptions({ setCreatorForm }) {
     }
 
     const handleRemove = (index) => {
-        const updatedFeatures = [...features]
-        updatedFeatures.splice(index, 1)
-        setFeatures(updatedFeatures)
+        setSubscriptionPlan((prev) => ({
+            ...prev,
+            features: prev.features.filter((_, i) => i !== index),
+        }))
     }
 
     useEffect(() => {
         calculateAnnualPrice()
-        calculateSellingPrice()
-    }, [monthlyPrice, offer])
+    }, [subscriptionPlan.monthlyPrice])
 
     useEffect(() => {
-        if (isSubscriptionOn) {
-            setSubscriptionDetails([
-                {
-                    features,
-                    monthlyPrice,
-                    annualPrice,
-                    sellingPrice,
-                    offer,
-                },
-            ])
-        }
+        calculateOfferPrice()
+    }, [subscriptionPlan.annualOffer.amount, subscriptionPlan.annualOffer.basePrice])
 
+    useEffect(() => {
         setCreatorForm((prevState) => ({
             ...prevState,
             subscription: isSubscriptionOn,
-            subscriptions: isSubscriptionOn ? JSON.stringify(subscriptionDetails) : [],
+            subscriptions: isSubscriptionOn ? [subscriptionPlan] : [],
         }))
-    }, [isSubscriptionOn, features, monthlyPrice, annualPrice, sellingPrice, offer])
+    }, [isSubscriptionOn, subscriptionPlan])
 
     return (
         <div className="mt-4 flex flex-col gap-5 px-1">
@@ -156,12 +165,12 @@ function OnboardingOptions({ setCreatorForm }) {
                                 </Dialog.Root>
                             </div>
                             <div className="grid-rows-auto grid grid-cols-2 gap-3">
-                                {features.length === 0 && (
+                                {subscriptionPlan.features.length === 0 && (
                                     <span className="col-span-2 rounded-md border-2 px-3 py-2 text-base font-medium text-gray-500">
                                         No features/perks added
                                     </span>
                                 )}
-                                {features.map((feature, index) => (
+                                {subscriptionPlan.features.map((feature, index) => (
                                     <div
                                         className="relative overflow-hidden rounded-md border-2 px-3 py-2"
                                         key={index}
@@ -181,91 +190,104 @@ function OnboardingOptions({ setCreatorForm }) {
                                 ))}
                             </div>
                         </div>
-                        <div className="mt-4 flex flex-col gap-3 py-2">
+                        <div className="mt-4 flex flex-col justify-center gap-4 py-2">
                             <label className="flex items-center justify-between gap-4">
                                 <span className="font-medium">Monthly Price (₹):</span>
                                 <input
                                     type="number"
                                     className="on-input"
-                                    value={monthlyPrice}
-                                    onChange={(e) => setMonthlyPrice(parseInt(e.target.value))}
+                                    value={subscriptionPlan.monthlyPrice}
+                                    onChange={(e) =>
+                                        setSubscriptionPlan((prev) => ({
+                                            ...prev,
+                                            monthlyPrice: e.target.value,
+                                        }))
+                                    }
+                                    min="0"
                                 />
                             </label>
-                            <label className="flex flex-col gap-1">
-                                <span className="font-medium">
-                                    Annual subscription Discount:
-                                </span>
-                                <div className="flex gap-3">
-                                    <select
-                                        value={offer.type}
-                                        className="on-input w-fit"
-                                        onChange={(e) =>
-                                            setOffer({ ...offer, type: e.target.value })
-                                        }>
-                                        <option value="amount">Amount</option>
-                                        <option value="percentage">Percentage</option>
-                                    </select>
-                                    {offer.type === "amount" && (
-                                        <input
-                                            type="number"
-                                            className="on-input"
-                                            value={offer.value}
-                                            onChange={(e) =>
-                                                setOffer({
-                                                    ...offer,
-                                                    value: e.target.value,
-                                                })
-                                            }
-                                        />
-                                    )}
-                                    {offer.type === "percentage" && (
-                                        <input
-                                            type="number"
-                                            className="on-input"
-                                            value={offer.value}
-                                            onChange={(e) =>
-                                                setOffer({
-                                                    ...offer,
-                                                    value: parseInt(e.target.value),
-                                                })
-                                            }
-                                            min="0"
-                                            max="100"
-                                        />
-                                    )}
-                                </div>
+                            <label className="flex items-center justify-between gap-4">
+                                <span className="font-medium">Annual Discount Amount (₹):</span>
+                                <input
+                                    type="number"
+                                    className="on-input"
+                                    value={subscriptionPlan.annualOffer.amount}
+                                    onChange={(e) =>
+                                        setSubscriptionPlan((prev) => ({
+                                            ...prev,
+                                            annualOffer: {
+                                                ...prev.annualOffer,
+                                                amount: e.target.value, // Ensure 'amount' is updated here
+                                            },
+                                        }))
+                                    }
+                                    min="0"
+                                />
                             </label>
-                            <div className="flex flex-col items-end">
-                                {annualPrice && (
-                                    <div className="mt-2">
-                                        <span className="font-medium">Annual Price: </span>
-                                        <span className="text-2xl font-semibold">
-                                            ₹ {annualPrice}
-                                        </span>
+                            <hr className="mb-1.5 mt-1.5" />
+                            <div className="flex flex-1 flex-row items-start justify-start gap-3">
+                                {subscriptionPlan.monthlyPrice && (
+                                    <div className="w-1/2 rounded-xl border-2 px-4 py-3">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium capitalize text-gray-800">
+                                                Monthly Plan
+                                            </span>
+                                            <span className="mt-1 text-3xl font-semibold tracking-tight">
+                                                ₹{subscriptionPlan.monthlyPrice}
+                                            </span>
+                                            <span className="text-xs font-medium leading-3 text-gray-500">
+                                                per month
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
-                                {offer.value && (
-                                    <div>
-                                        <span className="font-medium">Selling Price: </span>
-                                        <span className="text-2xl font-semibold">
-                                            ₹ {sellingPrice}
-                                        </span>
-                                    </div>
-                                )}
-
-                                {offer.value && (
-                                    <div className="mt-1">
-                                        <span className="font-medium">Save: </span>
-                                        {offer.type === "amount" && (
-                                            <span className="font-semibold">
-                                                ₹ {offer.value}
-                                            </span>
-                                        )}
-                                        {offer.type === "percentage" && (
-                                            <span className="font-semibold">
-                                                {offer.value}% off
-                                            </span>
-                                        )}
+                                {subscriptionPlan.annualPrice && (
+                                    <div className="flex w-1/2 flex-col items-end">
+                                        <div className="w-full rounded-xl">
+                                            <div
+                                                className={clsx(
+                                                    "flex flex-col rounded-t-xl border-2 px-4 py-3",
+                                                    {
+                                                        "border-b-0":
+                                                            parseInt(
+                                                                subscriptionPlan.annualOffer
+                                                                    ?.amount,
+                                                            ) > 0,
+                                                        "!rounded-b-xl border-b-2":
+                                                            !subscriptionPlan.annualOffer ||
+                                                            parseInt(
+                                                                subscriptionPlan.annualOffer
+                                                                    .amount,
+                                                            ) <= 0,
+                                                    },
+                                                )}>
+                                                <span className="text-sm font-medium capitalize text-gray-800">
+                                                    Annual Plan
+                                                </span>
+                                                <span className="mt-1 text-3xl font-semibold tracking-tight">
+                                                    ₹{subscriptionPlan.annualPrice}
+                                                </span>
+                                                <span className="text-xs font-medium leading-3 text-gray-500">
+                                                    per year
+                                                </span>
+                                            </div>
+                                            {subscriptionPlan.annualOffer &&
+                                                parseInt(subscriptionPlan.annualOffer.amount) >
+                                                    0 && (
+                                                    <div className="flex items-center gap-1 rounded-b-xl border-2 border-t bg-gray-50 px-3 py-0.5">
+                                                        <span className="text-xs font-medium">
+                                                            Discount
+                                                        </span>
+                                                        <span className="text-sm font-semibold text-green-500">
+                                                            ₹
+                                                            {
+                                                                subscriptionPlan.annualOffer
+                                                                    .amount
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                )}
+                                        </div>
                                     </div>
                                 )}
                             </div>

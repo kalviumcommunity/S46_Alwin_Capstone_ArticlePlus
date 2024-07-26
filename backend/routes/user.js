@@ -9,6 +9,7 @@ const {
     confirmOtpForVerification,
     followCreator,
     subscribeCreator,
+    getSubscriptions,
 } = require("../controllers/userController")
 
 router.use(asyncHandler(verifyToken))
@@ -16,8 +17,7 @@ router.use(asyncHandler(verifyToken))
 router.get("/verify", asyncHandler(sendVerificationEmail))
 router.post("/verify", asyncHandler(confirmOtpForVerification))
 
-router.get("/following")
-router.get("/subscriptions")
+router.get("/subscriptions", asyncHandler(getSubscriptions))
 
 router.get("/following/articles")
 router.get("/subscriptions/articles")

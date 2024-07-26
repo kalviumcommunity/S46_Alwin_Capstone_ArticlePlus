@@ -30,14 +30,14 @@ function Highlight({ article }) {
                     ) : (
                         <div className="flex items-center gap-1.5 ">
                             <Link
-                                to={`/organization/${article.author.organization.id}`}
+                                to={`/creator/${article.author.organization.id}`}
                                 className="text-sm font-semibold leading-4 hover:underline">
                                 {article.author.organization.name}
                             </Link>
                             <span>•</span>
                             <Link
                                 className="text-sm font-semibold leading-4 hover:underline"
-                                to={`/organization/${article.author.organization.id}/${article.author.id}`}>
+                                to={`/creator/${article.author.organization.id}/${article.author.id}`}>
                                 <span>{article.author.name}</span>
                             </Link>
                         </div>

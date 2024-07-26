@@ -27,12 +27,13 @@ function Signup() {
         setActionStatus("")
 
         axiosInstance
-            .get("auth/signup", payload)
+            .post("auth/signup", payload)
             .then((res) => {
                 userExists.value = true
             })
             .catch((error) => {
                 setActionStatus(error.response.data)
+                console.error(error)
             })
             .finally(() => {
                 setIsLoading(false)

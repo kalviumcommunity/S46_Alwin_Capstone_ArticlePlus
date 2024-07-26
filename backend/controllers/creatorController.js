@@ -170,41 +170,64 @@ const onboardCreator = async (req, res) => {
     }
 }
 
-const authCreatorInfo = async (req, res) => {
-    const { userId } = req
+const joinOrganization = async (req, res) => {
+    const userId = req.userId
+    const { inviteCode } = req.body
 
-    const user = await User.findById(userId)
+    try {
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
 
-    if (!user) {
-        return res.status(404).json({ message: "User not found" })
+        const creator = await Creator.findOne({ "invite.code": inviteCode })
+        if (!creator) {
+            return res.status(404).json({ message: "Not a valid creator invite code" })
+        }
+
+        // Check if the user is already a contributor to the creator
+        const isContributor = creator.contributors.some(
+            (contributor) => contributor.userRef === userId,
+        )
+
+        if (isContributor) {
+            return res
+                .status(400)
+                .json({ message: `Your already a contributor to ${creator.name}` })
+        }
+
+        // Check if the user has already sent a join request
+        const existingRequest = creator.joinRequests.find(
+            (request) => request.userRef === userId,
+        )
+
+        if (existingRequest) {
+            return res.status(400).json({ message: "Join request already sent" })
+        }
+
+        // Add the join request
+        creator.joinRequests.push({
+            inviteCode,
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            userRef: user._id.toString(),
+            displayPicture: user?.displayPicture,
+            createdAt: new Date(),
+            role: "author",
+        })
+
+        await creator.save()
+
+        return res.json({
+            success: true,
+            message: "Join request sent successfully",
+            creatorName: creator.name,
+        })
+    } catch (error) {
+        console.error("Error in joinOrganization:", error)
+        return res.status(500).json({ message: "Internal server error" })
     }
-
-    if (!user.creator) {
-        return res.status(403).json({ message: "User is not a creator" })
-    }
-
-    const creator = await Creator.findOne(
-        { contributors: { $elemMatch: { userRef: userId } } },
-        { contributors: { $elemMatch: { userRef: userId } }, __v: 0 },
-    )
-
-    if (!creator) {
-        return res.status(404).json({ message: "Creator not found" })
-    }
-
-    const creatorDetails = creator.toObject()
-
-    if (creator.displayPicture.small) {
-        creatorDetails.displayPicture = creator.displayPicture.small
-    } else {
-        creatorDetails.displayPicture = creator.displayPicture.large
-    }
-
-    creatorDetails.user = creatorDetails.contributors[0]
-
-    delete creatorDetails.contributors
-
-    return res.json(creatorDetails)
 }
 
 const getCreatorArticles = async (req, res) => {
@@ -312,6 +335,82 @@ const getCreatorProfile = async (req, res) => {
     } catch (error) {
         console.error("Error fetching creator profile:", error)
         return res.status(500).json({ message: "Failed to fetch creator profile" })
+    }
+}
+
+const getContributorWithArticles = async (req, res) => {
+    try {
+        const { id, contributorId } = req.params
+        const { page = 1, pageSize = 10 } = req.query // Default values for pagination
+        const isLoggedIn = req.isUserLoggedIn
+
+        // Check if page and pageSize are numbers and positive integers
+        const currentPage = Math.max(parseInt(page, 10), 1)
+        const currentPageSize = Math.max(parseInt(pageSize, 10), 1)
+
+        const creator = await Creator.findOne({ id }).select("contributors")
+
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const contributor = creator.contributors.find(
+            (contributor) => contributor.id === contributorId,
+        )
+
+        if (!contributor) {
+            return res.status(404).json({ message: "Contributor not found" })
+        }
+
+        let isSubscribed = false
+
+        if (isLoggedIn) {
+            const userId = req.userId
+
+            const user = await User.findOne({ id: userId }).select("action.subscriptions")
+
+            if (user) {
+                // Check if the user is subscribed to the creator
+                isSubscribed = user.action.subscriptions.some(
+                    (subscription) => subscription.id === creator._id.toString(),
+                )
+            }
+        }
+
+        const queryConditions = {
+            "flags.creator": creator._id,
+            "flags.status": "published",
+            "flags.access": "all",
+        }
+
+        // If subscribed, include articles by the contributor as well
+        if (isSubscribed) {
+            queryConditions["flags.author.userRef"] = contributor.userRef
+        }
+
+        // Query for the articles by the creator or contributor, with pagination
+        const [creatorArticles, totalArticles] = await Promise.all([
+            Article.find(queryConditions)
+                .sort({ publishedAt: -1 })
+                .skip((currentPage - 1) * currentPageSize)
+                .limit(currentPageSize)
+                .select("-__v -_id -flags -content")
+                .lean(),
+            Article.countDocuments(queryConditions),
+        ])
+
+        // Determine if there are more articles to fetch
+        const moreArticlesExist = currentPage * currentPageSize < totalArticles
+
+        res.json({
+            contributor: contributor,
+            articles: creatorArticles,
+            page: currentPage,
+            moreArticlesExist,
+            isSubscribed,
+        })
+    } catch (error) {
+        console.error(error)
     }
 }
 
@@ -464,12 +563,113 @@ const toggleFollow = async (req, res) => {
     return res.json({ success: true, isFollowing, message })
 }
 
+const subscribeCreator = async (req, res) => {
+    const { id } = req.params
+    const { userId, isUserLoggedIn } = req
+
+    if (!isUserLoggedIn) {
+        return res.status(401).json({ message: "Login required" })
+    }
+
+    try {
+        const [user, creator] = await Promise.all([
+            User.findById(userId),
+            Creator.findOne({ id }),
+        ])
+
+        if (!user) {
+            return res.status(401).json({ message: "User not found" })
+        }
+
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const isAlreadySubscribed = user.actions.subscriptions.some(
+            (subscription) => subscription.creatorId === id,
+        )
+
+        if (isAlreadySubscribed) {
+            return res.status(400).json({ message: "Already subscribed to this creator" })
+        }
+
+        user.actions.subscriptions.push({
+            creatorRefId: creator._id.toString(),
+            creatorId: creator.id,
+            creatorName: creator.name,
+            createdAt: new Date(),
+        })
+        creator.subscribers++
+
+        await Promise.all([user.save(), creator.save()])
+
+        return res.json({
+            success: true,
+            isSubscribed: true,
+            message: `Subscribed to ${creator.name}`,
+        })
+    } catch (error) {
+        console.error("Error in subscribeCreator:", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+const unsubscribeCreator = async (req, res) => {
+    const { id } = req.params
+    const { userId, isUserLoggedIn } = req
+
+    if (!isUserLoggedIn) {
+        return res.status(401).json({ message: "Login required" })
+    }
+
+    try {
+        const [user, creator] = await Promise.all([
+            User.findById(userId),
+            Creator.findOne({ id }),
+        ])
+
+        if (!user) {
+            return res.status(401).json({ message: "User not found" })
+        }
+
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const subscriptionIndex = user.actions.subscriptions.findIndex(
+            (subscription) => subscription.creatorId === id,
+        )
+
+        if (subscriptionIndex === -1) {
+            return res.status(400).json({ message: "Not subscribed to this creator" })
+        }
+
+        user.actions.subscriptions.splice(subscriptionIndex, 1)
+        creator.subscribers--
+
+        await Promise.all([user.save(), creator.save()])
+
+        return res.json({
+            success: true,
+            isSubscribed: false,
+            message: `Unsubscribed from ${creator.name}`,
+        })
+    } catch (error) {
+        console.error("Error in unsubscribeCreator:", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
 module.exports = {
     onboardCreator,
-    authCreatorInfo,
+    joinOrganization,
     getCreatorArticles,
     getCreatorProfile,
+    getContributorWithArticles,
     getForFollowerArticles,
     getForSubscriberArticles,
     toggleFollow,
+    subscribeCreator,
+    subscribeCreator,
+    unsubscribeCreator,
 }
