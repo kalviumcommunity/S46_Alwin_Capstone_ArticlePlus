@@ -6,7 +6,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 import { creatorInfo, isUserCreator } from "@/signals/creator"
 import { userDetails, userExists } from "@/signals/user"
-import { getCookie, setCookie } from "@/helpers/cookies"
+import { getCookie } from "@/helpers/cookies"
 import axiosInstance from "@/axios"
 
 function useLogic() {
@@ -16,6 +16,9 @@ function useLogic() {
 
     const [user, setUser] = useState()
     const [isSubNavActive, setIsSubNavActive] = useState(true)
+    const [creator, setCreator] = useState()
+
+    useSignalEffect(() => setCreator(creatorInfo.value))
 
     const navLinks = [
         { path: "/dashboard", label: "Dashboard" },
@@ -58,11 +61,11 @@ function useLogic() {
             .catch((err) => console.error(err))
     }
 
-    return { user, isSubNavActive, navLinks, currentPath, handleLogout }
+    return { user, creator, isSubNavActive, navLinks, currentPath, handleLogout }
 }
 
 function DashboardNavbar() {
-    const { user, isSubNavActive, navLinks, currentPath, handleLogout } = useLogic()
+    const { user, creator, isSubNavActive, navLinks, currentPath, handleLogout } = useLogic()
 
     return (
         <nav className="sticky top-0 z-40 flex flex-col bg-white">
@@ -135,22 +138,34 @@ function DashboardNavbar() {
                 )}
             </div>
             {isSubNavActive && (
-                <div className="flex items-center gap-2 overflow-x-scroll border-b px-4 text-sm text-gray-600 sm:overflow-auto sm:px-6">
-                    {navLinks.map((link, index) => (
-                        <Link
-                            key={index}
-                            to={link.path}
-                            className={`${
-                                currentPath === link.path
-                                    ? "group border-b-2 border-gray-800 font-medium text-gray-900 hover:border-gray-800"
-                                    : "group border-white font-medium text-gray-500 hover:text-gray-900"
-                            } border-b-2 py-1`}>
-                            <div className="rounded px-3 py-1.5 group-hover:bg-gray-100">
-                                {link.label}
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+                <>
+                    <div className="flex items-center gap-2 overflow-x-scroll border-b px-4 text-sm text-gray-600 sm:overflow-auto sm:px-6">
+                        {navLinks.map((link, index) => (
+                            <Link
+                                key={index}
+                                to={link.path}
+                                className={`${
+                                    currentPath === link.path
+                                        ? "group border-b-2 border-gray-800 font-medium text-gray-900 hover:border-gray-800"
+                                        : "group border-white font-medium text-gray-500 hover:text-gray-900"
+                                } border-b-2 py-1`}>
+                                <div className="rounded px-3 py-1.5 group-hover:bg-gray-100">
+                                    {link.label}
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                    {creator?.type === "organization" && creator?.user?.role !== "owner" && (
+                        <div className="flex justify-center gap-1 border-b border-yellow-200 bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-700 sm:overflow-auto sm:px-6">
+                            Your account is managed by
+                            <Link
+                                to="/dashboard/organization-settings"
+                                className="text-yellow-700 underline">
+                                your organization
+                            </Link>
+                        </div>
+                    )}
+                </>
             )}
         </nav>
     )

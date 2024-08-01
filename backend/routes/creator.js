@@ -22,6 +22,8 @@ const {
     generateAndReturnInviteCode,
     approveJoinRequest,
     denyJoinRequest,
+    getOrganizationAuthors,
+    updateAuthorAccess,
 } = require("../controllers/creatorDashboardController")
 
 const { isLoggedIn } = require("../middlewares/isLoggedIn")
@@ -39,6 +41,8 @@ router.get("/dashboard/invite-code", asyncHandler(getCreatorInviteCode))
 router.post("/dashboard/invite-code/generate", asyncHandler(generateAndReturnInviteCode))
 router.post("/dashboard/invite/approve", asyncHandler(approveJoinRequest))
 router.post("/dashboard/invite/deny", asyncHandler(denyJoinRequest))
+router.get("/dashboard/authors", asyncHandler(getOrganizationAuthors))
+router.post("/dashboard/author/:id/access", asyncHandler(updateAuthorAccess))
 
 router.post("/articles", asyncHandler(getCreatorArticles))
 

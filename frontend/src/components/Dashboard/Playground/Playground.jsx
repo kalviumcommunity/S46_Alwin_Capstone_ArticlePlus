@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useRef, useState } from "react"
 import { useSignals } from "@preact/signals-react/runtime"
 import clsx from "clsx"
-import { toast, Toaster } from "sonner"
+import { toast } from "sonner"
 import { z } from "zod"
 
 import useKeyPress from "@/helpers/hooks/useKeyPress"
@@ -420,7 +420,6 @@ function Playground({ articleId }) {
                                 </div>
                             </div>
                         </div>
-                        <Toaster richColors position="top-center" />
                     </SelectedElementRefContext.Provider>
                 </SelectedElementContext.Provider>
             </PlaygroundArticleContext.Provider>

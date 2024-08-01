@@ -63,12 +63,14 @@ function Navbar() {
                                     <img
                                         className="h-8 w-8 rounded-full"
                                         src={`${user.picture}`}
+                                        loading="lazy"
                                         alt=""
                                     />
                                 ) : (
                                     <img
                                         className="h-8 w-8 rounded-full"
                                         src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
+                                        loading="lazy"
                                         alt=""
                                     />
                                 )}

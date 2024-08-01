@@ -82,6 +82,7 @@ const createNewArticle = async (req, res) => {
             author = {
                 name: contributor.name,
                 id: contributor.id,
+                status: "active",
                 type: creator.type,
                 organization: {
                     name: creator.name,
@@ -212,6 +213,19 @@ const getArticleSettings = async (req, res) => {
         articleSettings.subtitle = article.subtitle
         articleSettings.datePublished = article.datePublished
         articleSettings.image = article.image.url
+
+        articleSettings.author = {
+            id: article.author.id,
+            type: article.author.type,
+            name: article.author.name,
+        }
+
+        if (article.author.type === "organization") {
+            articleSettings.author.organization = {
+                name: article.author.organization.name,
+                id: article.author.organization.id,
+            }
+        }
 
         if (article.flags) {
             articleSettings.access = article.flags.access

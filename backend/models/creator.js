@@ -34,6 +34,7 @@ const CreatorSchema = new mongoose.Schema({
                 role: { type: String, required: true, enum: ["owner", "author", "editor"] },
                 userRef: { type: String, required: true },
                 displayPicture: { type: String },
+                status: { type: String, enum: ["active", "paused"] },
             },
         ],
     },

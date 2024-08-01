@@ -53,11 +53,9 @@ function ArticlesTable({ articles, loading, isDashboard = false }) {
                         <span className="line-clamp-2">{article?.title}</span>
                     </div>
 
-                    <Link
-                        className="line-clamp-1 w-32 flex-shrink-0 px-4 leading-4 hover:underline"
-                        to={`/dashboard/settings`}>
+                    <span className="line-clamp-1 w-32 flex-shrink-0 px-4 leading-4">
                         @{article?.author?.id}
-                    </Link>
+                    </span>
 
                     <div className="w-32 flex-shrink-0 px-4 py-2">
                         {article?.flags?.status === "draft" && (

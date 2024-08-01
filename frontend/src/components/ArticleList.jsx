@@ -15,8 +15,8 @@ const ArticleList = ({ article }) => {
                     className={`${article.image.bg ? "object-cover" : "object-contain"} w-full rounded-sm lg:h-44`}
                     style={{ backdropFilter: "blur(50px)" }}
                     src={article.image.url}
-                    loading="lazy"
                     alt={article.image.caption}
+                    loading="lazy"
                 />
             </div>
             <div className="flex w-full flex-col justify-center gap-1">

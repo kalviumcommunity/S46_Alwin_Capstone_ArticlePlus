@@ -6,6 +6,7 @@ import { creatorInfo, isUserCreator } from "@/signals/creator"
 
 import Account from "@/pages/Account"
 import Article from "@/pages/Article"
+import AuthorFromCreator from "@/pages/AuthorFromCreator"
 import Creator from "@/pages/Creator"
 import ArticleOverview from "@/pages/Dashboard/ArticleOverview"
 import Editor from "@/pages/Dashboard/Editor"
@@ -51,7 +52,7 @@ function UserRoutes() {
                 <Route path="account/subscriptions" element={<Account />} />
                 <Route path="article/:slug" element={<Article />} />
                 <Route path="creator/:id" element={<Creator />} />
-                <Route path="creator/:id/:contributor" element={<Creator />} />
+                <Route path="creator/:id/:author" element={<AuthorFromCreator />} />
                 {isUserCreator.value === false && (
                     <>
                         <Route path="/onboarding" element={<OnboardingCreator />} />

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import * as Dialog from "@radix-ui/react-dialog"
-import { toast, Toaster } from "sonner"
+import { toast } from "sonner"
 
 import { randomGradient } from "@/helpers/ui/randomGradient"
 import axiosInstance from "@/axios"
@@ -12,7 +12,7 @@ import SubscribePortal from "@/components/SubscribePortal"
 import Loader from "@/ui/Loader"
 
 function Creator() {
-    const { id, contributor } = useParams()
+    const { id } = useParams()
 
     const [creator, setCreator] = useState(null)
     const [isFollowing, setIsFollowing] = useState(false)
@@ -21,10 +21,8 @@ function Creator() {
 
     const fetchCreatorProfile = useCallback(async () => {
         try {
-            const endpoint = contributor
-                ? `/creator/profile/${id}/${contributor}`
-                : `/creator/profile/${id}`
-            const { data } = await axiosInstance.get(endpoint)
+            const { data } = await axiosInstance.get(`/creator/profile/${id}`)
+            console.log(data)
             setCreator(data.creator)
             setIsFollowing(data.isFollowing)
             setIsSubscribed(data.isSubscribed)
@@ -34,7 +32,7 @@ function Creator() {
         } finally {
             setLoading(false)
         }
-    }, [id, contributor])
+    }, [id])
 
     useEffect(() => {
         fetchCreatorProfile()
@@ -55,10 +53,11 @@ function Creator() {
                                     className="h-20 w-fit rounded-full shadow"
                                     src={creator.displayPicture}
                                     alt={`${creator.name}'s profile`}
+                                    loading="lazy"
                                 />
                             </div>
-                            <div className="flex flex-col gap-6 px-4 pb-8 sm:flex-row sm:px-8 lg:gap-8 lg:px-16">
-                                <div className="flex w-max flex-col gap-1">
+                            <div className="flex flex-col gap-6 px-4 pb-8 sm:flex-row sm:px-8 lg:gap-10 lg:px-16">
+                                <div className="flex w-max flex-col gap-0.5">
                                     <div className="flex items-center gap-2">
                                         <h1 className="w-max text-2xl font-bold">
                                             {creator.name}
@@ -68,6 +67,7 @@ function Creator() {
                                                 className="h-5 w-5"
                                                 src="/assets/icons/verified.svg"
                                                 alt="Verified"
+                                                loading="lazy"
                                             />
                                         )}
                                     </div>
@@ -130,7 +130,6 @@ function Creator() {
                 </div>
             </div>
             {creator && <CreatorContent creator={creator} isSubscribed={isSubscribed} />}
-            <Toaster richColors position="top-center" closeButton />
         </div>
     )
 }

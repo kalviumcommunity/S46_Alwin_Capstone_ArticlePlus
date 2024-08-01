@@ -64,11 +64,13 @@ function OrganizationSettings() {
                         value="authors">
                         Authors
                     </Tabs.Trigger>
-                    <Tabs.Trigger
-                        className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
-                        value="billing">
-                        Billing
-                    </Tabs.Trigger>
+                    {creatorDetails?.user?.role === "owner" && (
+                        <Tabs.Trigger
+                            className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
+                            value="billing">
+                            Billing
+                        </Tabs.Trigger>
+                    )}
                     <Tabs.Trigger
                         className="border border-white px-3 py-3 text-start text-sm hover:bg-gray-50 sm:w-full sm:rounded sm:px-4 sm:py-2 sm:text-base sm:text-gray-500 [&[data-state='active']]:font-medium [&[data-state='active']]:text-black sm:[&[data-state='active']]:border sm:[&[data-state='active']]:border-gray-200"
                         value="team">
@@ -113,14 +115,18 @@ function OrganizationSettings() {
                                 <span className="lg:w-2/3">{creatorDetails.description}</span>
                             </div>
                         )}
-                        <JoinRequests creatorDetails={creatorDetails} />
+                        {creatorDetails?.user?.role === "owner" && (
+                            <JoinRequests creatorDetails={creatorDetails} />
+                        )}
                     </Tabs.Content>
                     <Tabs.Content value="authors">
                         <Authors />
                     </Tabs.Content>
-                    <Tabs.Content value="billing">
-                        <Billing />
-                    </Tabs.Content>
+                    {creatorDetails?.user?.role === "owner" && (
+                        <Tabs.Content value="billing">
+                            <Billing />
+                        </Tabs.Content>
+                    )}
                     <Tabs.Content value="team">
                         <Team />
                     </Tabs.Content>

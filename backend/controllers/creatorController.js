@@ -295,7 +295,9 @@ const getCreatorProfile = async (req, res) => {
     const isLoggedIn = req.isUserLoggedIn
 
     try {
-        const creator = await Creator.findOne({ id: id }).select("-contributors")
+        const creator = await Creator.findOne({ id: id }).select(
+            "-contributors -joinRequests -owner -v -_id",
+        )
 
         if (!creator) {
             return res.status(404).json({ message: "Creator not found" })
@@ -348,7 +350,7 @@ const getContributorWithArticles = async (req, res) => {
         const currentPage = Math.max(parseInt(page, 10), 1)
         const currentPageSize = Math.max(parseInt(pageSize, 10), 1)
 
-        const creator = await Creator.findOne({ id }).select("contributors")
+        const creator = await Creator.findOne({ id })
 
         if (!creator) {
             return res.status(404).json({ message: "Creator not found" })
@@ -399,11 +401,39 @@ const getContributorWithArticles = async (req, res) => {
             Article.countDocuments(queryConditions),
         ])
 
+        const creatorProfile = {
+            type: "contributor",
+            displayPicture: contributor.displayPicture,
+            name: contributor.name,
+            description: contributor.description,
+            articles: {
+                free: 0,
+                subscription: 0,
+                total: totalArticles,
+            },
+        }
+
+        const organization = {
+            id: creator.id,
+            type: "organization",
+            displayPicture: creator.displayPicture.small
+                ? creator.displayPicture.small
+                : creator.displayPicture.large,
+            name: creator.name,
+            description: creator.description,
+            articles: {
+                free: creator.articles.free,
+                subscription: creator.articles.subscription,
+                total: creator.articles.total,
+            },
+        }
+
         // Determine if there are more articles to fetch
         const moreArticlesExist = currentPage * currentPageSize < totalArticles
 
         res.json({
-            contributor: contributor,
+            creator: creatorProfile,
+            organization: organization,
             articles: creatorArticles,
             page: currentPage,
             moreArticlesExist,
