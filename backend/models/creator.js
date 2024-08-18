@@ -30,11 +30,17 @@ const CreatorSchema = new mongoose.Schema({
         type: [
             {
                 name: { type: String, required: true },
-                id: { type: String, required: true },
+                id: {
+                    type: String,
+                    required: function () {
+                        return this.role === "active"
+                    },
+                },
                 role: { type: String, required: true, enum: ["owner", "author", "editor"] },
                 userRef: { type: String, required: true },
                 displayPicture: { type: String },
-                status: { type: String, enum: ["active", "paused"] },
+                description: { type: String },
+                status: { type: String, enum: ["active", "paused", "approved"] },
             },
         ],
     },

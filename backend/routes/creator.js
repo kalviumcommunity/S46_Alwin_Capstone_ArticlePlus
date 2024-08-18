@@ -18,6 +18,9 @@ const {
 } = require("../controllers/creatorController")
 const {
     authCreatorInfo,
+    updateContributorDescription,
+    updateContributorID,
+    activateContributor,
     getCreatorInviteCode,
     generateAndReturnInviteCode,
     approveJoinRequest,
@@ -43,6 +46,10 @@ router.post("/dashboard/invite/approve", asyncHandler(approveJoinRequest))
 router.post("/dashboard/invite/deny", asyncHandler(denyJoinRequest))
 router.get("/dashboard/authors", asyncHandler(getOrganizationAuthors))
 router.post("/dashboard/author/:id/access", asyncHandler(updateAuthorAccess))
+
+router.post("/dashboard/contributor/description", asyncHandler(updateContributorDescription))
+router.post("/dashboard/contributor/id", asyncHandler(updateContributorID))
+router.post("/dashboard/contributor/activate", asyncHandler(activateContributor))
 
 router.post("/articles", asyncHandler(getCreatorArticles))
 

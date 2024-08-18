@@ -55,6 +55,161 @@ const authCreatorInfo = async (req, res) => {
     return res.json(creatorDetails)
 }
 
+const updateContributorDescription = async (req, res) => {
+    const userId = req.userId
+    const { description } = req.body
+
+    try {
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        const creator = await Creator.findById(user.creatorId)
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const contributor = creator.contributors.find(
+            (contributor) => contributor.userRef === user._id.toString(),
+        )
+
+        if (!contributor) {
+            return res.status(404).json({ message: "Contributor not found" })
+        }
+
+        if (creator.type === "individual") {
+            return res
+                .status(400)
+                .json({ message: "Adding people is not allowed for individual creators" })
+        }
+
+        contributor.description = description
+
+        await creator.save()
+
+        return res.json({ message: "Description updated successfully" })
+    } catch (error) {
+        console.error("Error updating description:", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+const updateContributorID = async (req, res) => {
+    const userId = req.userId
+    const { id: newId } = req.body
+
+    try {
+        // validate id, it should be all small letters and only - numbers
+        const idRegex = /^[a-z0-9-]+$/
+        if (!idRegex.test(newId)) {
+            return res.status(400).json({
+                message:
+                    "ID not allowed. Only small letters, numbers and hypens(-) are allowed",
+            })
+        }
+
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        const creator = await Creator.findById(user.creatorId)
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const contributor = creator.contributors.find(
+            (contributor) => contributor.userRef === user._id.toString(),
+        )
+
+        if (!contributor) {
+            return res.status(404).json({ message: "Contributor not found" })
+        }
+
+        if (creator.type === "individual") {
+            return res
+                .status(400)
+                .json({ message: "Adding people is not allowed for individual creators" })
+        }
+
+        if (contributor.userRef === userId) {
+            if (newId) {
+                contributor.id = newId
+                await creator.save()
+                return res.json({ message: "ID updated successfully" })
+            } else {
+                return res.status(400).json({ message: "ID cannot be empty" })
+            }
+        }
+
+        // Check if anyone else is using the same ID
+        const otherContributor = creator.contributors.find(
+            (contributor) => contributor.id === newId && contributor.userRef !== userId,
+        )
+
+        if (otherContributor) {
+            return res.status(400).json({ message: "ID is already in use" })
+        }
+
+        contributor.id = newId
+
+        await creator.save()
+
+        return res.json({ message: "ID updated successfully" })
+    } catch (error) {
+        console.error("Error updating ID:", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+const activateContributor = async (req, res) => {
+    const userId = req.userId
+
+    try {
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        const creator = await Creator.findById(user.creatorId)
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        const contributor = creator.contributors.find(
+            (contributor) => contributor.userRef === userId,
+        )
+
+        if (!contributor) {
+            return res.status(404).json({ message: "Contributor not found" })
+        }
+
+        if (!contributor.id || !contributor.description) {
+            return res.status(400).json({ message: "Contributor is not complete" })
+        }
+
+        if (creator.type === "individual") {
+            return res
+                .status(400)
+                .json({ message: "Adding people is not allowed for individual creators" })
+        }
+
+        if (contributor.status === "active") {
+            return res.status(400).json({ message: "Contributor is already active" })
+        }
+
+        contributor.status = "active"
+
+        await creator.save()
+
+        return res.json({ message: "Contributor activated successfully" })
+    } catch (error) {
+        console.error("Error activating contributor:", error)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
 const getCreatorInviteCode = async (req, res) => {
     const userId = req.userId
 
@@ -156,11 +311,10 @@ const approveJoinRequest = async (req, res) => {
         // Move the join request to contributors
         creator.contributors.push({
             name: joinRequest.name,
-            id: joinRequest.id,
             role: joinRequest.role,
             userRef: joinRequest.userRef,
             displayPicture: joinRequest.displayPicture,
-            status: "active",
+            status: "approved",
         })
 
         // Remove the join request
@@ -297,6 +451,9 @@ const updateAuthorAccess = async (req, res) => {
 
 module.exports = {
     authCreatorInfo,
+    updateContributorDescription,
+    updateContributorID,
+    activateContributor,
     getCreatorInviteCode,
     generateAndReturnInviteCode,
     approveJoinRequest,

@@ -356,9 +356,13 @@ const getContributorWithArticles = async (req, res) => {
             return res.status(404).json({ message: "Creator not found" })
         }
 
+        console.log(creator.contributors)
+
         const contributor = creator.contributors.find(
-            (contributor) => contributor.id === contributorId,
+            (contributor) => contributor.userRef === contributorId,
         )
+
+        console.log(contributor)
 
         if (!contributor) {
             return res.status(404).json({ message: "Contributor not found" })
@@ -382,12 +386,12 @@ const getContributorWithArticles = async (req, res) => {
         const queryConditions = {
             "flags.creator": creator._id,
             "flags.status": "published",
-            "flags.access": "all",
+            "flags.author.userRef": contributor.userRef,
         }
 
-        // If subscribed, include articles by the contributor as well
-        if (isSubscribed) {
-            queryConditions["flags.author.userRef"] = contributor.userRef
+        // If not subscribed, only include free articles
+        if (!isSubscribed) {
+            queryConditions["flags.access"] = "all"
         }
 
         // Query for the articles by the creator or contributor, with pagination
@@ -400,6 +404,8 @@ const getContributorWithArticles = async (req, res) => {
                 .lean(),
             Article.countDocuments(queryConditions),
         ])
+
+        console.log(creatorArticles)
 
         const creatorProfile = {
             type: "contributor",

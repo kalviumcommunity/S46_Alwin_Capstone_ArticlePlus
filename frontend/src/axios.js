@@ -15,7 +15,7 @@ const forceLogoutUser = () => {
     const refreshTokenId = getCookie("refreshTokenId")
     instance
         .post("session/remove", { refreshTokenId, isCurrentSession: true })
-        .then((res) => {
+        .then(() => {
             if (!alertShown) {
                 alert("Your session has expired. Please login again.")
                 alertShown = true
@@ -43,9 +43,13 @@ instance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config
-        // Check if the error status is 401 and the request is retryable
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true // Mark the request as retried
+        if (
+            error.response &&
+            error.response.status === 401 &&
+            !originalRequest._retry &&
+            getCookie("refreshTokenId")
+        ) {
+            originalRequest._retry = true
             try {
                 const response = await instance.post("/auth/refresh", null, {
                     withCredentials: true,
@@ -59,6 +63,8 @@ instance.interceptors.response.use(
                 forceLogoutUser() // Log out the user if token refresh fails
                 return Promise.reject(refreshError)
             }
+        } else if (error.response && error.response.status === 401) {
+            forceLogoutUser() // Immediately log out if token refresh isn't possible or fails
         }
         return Promise.reject(error)
     },
