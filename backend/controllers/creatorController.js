@@ -155,7 +155,8 @@ const onboardCreator = async (req, res) => {
                 generateResizedImages(displayPictureFile, id, creatorDetails)
 
                 return res.json({ onboarding: "success" })
-            } catch (e) {
+            } catch (err) {
+                console.log(err)
                 return res
                     .status(500)
                     .json({ status: "failed", message: "Error saving creator details" })
@@ -163,7 +164,7 @@ const onboardCreator = async (req, res) => {
         })
 
         blobStream.end(webpDisplayPictureFile)
-    } catch (e) {
+    } catch (err) {
         return res
             .status(500)
             .json({ status: "failed", message: "Error processing display picture" })

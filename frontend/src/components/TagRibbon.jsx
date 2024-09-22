@@ -54,6 +54,7 @@ function TagRibbon({ isLoggedIn }) {
                             {
                                 "border-rose-200 bg-rose-50 text-rose-500":
                                     location.pathname === "/",
+                                "bg-white": location.pathname !== "/",
                             },
                         )}>
                         <svg
@@ -83,6 +84,7 @@ function TagRibbon({ isLoggedIn }) {
                             "flex items-center gap-1.5 rounded-full border px-4 hover:cursor-pointer hover:bg-gray-50",
                             {
                                 "border-rose-200 bg-rose-50 text-rose-500": isForYouPage,
+                                "bg-white": !isForYouPage,
                             },
                         )}>
                         <svg

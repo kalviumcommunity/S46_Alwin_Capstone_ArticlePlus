@@ -21,8 +21,8 @@ const CreatorSchema = new mongoose.Schema({
     type: { type: String, required: true, enum: ["individual", "organization"] },
     invite: {
         type: {
-            code: { type: String, required: true, unique: true },
-            token: { type: String, required: true },
+            code: { type: String },
+            token: { type: String },
         },
     },
     subscription: { type: Boolean, required: true },
@@ -81,6 +81,8 @@ const CreatorSchema = new mongoose.Schema({
         },
     },
 })
+
+CreatorSchema.index({ "invite.code": 1 }, { unique: true })
 
 const Creator = mongoose.model("creators", CreatorSchema)
 
