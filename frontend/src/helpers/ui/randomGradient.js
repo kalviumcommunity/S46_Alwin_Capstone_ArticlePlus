@@ -1,4 +1,4 @@
-const randomGradient = (setGradient) => {
+const randomGradient = () => {
     const colors = [
         "#FFEFD5",
         "#E9F5DB",
@@ -18,7 +18,8 @@ const randomGradient = (setGradient) => {
     } while (randomColor1 === randomColor2)
 
     const randomGradient = `linear-gradient(to right, ${randomColor1}, ${randomColor2})`
-    setGradient(randomGradient)
+
+    return randomGradient
 }
 
 export { randomGradient }

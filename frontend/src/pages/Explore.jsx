@@ -129,10 +129,10 @@ function Explore({ isLoggedIn }) {
             )}
 
             {!isLoading && articles.length === 0 && (
-                <div className="flex flex-col items-center justify-center gap-5 px-4 py-24 sm:gap-8 sm:px-0">
+                <div className="flex flex-col items-center justify-center gap-4 px-4 py-28 sm:gap-6 sm:px-0">
                     <div className="relative flex justify-center">
                         <img
-                            className="h-56 rounded-full"
+                            className="h-52 rounded-full"
                             src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3pqOGVrMGUyNnNiY3JqZzlqYzJwNGE2OW5kdzM2c2N6NGZ0YzNtOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VFqT7OwzErUIxC7Nt7/giphy.webp"
                             alt="Giphy"
                         />
@@ -149,10 +149,10 @@ function Explore({ isLoggedIn }) {
                         </p>
                     </div>
                     <div className="flex flex-col items-center sm:items-center">
-                        <span className="bg-gradient-to-br from-rose-400 to-rose-600 bg-clip-text text-4xl font-extrabold uppercase leading-none text-transparent">
+                        <span className="bg-gradient-to-br from-rose-400 to-rose-600 bg-clip-text text-3xl font-extrabold uppercase leading-none text-transparent">
                             No articles found
                         </span>
-                        <span className="mt-1.5 text-lg font-medium leading-none">
+                        <span className="mt-1.5 text-base font-medium leading-none">
                             Remove the filter or try another category
                         </span>
                     </div>

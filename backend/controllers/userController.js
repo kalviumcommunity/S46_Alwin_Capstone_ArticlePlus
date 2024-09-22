@@ -151,9 +151,42 @@ const subscribeCreator = async (req, res) => {
     res.status(200).json({ success: true, message: "Subscribed successfully" })
 }
 
+const getSubscriptions = async (req, res) => {
+    const userId = req.userId
+
+    try {
+        const user = await User.findById(userId).select("actions.subscriptions")
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" })
+        }
+
+        const creatorIds = user.actions.subscriptions.map((sub) => sub.creatorId)
+
+        const creators = await Creator.find(
+            { id: { $in: creatorIds } },
+            { id: 1, displayPicture: 1 },
+        )
+
+        const creatorMap = new Map(
+            creators.map((creator) => [creator.id, creator.displayPicture]),
+        )
+
+        const subscriptionsWithDP = user.actions.subscriptions.map((sub) => ({
+            ...sub.toObject(),
+            displayPicture: creatorMap.get(sub.creatorId) || null,
+        }))
+
+        res.json({ success: true, subscriptions: subscriptionsWithDP })
+    } catch (error) {
+        console.error("Error in getSubscriptions:", error)
+        res.status(500).json({ success: false, message: "Internal server error" })
+    }
+}
+
 module.exports = {
     sendVerificationEmail,
     confirmOtpForVerification,
     followCreator,
     subscribeCreator,
+    getSubscriptions,
 }

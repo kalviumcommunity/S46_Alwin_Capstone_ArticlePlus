@@ -27,12 +27,13 @@ function Signup() {
         setActionStatus("")
 
         axiosInstance
-            .get("auth/signup", payload)
+            .post("auth/signup", payload)
             .then((res) => {
                 userExists.value = true
             })
             .catch((error) => {
                 setActionStatus(error.response.data)
+                console.error(error)
             })
             .finally(() => {
                 setIsLoading(false)
@@ -59,7 +60,7 @@ function Signup() {
     }
 
     return (
-        <div className="sm:py-26 mx-4 flex flex-col items-center gap-4  border-b pb-16 pt-10 sm:mx-16 sm:gap-6">
+        <div className="sm:py-26 mx-4 flex flex-col items-center gap-4 pb-16 pt-10 sm:mx-16 sm:gap-6">
             <div className="flex flex-col gap-3 sm:w-96">
                 <h1 className="mb-2 mr-auto text-4xl font-semibold">Signup</h1>
                 {isLoading ? (

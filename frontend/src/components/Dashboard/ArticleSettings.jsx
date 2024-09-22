@@ -124,7 +124,7 @@ function ArticleSettings({ articleId }) {
                         {article?.subtitle}
                     </span>
                     <p className="mt-2 text-xs font-normal text-gray-500">
-                        {article?.datestamp}
+                        {article?.datePublished}
                     </p>
                     <div className="mt-3 flex flex-col gap-1">
                         <span className="font-medium">Article status:</span>

@@ -45,7 +45,7 @@ router.get("/:slug", isLoggedIn, async (req, res) => {
         const articlePreview = {
             title: article.title,
             subtitle: article.subtitle,
-            datestamp: article.datestamp,
+            datePublished: article.datePublished,
             author: article.author,
             image: article.image.url,
             accessType,

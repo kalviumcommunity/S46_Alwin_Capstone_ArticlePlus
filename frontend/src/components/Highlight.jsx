@@ -4,14 +4,11 @@ import { Link } from "react-router-dom"
 import { randomGradient } from "@/helpers/ui/randomGradient"
 
 function Highlight({ article }) {
-    const [gradient, setGradient] = useState("")
-
-    useEffect(() => {
-        randomGradient(setGradient)
-    }, [])
-
     return (
-        <Link to={`/article/${article.slug}`} className="flex" style={{ background: gradient }}>
+        <Link
+            to={`/article/${article.slug}`}
+            className="flex"
+            style={{ background: randomGradient() }}>
             <div className="group flex flex-col justify-between gap-8 border-b border-gray-50 bg-gradient-to-t from-white to-transparent px-4 pb-10 pt-16 hover:cursor-pointer sm:flex-row sm:gap-4">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-4">
@@ -33,14 +30,14 @@ function Highlight({ article }) {
                     ) : (
                         <div className="flex items-center gap-1.5 ">
                             <Link
-                                to={`/organization/${article.author.organization.id}`}
+                                to={`/creator/${article.author.organization.id}`}
                                 className="text-sm font-semibold leading-4 hover:underline">
                                 {article.author.organization.name}
                             </Link>
                             <span>•</span>
                             <Link
                                 className="text-sm font-semibold leading-4 hover:underline"
-                                to={`/organization/${article.author.organization.id}/${article.author.id}`}>
+                                to={`/creator/${article.author.organization.id}/${article.author.id}`}>
                                 <span>{article.author.name}</span>
                             </Link>
                         </div>

@@ -1,8 +1,8 @@
 const express = require("express")
 const Joi = require("joi")
 
-const User = require("../models/user") // Adjust the path as needed
-const Article = require("../models/article") // Adjust the path as needed
+const User = require("../models/user")
+const Article = require("../models/article")
 
 const { isLoggedIn } = require("../middlewares/isLoggedIn")
 
@@ -82,7 +82,7 @@ const exploreArticles = async (req, res) => {
         const totalArticles = await Article.countDocuments(articlesQuery)
 
         const recentArticles = await Article.find(articlesQuery)
-            .sort({ datestamp: -1 }) // Sort by most recent
+            .sort({ publishedAt: -1 })
             .skip((page - 1) * pageSize)
             .limit(pageSize)
             .lean()
@@ -158,7 +158,7 @@ const suggestSimilarArticles = async (req, res) => {
             category: currentArticleCategory,
             slug: { $ne: currentArticleSlug },
         })
-            .sort({ datestamp: -1 })
+            .sort({ publishedAt: -1 })
             .limit(2)
             .lean()
             .select("-content -flow -display -category -__v -flags")
@@ -200,7 +200,119 @@ const suggestSimilarArticles = async (req, res) => {
     }
 }
 
+const getFollowingArticles = async (req, res) => {
+    const isUserLoggedIn = req.isUserLoggedIn
+    const page = parseInt(req.query.page, 10) || 1 // Default to page 1
+    const pageSize = 8
+
+    try {
+        if (isUserLoggedIn) {
+            const userId = req.userId
+            const user = await User.findById(userId).lean()
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found" })
+            }
+
+            // Extract the list of following creators
+            const followingCreatorRefIds = user.actions.following.map(
+                (following) => following.creatorRefId,
+            )
+
+            // Query for following creators' articles
+            const followingArticlesQuery = {
+                "flags.status": "published",
+                "flags.creator": { $in: followingCreatorRefIds },
+                "flags.access": "all",
+            }
+
+            const totalFollowingArticles = await Article.countDocuments(followingArticlesQuery)
+
+            const followingArticles = await Article.find(followingArticlesQuery)
+                .sort({ publishedAt: -1 })
+                .skip((page - 1) * pageSize)
+                .limit(pageSize)
+                .select("-__v -_id -flags -content")
+                .lean()
+
+            const moreFollowingArticlesExist = page * pageSize < totalFollowingArticles
+
+            res.json({
+                articles: followingArticles,
+                page,
+                moreArticlesExist: moreFollowingArticlesExist,
+            })
+        } else {
+            // If user is not logged in, show only public articles
+            res.status(401).json({
+                message: "User must be logged in to view following articles",
+            })
+        }
+    } catch (error) {
+        console.error("Error serving following articles:", error)
+        res.status(500).json({ message: "Error serving following articles" })
+    }
+}
+
+const getSubscribedArticles = async (req, res) => {
+    const isUserLoggedIn = req.isUserLoggedIn
+    const page = parseInt(req.query.page, 10) || 1 // Default to page 1
+    const pageSize = 8
+
+    try {
+        if (isUserLoggedIn) {
+            const userId = req.userId
+            const user = await User.findById(userId).lean()
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found" })
+            }
+
+            // Extract the list of subscribed creators
+            const subscribedCreatorRefIds = user.actions.subscriptions.map(
+                (subscription) => subscription.creatorRefId,
+            )
+
+            // Query for subscribed creators' articles
+            const subscribedArticlesQuery = {
+                "flags.status": "published",
+                "flags.creator": { $in: subscribedCreatorRefIds },
+                "flags.access": "subscribers",
+            }
+
+            const totalSubscribedArticles =
+                await Article.countDocuments(subscribedArticlesQuery)
+
+            const subscribedArticles = await Article.find(subscribedArticlesQuery)
+                .sort({ publishedAt: -1 })
+                .skip((page - 1) * pageSize)
+                .limit(pageSize)
+                .lean()
+                .select("-__v -_id -flags -content")
+
+            const moreSubscribedArticlesExist = page * pageSize < totalSubscribedArticles
+
+            res.json({
+                articles: subscribedArticles,
+                page,
+                moreArticlesExist: moreSubscribedArticlesExist,
+            })
+        } else {
+            // If user is not logged in, show only public articles
+            res.status(401).json({
+                message: "User must be logged in to view subscribed articles",
+            })
+        }
+    } catch (error) {
+        console.error("Error serving subscribed articles:", error)
+        res.status(500).json({ message: "Error serving subscribed articles" })
+    }
+}
+
 router.get("/explore", isLoggedIn, exploreArticles)
 router.get("/suggested/similar", isLoggedIn, suggestSimilarArticles)
+
+router.get("/following", isLoggedIn, getFollowingArticles)
+router.get("/subscriptions", isLoggedIn, getSubscribedArticles)
 
 module.exports = router

@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     actions: {
         following: [
             {
-                creatorRef: { type: String, required: true },
+                creatorRefId: { type: String, required: true },
                 creatorId: { type: String, required: true },
                 creatorName: { type: String, required: true },
                 createdAt: { type: Date, required: true, default: Date.now },
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
         ],
         subscriptions: [
             {
-                creatorRef: { type: String, required: true },
+                creatorRefId: { type: String, required: true },
                 creatorId: { type: String, required: true },
                 creatorName: { type: String, required: true },
                 createdAt: { type: Date, required: true, default: Date.now },

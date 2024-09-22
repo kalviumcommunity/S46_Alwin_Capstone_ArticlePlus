@@ -6,6 +6,7 @@ import { creatorInfo, isUserCreator } from "@/signals/creator"
 
 import Account from "@/pages/Account"
 import Article from "@/pages/Article"
+import AuthorFromCreator from "@/pages/AuthorFromCreator"
 import Creator from "@/pages/Creator"
 import ArticleOverview from "@/pages/Dashboard/ArticleOverview"
 import Editor from "@/pages/Dashboard/Editor"
@@ -14,8 +15,8 @@ import NewArticle from "@/pages/Dashboard/NewArticle"
 import OrganizationSettings from "@/pages/Dashboard/OrganizationSettings"
 import Explore from "@/pages/Explore"
 import ForYou from "@/pages/ForYou"
+import JoinOrganization from "@/pages/JoinOrganization"
 import OnboardingCreator from "@/pages/OnboardingCreator"
-import Organization from "@/pages/Organization"
 import Navbar from "@/components/Navbar"
 
 import SuspenseLoader from "@/ui/SuspenseLoader"
@@ -50,12 +51,15 @@ function UserRoutes() {
                 <Route path="account" element={<Account />} />
                 <Route path="account/subscriptions" element={<Account />} />
                 <Route path="article/:slug" element={<Article />} />
-                <Route path="creator/:creator" element={<Creator />} />
-                <Route path="organization/:id/:contributor" element={<Creator />} />
-                <Route path="organization/:id" element={<Organization />} />
+                <Route path="creator/:id" element={<Creator />} />
+                <Route path="creator/:id/:author" element={<AuthorFromCreator />} />
                 {isUserCreator.value === false && (
                     <>
                         <Route path="/onboarding" element={<OnboardingCreator />} />
+                        <Route
+                            path="/onboarding/join-organization"
+                            element={<JoinOrganization />}
+                        />
                         <Route path="/dashboard" element={<Navigate to="/onboarding" />} />
                     </>
                 )}

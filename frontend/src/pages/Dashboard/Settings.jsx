@@ -3,10 +3,12 @@ import { Link, useLocation } from "react-router-dom"
 import { useSignalEffect } from "@preact/signals-react"
 import * as Dialog from "@radix-ui/react-dialog"
 import * as Tabs from "@radix-ui/react-tabs"
+import clsx from "clsx"
 
 import { creatorInfo } from "@/signals/creator"
-import { userDetails } from "@/signals/user"
+import axiosInstance from "@/axios"
 
+import { fetchCreatorInfo } from "@/pages/Dashboard/Layout"
 import Billing from "@/components/Dashboard/Billing"
 import Team from "@/components/Dashboard/Team"
 
@@ -14,11 +16,12 @@ function DashboardSettings() {
     const location = useLocation()
 
     const [creatorDetails, setCreatorDetails] = useState(null)
+    const [user, setUser] = useState(null)
     const [activeTab, setActiveTab] = useState(window.innerWidth > 640 ? "general" : "")
 
     useSignalEffect(() => {
         setCreatorDetails(creatorInfo.value)
-        console.log(creatorInfo.value)
+        setUser(creatorInfo.value.user)
     })
 
     useEffect(() => {
@@ -30,6 +33,23 @@ function DashboardSettings() {
     useEffect(() => {
         console.log(creatorDetails)
     }, [creatorDetails])
+
+    const handleEditDescription = () => {
+        const description = prompt("Enter description")
+        if (description) {
+            axiosInstance
+                .post(`creator/dashboard/contributor/description`, {
+                    description,
+                })
+                .then((res) => {
+                    fetchCreatorInfo()
+                })
+                .catch((err) => {
+                    console.error(err)
+                    alert("Failed to update description. Please try again.")
+                })
+        }
+    }
 
     return (
         <div className="mb-8 flex flex-col sm:gap-6">
@@ -179,12 +199,11 @@ function DashboardSettings() {
                                             </Dialog.Portal>
                                         </Dialog.Root>
                                     </div>
-                                ) : creatorDetails.type === "organization" &&
-                                  creatorDetails.owner === userDetails.value.id ? (
+                                ) : creatorDetails.type === "organization" ? (
                                     <div className="flex flex-col overflow-hidden rounded border">
                                         <div className="flex flex-col items-center gap-4 border-b px-4 py-4 text-sm text-gray-800 sm:flex-row sm:gap-1.5 sm:px-8 sm:py-3">
                                             <span>
-                                                You are owner of the{" "}
+                                                You are {user.role} of the{" "}
                                                 <Link
                                                     to="/organization/new-yorker"
                                                     className="font-medium underline">
@@ -198,7 +217,76 @@ function DashboardSettings() {
                                                 Go to organization settings
                                             </Link>
                                         </div>
-                                        <div className="flex flex-col gap-5 px-6 py-6 sm:px-10"></div>
+                                        <div className="flex flex-col gap-5 px-6 py-6 sm:px-10">
+                                            <div className="flex items-center gap-3">
+                                                <img
+                                                    className="h-14 w-14 rounded-full object-cover"
+                                                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${creatorDetails.user.name}`}
+                                                    alt=""
+                                                />
+                                                <div className="flex flex-1 flex-col gap-1">
+                                                    <div className="flex items-center gap-3">
+                                                        <p className="text-xl font-semibold leading-7">
+                                                            {creatorDetails.user.name}
+                                                        </p>
+                                                        <span
+                                                            className={clsx(
+                                                                "flex w-fit items-center gap-1 rounded-full border px-3 text-sm font-medium capitalize",
+                                                                {
+                                                                    "border-yellow-300 bg-yellow-50":
+                                                                        user?.role === "owner",
+                                                                    "border-blue-200 bg-blue-50":
+                                                                        user?.role !== "owner",
+                                                                },
+                                                            )}>
+                                                            {user?.role === "owner" ? (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="2"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    className="h-4 w-4 fill-yellow-500 text-yellow-500">
+                                                                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+                                                                    <path d="M5 21h14" />
+                                                                </svg>
+                                                            ) : (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="2"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    className="h-4 w-4 fill-blue-500 text-blue-500">
+                                                                    <path d="M12 20h9" />
+                                                                    <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
+                                                                    <path d="m15 5 3 3" />
+                                                                </svg>
+                                                            )}
+                                                            {creatorDetails.user.role}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-sm leading-4 text-gray-700">
+                                                        @{creatorDetails.user.id}
+                                                    </span>
+                                                </div>
+
+                                                <button
+                                                    className="h-fit rounded-full border bg-rose-500 px-4 py-1 text-sm font-medium text-white hover:bg-rose-600"
+                                                    onClick={() => handleEditDescription()}>
+                                                    Edit profile description
+                                                </button>
+                                            </div>
+                                            <span className="flex justify-between gap-1">
+                                                <span className="lg:w-2/3">
+                                                    {user?.description}
+                                                </span>
+                                            </span>
+                                        </div>
                                     </div>
                                 ) : null}
                             </>

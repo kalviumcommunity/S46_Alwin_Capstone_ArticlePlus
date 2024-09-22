@@ -16,6 +16,7 @@ function ArticleOverview() {
             .get(`article/editor/${articleId}/settings`)
             .then((res) => {
                 setArticle(res.data)
+                console.log(res.data)
             })
             .catch((err) => {
                 console.error(err)
@@ -62,11 +63,20 @@ function ArticleOverview() {
                                 <span className="mt-1 line-clamp-2 text-sm italic text-gray-800">
                                     {article?.subtitle}
                                 </span>
-                                <p className="mt-2 text-xs font-normal text-gray-500">
-                                    {article?.datestamp}
-                                </p>
-                                <div className="mt-3 flex flex-col gap-1">
-                                    <span className="font-medium">Article status:</span>
+                                <di className="mt-2 flex items-center gap-2">
+                                    {article?.author?.type === "organization" && (
+                                        <Link
+                                            to={`/creator/${article?.author?.organization?.id}/${article?.author?.id}`}
+                                            className="w-fit rounded-sm font-medium hover:underline">
+                                            {article?.author?.name}
+                                        </Link>
+                                    )}
+                                    <p className="text-xs font-normal text-gray-500">
+                                        {article?.datePublished}
+                                    </p>
+                                </di>
+                                <div className="mt-3 flex items-center gap-2">
+                                    <span className="text-sm">Status:</span>
                                     {article?.status === "draft" && (
                                         <span className="w-fit rounded-sm border border-red-200 bg-red-100 px-3 py-0.5 text-sm font-medium text-red-800">
                                             Draft

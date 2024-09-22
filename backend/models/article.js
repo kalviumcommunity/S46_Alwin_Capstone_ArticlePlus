@@ -91,7 +91,8 @@ const articleSchema = new mongoose.Schema({
     },
     subtitle: { type: String, default: "Write what is the short summary/hook for the article" },
     author: authorSchema,
-    datestamp: {
+    content: [contentBlockSchema],
+    datePublished: {
         type: String,
         required: true,
         default: new Date().toLocaleString("en-US", {
@@ -100,7 +101,7 @@ const articleSchema = new mongoose.Schema({
             year: "numeric",
         }),
     },
-    content: [contentBlockSchema],
+    publishedAt: { type: Date, default: Date.now, required: true },
     createdAt: { type: Date, default: Date.now, required: true },
     updatedAt: { type: Date, default: Date.now, required: true },
 })
