@@ -28,6 +28,7 @@ const upload = initMulter()
 
 router.get("/:slug", isLoggedIn, async (req, res) => {
     try {
+        // Fetch the article based on slug and published status
         const article = await Article.findOne({
             slug: req.params.slug,
             "flags.status": "published",
@@ -37,24 +38,28 @@ router.get("/:slug", isLoggedIn, async (req, res) => {
             return res.status(404).json({ message: "Article not found" })
         }
 
-        const { flags, ...articleObject } = article
-        const { access: accessType, creator: creatorId } = flags
+        // Destructure and extract nested fields from article flags
+        const {
+            flags: { access: accessType, creator: creatorId },
+            ...articleObject
+        } = article
 
-        articleObject.accessType = accessType
-
+        // Construct article preview for restricted content display
         const articlePreview = {
             title: article.title,
             subtitle: article.subtitle,
             datePublished: article.datePublished,
             author: article.author,
-            image: article.image.url,
+            image: article.image?.url,
             accessType,
         }
 
+        // If accessType is 'all', return the full article
         if (accessType === "all") {
             return res.json({ message: "Article fetched successfully", article: articleObject })
         }
 
+        // If the user is not logged in, show only the preview
         if (!req.isUserLoggedIn) {
             return res.status(403).json({
                 message: "Please log in to view this article",
@@ -62,24 +67,52 @@ router.get("/:slug", isLoggedIn, async (req, res) => {
             })
         }
 
-        const user = await User.findById(req.userId, { "actions.subscriptions": 1 })
+        // Fetch user details and check their subscriptions
+        const user = await User.findById(req.userId, { "actions.subscriptions": 1 }).lean()
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
 
+        // Check if the user is subscribed to the article's creator
         const isSubscribed = user.actions.subscriptions.some(
-            (sub) => sub.creatorId.toString() === creatorId.toString(),
+            (sub) => sub.creatorRefId.toString() === creatorId.toString(),
         )
 
         if (isSubscribed) {
             return res.json({ message: "Article fetched successfully", article: articleObject })
-        } else {
-            return res.status(403).json({
-                message: "Subscribe to access article",
-                articlePreview,
-            })
         }
+
+        // Fetch the creator's details to validate article-specific access rules
+        const creator = await Creator.findById(creatorId).lean()
+        if (!creator) {
+            return res.status(404).json({ message: "Creator not found" })
+        }
+
+        // Check if the creator has an article-specific subscription
+        if (creator.subscription && creator.subscriptions.length > 0) {
+            const hasAccess = user.actions.subscriptions.some((sub) => {
+                return (
+                    sub.creatorRefId.toString() === creatorId.toString() &&
+                    creator.subscriptions.some((plan) => plan.name === sub.plan)
+                )
+            })
+
+            if (hasAccess) {
+                return res.json({
+                    message: "Article fetched successfully",
+                    article: articleObject,
+                })
+            }
+        }
+
+        // If no access is granted, show the preview and request a subscription
+        return res.status(403).json({
+            message: "Subscribe to access the full article",
+            articlePreview,
+        })
     } catch (err) {
+        // Handle errors
+        console.error(err) // Log error for debugging purposes
         res.status(500).json({ message: "Internal server error", error: err.message })
     }
 })

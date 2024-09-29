@@ -44,6 +44,7 @@ const userSchema = new mongoose.Schema({
                 creatorId: { type: String, required: true },
                 creatorName: { type: String, required: true },
                 createdAt: { type: Date, required: true, default: Date.now },
+                plan: { type: String, required: true, enum: ["monthly", "annual"] },
                 autoRenew: { type: Boolean, required: true, default: false },
             },
         ],

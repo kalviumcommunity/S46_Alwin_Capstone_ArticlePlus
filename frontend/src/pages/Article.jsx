@@ -42,6 +42,7 @@ function Article() {
                         setErrorMessage(message)
                     } else {
                         setArticle(article)
+                        console.log(response)
                     }
 
                     return fetchSuggestedArticles(article.slug, category || "technology")

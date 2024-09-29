@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useSignalEffect, useSignals } from "@preact/signals-react/runtime"
 import * as Tabs from "@radix-ui/react-tabs"
+import { toast } from "sonner"
 
 import { isUserCreator } from "@/signals/creator"
 import { userDetails } from "@/signals/user"
 import { randomGradient } from "@/helpers/ui/randomGradient"
+import axiosInstance from "@/axios"
 
 import ChangePassword from "@/components/ChangePassword"
 import { Session } from "@/components/Session"
@@ -160,12 +162,159 @@ function Account() {
                         </div>
                     </Tabs.Content>
                     <Tabs.Content value="subscriptions">
-                        <div className="my-2 flex flex-col gap-2 sm:mx-3">
-                            <span className="mb-2 text-2xl font-semibold">Subscriptions</span>
-                        </div>
+                        <Subscriptions />
                     </Tabs.Content>
                 </div>
             </Tabs.Root>
+        </div>
+    )
+}
+
+const Subscriptions = () => {
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState(null)
+    const [subscriptions, setSubscriptions] = useState([])
+
+    // Fetch subscriptions when the component is mounted.
+    const getSubscriptions = useCallback(async () => {
+        try {
+            setIsLoading(true)
+            setError(null)
+            const response = await axiosInstance.get("user/subscriptions")
+            console.log(response.data)
+            setSubscriptions(response.data.subscriptions)
+        } catch (error) {
+            console.error("Error fetching subscriptions:", error)
+            setError("Failed to fetch subscriptions. Please try again.")
+        } finally {
+            setIsLoading(false)
+        }
+    }, [])
+
+    const handleUnsubscribe = async (id, plan, createdAt) => {
+        const startDate = new Date(createdAt)
+        let endDate
+
+        if (plan === "annual") {
+            endDate = new Date(startDate)
+            endDate.setFullYear(startDate.getFullYear() + 1)
+        } else if (plan === "monthly") {
+            endDate = new Date(startDate)
+            endDate.setMonth(startDate.getMonth() + 1)
+        }
+
+        const formattedEndDate = endDate.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        })
+
+        const confirmationMessage = `You have a ${plan} plan. Your subscription will remain active until ${formattedEndDate}. Type 'YES' to unsubscribe`
+        const confirmation = window.prompt(confirmationMessage)
+
+        if (confirmation.toLowerCase() === "yes") {
+            try {
+                const response = await axiosInstance.post(`creator/${id}/unsubscribe`)
+                toast.success(response.data.message + ". You will not be charged any further.")
+
+                setSubscriptions((prevSubscriptions) =>
+                    prevSubscriptions.filter((subscription) => subscription.creatorId !== id),
+                )
+            } catch (error) {
+                console.error("Error unsubscribing:", error)
+                toast.error("Failed to unsubscribe. Please try again.")
+            }
+        } else {
+            toast.info("Unsubscribing cancelled")
+        }
+    }
+
+    useEffect(() => {
+        getSubscriptions()
+    }, [getSubscriptions])
+
+    if (isLoading) {
+        return <div className="text-center">Loading subscriptions...</div>
+    }
+
+    if (error) {
+        return <div className="text-center text-red-500">{error}</div>
+    }
+
+    return (
+        <div className="my-2 flex flex-col gap-2 sm:mx-3">
+            <span className="mb-2 text-2xl font-semibold">Subscriptions</span>
+            <div>
+                {subscriptions && subscriptions.length > 0 ? (
+                    <div className="flex h-96 flex-col gap-4 overflow-y-scroll rounded border">
+                        {subscriptions.map((subscription, index) => (
+                            <div key={index} className="border-b bg-white px-6 py-4">
+                                <div className="b flex flex-col gap-2">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <Link
+                                            to={`/creator/{}`}
+                                            className="flex w-fit items-center gap-2 rounded-full border p-1 pr-5">
+                                            <img
+                                                className="h-8 w-8 rounded-full"
+                                                src={subscription.displayPicture.small}
+                                                alt={`${subscription.creatorName}'s profile`}
+                                            />
+                                            <div className="flex flex-col">
+                                                <span className="text-xl font-semibold leading-7">
+                                                    {subscription.creatorName}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                        <button
+                                            onClick={() =>
+                                                handleUnsubscribe(
+                                                    subscription.creatorId,
+                                                    subscription.plan,
+                                                    subscription.createdAt,
+                                                )
+                                            }
+                                            className="flex h-fit w-fit items-center justify-center rounded-full border border-red-500 px-4 py-0.5 text-base font-medium text-red-600 hover:bg-red-50">
+                                            Unsubscribe
+                                        </button>
+                                    </div>
+
+                                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                                        <div className="text-sm text-gray-600">
+                                            Plan:{" "}
+                                            <span className="font-medium capitalize text-black">
+                                                {subscription.plan}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Subscribed on:{" "}
+                                            <span className="font-medium text-black">
+                                                {new Date(
+                                                    subscription.createdAt,
+                                                ).toLocaleDateString("en-GB", {
+                                                    year: "numeric",
+                                                    month: "long",
+                                                    day: "numeric",
+                                                })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex h-96 flex-col items-center justify-center gap-4 overflow-y-scroll rounded border">
+                        <div className="flex flex-col bg-white px-6 py-4 text-center">
+                            <span className="bg-gradient-to-br from-rose-400 to-rose-600 bg-clip-text pt-1 text-3xl font-extrabold uppercase leading-none text-transparent">
+                                No subscriptions
+                            </span>
+                            <span className="mt-1 text-gray-700">
+                                You are not subscribed to any creators.
+                            </span>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

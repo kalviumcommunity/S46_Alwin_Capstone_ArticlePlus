@@ -25,15 +25,19 @@ function CreatorContent({ creator, isSubscribed }) {
                     params: { page },
                 })
 
-                setArticlesState((prevState) => ({
-                    ...prevState,
-                    [tab]: {
-                        articles: [...prevState[tab].articles, ...data.articles],
-                        page,
-                        moreArticlesExist: data.moreArticlesExist,
-                        loaded: true,
-                    },
-                }))
+                console.log(data)
+
+                if (data.success === true) {
+                    setArticlesState((prevState) => ({
+                        ...prevState,
+                        [tab]: {
+                            articles: [...prevState[tab].articles, ...data.articles],
+                            page,
+                            moreArticlesExist: data.moreArticlesExist,
+                            loaded: true,
+                        },
+                    }))
+                }
             } catch (error) {
                 console.error("Error fetching creator articles:", error)
             } finally {

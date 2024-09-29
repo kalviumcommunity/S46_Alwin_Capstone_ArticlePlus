@@ -24,6 +24,7 @@ const CreatorSchema = new mongoose.Schema({
             code: { type: String, required: true, unique: true },
             token: { type: String, required: true },
         },
+        required: false,
     },
     subscription: { type: Boolean, required: true },
     contributors: {
@@ -66,18 +67,29 @@ const CreatorSchema = new mongoose.Schema({
     subscriptions: {
         type: [
             {
-                name: { type: String, required: true, default: "default" },
+                name: { type: String, required: true },
                 features: [{ type: String, required: true }],
-                monthlyPrice: { type: Number, required: true },
-                annualPrice: { type: Number, required: true },
-                annualOffer: {
-                    amount: { type: Number, required: true },
+                monthly: {
+                    price: { type: Number, required: true },
+                },
+                annual: {
+                    price: { type: Number, required: true },
                     basePrice: { type: Number, required: true },
+                    discount: {
+                        amount: { type: Number, required: true },
+                    },
                 },
             },
         ],
         required: function () {
-            return this.subscription
+            return this.subscription === true
+        },
+        validate: {
+            validator: function (subscriptions) {
+                if (this.subscription === false) return true
+                return subscriptions.length > 0
+            },
+            message: "At least one subscription type is required",
         },
     },
 })

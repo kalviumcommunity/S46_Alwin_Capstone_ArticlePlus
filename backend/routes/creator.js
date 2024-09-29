@@ -15,6 +15,7 @@ const {
     toggleFollow,
     subscribeCreator,
     joinOrganization,
+    unsubscribeCreator,
 } = require("../controllers/creatorController")
 const {
     authCreatorInfo,
@@ -34,6 +35,21 @@ const { isLoggedIn } = require("../middlewares/isLoggedIn")
 const router = express.Router()
 const upload = initMulter()
 
+router.post("/articles", asyncHandler(getCreatorArticles))
+
+router.get("/profile/:id", isLoggedIn, asyncHandler(getCreatorProfile))
+
+// Get contributor profile of organization
+router.get("/profile/:id/:contributorId", isLoggedIn, asyncHandler(getContributorWithArticles))
+
+router.get("/:id/articles/for-followers", isLoggedIn, asyncHandler(getForFollowerArticles))
+router.get("/:id/articles/for-subscribers", isLoggedIn, asyncHandler(getForSubscriberArticles))
+
+router.post("/:id/follow", isLoggedIn, asyncHandler(toggleFollow))
+router.post("/:id/subscribe", isLoggedIn, asyncHandler(subscribeCreator))
+
+router.post("/:id/unsubscribe", isLoggedIn, asyncHandler(unsubscribeCreator))
+
 router.use(asyncHandler(verifyToken))
 
 router.post("/onboarding", upload.single("displayPicture"), asyncHandler(onboardCreator))
@@ -50,18 +66,5 @@ router.post("/dashboard/author/:id/access", asyncHandler(updateAuthorAccess))
 router.post("/dashboard/contributor/description", asyncHandler(updateContributorDescription))
 router.post("/dashboard/contributor/id", asyncHandler(updateContributorID))
 router.post("/dashboard/contributor/activate", asyncHandler(activateContributor))
-
-router.post("/articles", asyncHandler(getCreatorArticles))
-
-router.get("/profile/:id", isLoggedIn, asyncHandler(getCreatorProfile))
-
-// Get contributor profile of organization
-router.get("/profile/:id/:contributorId", isLoggedIn, asyncHandler(getContributorWithArticles))
-
-router.get("/:id/articles/for-followers", isLoggedIn, asyncHandler(getForFollowerArticles))
-router.get("/:id/articles/for-subscribers", isLoggedIn, asyncHandler(getForSubscriberArticles))
-
-router.post("/:id/follow", isLoggedIn, asyncHandler(toggleFollow))
-router.post("/:id/subscribe", isLoggedIn, asyncHandler(subscribeCreator))
 
 module.exports = router

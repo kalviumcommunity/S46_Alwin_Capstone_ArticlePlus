@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import * as Dialog from "@radix-ui/react-dialog"
 import { toast } from "sonner"
 
@@ -28,17 +28,24 @@ function Creator() {
             setIsSubscribed(data.isSubscribed)
         } catch (error) {
             console.error("Error fetching creator profile:", error)
-            alert("Failed to load creator profile. Please refresh the page.")
+            toast.error("Failed to load creator profile. Please refresh the page.")
         } finally {
             setLoading(false)
         }
     }, [id])
 
+    const handleSubscribe = () => {
+        toast.success(`Your now subscribed to ${creator.name}`)
+        setIsSubscribed(true)
+        setCreator((prevState) => ({
+            ...prevState,
+            subscribers: prevState.subscribers + 1,
+        }))
+    }
+
     useEffect(() => {
         fetchCreatorProfile()
     }, [fetchCreatorProfile])
-
-    const handleSubscribe = () => setIsSubscribed((prev) => !prev)
 
     if (loading) return <Loader />
 
@@ -178,23 +185,38 @@ function SubscribeSection({ creator, isSubscribed, handleSubscribe }) {
     const defaultSubscription = creator.subscriptions[0]
     return (
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
-            <Dialog.Root>
-                <Dialog.Trigger asChild>
-                    <button
-                        className={`flex h-9 w-fit min-w-28 items-center justify-center rounded-full border px-6 py-1 pr-5 text-base font-medium ${
-                            isSubscribed
-                                ? "border-gray-300 hover:bg-gray-100"
-                                : "border-red-100 bg-red-100 text-red-700"
-                        }`}
-                        onClick={handleSubscribe}>
-                        {isSubscribed ? "Subscribed" : "Subscribe"}
-                    </button>
-                </Dialog.Trigger>
-                <SubscribePortal details={creator} />
-            </Dialog.Root>
-            <span className="text-sm font-medium leading-4">
-                Starting at ₹{defaultSubscription.monthlyPrice}/per month
-            </span>
+            {isSubscribed ? (
+                <Link to="/account/subscriptions">
+                    <a className="flex h-9 w-fit min-w-28 items-center justify-center rounded-full border border-gray-300 px-6 py-1 pr-5 text-base font-medium hover:bg-gray-100">
+                        Subscribed{" "}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="ml-2 h-4 w-4 fill-yellow-400 text-yellow-500">
+                            <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+                            <path d="M5 21h14" />
+                        </svg>
+                    </a>
+                </Link>
+            ) : (
+                <Dialog.Root>
+                    <Dialog.Trigger asChild>
+                        <button className="flex h-9 w-fit min-w-28 items-center justify-center rounded-full border border-red-100 bg-red-100 px-6 py-1 pr-5 text-base font-medium text-red-700">
+                            Subscribe
+                        </button>
+                    </Dialog.Trigger>
+                    <SubscribePortal details={creator} handleSubscribe={handleSubscribe} />
+                </Dialog.Root>
+            )}
+            {!isSubscribed && defaultSubscription && (
+                <span className="text-sm font-medium leading-4">
+                    Starting at ₹{defaultSubscription.monthly.price}/per month
+                </span>
+            )}
         </div>
     )
 }

@@ -156,6 +156,7 @@ const onboardCreator = async (req, res) => {
 
                 return res.json({ onboarding: "success" })
             } catch (e) {
+                console.log(e)
                 return res
                     .status(500)
                     .json({ status: "failed", message: "Error saving creator details" })
@@ -356,13 +357,9 @@ const getContributorWithArticles = async (req, res) => {
             return res.status(404).json({ message: "Creator not found" })
         }
 
-        console.log(creator.contributors)
-
         const contributor = creator.contributors.find(
             (contributor) => contributor.userRef === contributorId,
         )
-
-        console.log(contributor)
 
         if (!contributor) {
             return res.status(404).json({ message: "Contributor not found" })
@@ -404,8 +401,6 @@ const getContributorWithArticles = async (req, res) => {
                 .lean(),
             Article.countDocuments(queryConditions),
         ])
-
-        console.log(creatorArticles)
 
         const creatorProfile = {
             type: "contributor",
@@ -482,6 +477,7 @@ const getForFollowerArticles = async (req, res) => {
         const moreArticlesExist = page * pageSize < totalArticles
 
         res.json({
+            success: true,
             articles: creatorArticles,
             page,
             moreArticlesExist,
@@ -493,8 +489,8 @@ const getForFollowerArticles = async (req, res) => {
 }
 
 const getForSubscriberArticles = async (req, res) => {
-    if (!req.isLoggedIn) {
-        return res.status(401).json({ message: "Not Authorized" })
+    if (!req.isUserLoggedIn) {
+        return res.status(401).json({ message: "Login required" })
     }
 
     const { id } = req.params
@@ -538,6 +534,7 @@ const getForSubscriberArticles = async (req, res) => {
         const moreArticlesExist = page * pageSize < totalArticles
 
         res.json({
+            success: true,
             articles: creatorArticles,
             page,
             moreArticlesExist,
@@ -602,9 +599,19 @@ const toggleFollow = async (req, res) => {
 const subscribeCreator = async (req, res) => {
     const { id } = req.params
     const { userId, isUserLoggedIn } = req
+    const { plan } = req.body
 
     if (!isUserLoggedIn) {
         return res.status(401).json({ message: "Login required" })
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+        return res.status(401).json({ message: "User not found" })
+    }
+
+    if (!plan || !["monthly", "annual"].includes(plan)) {
+        return res.status(400).json({ success: false, message: "Invalid subscription plan" })
     }
 
     try {
@@ -614,11 +621,13 @@ const subscribeCreator = async (req, res) => {
         ])
 
         if (!user) {
-            return res.status(401).json({ message: "User not found" })
+            return res
+                .status(200)
+                .json({ success: false, message: "User not found", requireLogin: true })
         }
 
         if (!creator) {
-            return res.status(404).json({ message: "Creator not found" })
+            return res.status(404).json({ success: false, message: "Creator not found" })
         }
 
         const isAlreadySubscribed = user.actions.subscriptions.some(
@@ -626,7 +635,25 @@ const subscribeCreator = async (req, res) => {
         )
 
         if (isAlreadySubscribed) {
-            return res.status(400).json({ message: "Already subscribed to this creator" })
+            return res
+                .status(400)
+                .json({ success: false, message: "Already subscribed to this creator" })
+        }
+
+        const subscriptionPlan = creator.subscriptions[0]
+
+        if (!subscriptionPlan) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Subscription plan not found" })
+        }
+
+        const planDetails = subscriptionPlan[plan]
+
+        if (!planDetails) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Selected plan not available" })
         }
 
         user.actions.subscriptions.push({
@@ -634,6 +661,8 @@ const subscribeCreator = async (req, res) => {
             creatorId: creator.id,
             creatorName: creator.name,
             createdAt: new Date(),
+            plan: plan,
+            autoRenew: plan === "monthly",
         })
         creator.subscribers++
 
@@ -643,10 +672,16 @@ const subscribeCreator = async (req, res) => {
             success: true,
             isSubscribed: true,
             message: `Subscribed to ${creator.name}`,
+            plan: {
+                name: subscriptionPlan.name,
+                type: plan,
+                price: planDetails.price,
+                features: subscriptionPlan.features,
+            },
         })
     } catch (error) {
         console.error("Error in subscribeCreator:", error)
-        return res.status(500).json({ message: "Internal server error" })
+        return res.status(500).json({ success: false, message: "Internal server error" })
     }
 }
 
@@ -655,7 +690,9 @@ const unsubscribeCreator = async (req, res) => {
     const { userId, isUserLoggedIn } = req
 
     if (!isUserLoggedIn) {
-        return res.status(401).json({ message: "Login required" })
+        return res
+            .status(200)
+            .json({ success: false, message: "Login required", requireLogin: true })
     }
 
     try {
@@ -665,11 +702,13 @@ const unsubscribeCreator = async (req, res) => {
         ])
 
         if (!user) {
-            return res.status(401).json({ message: "User not found" })
+            return res
+                .status(200)
+                .json({ success: false, message: "User not found", requireLogin: true })
         }
 
         if (!creator) {
-            return res.status(404).json({ message: "Creator not found" })
+            return res.status(404).json({ success: false, message: "Creator not found" })
         }
 
         const subscriptionIndex = user.actions.subscriptions.findIndex(
@@ -677,11 +716,13 @@ const unsubscribeCreator = async (req, res) => {
         )
 
         if (subscriptionIndex === -1) {
-            return res.status(400).json({ message: "Not subscribed to this creator" })
+            return res
+                .status(400)
+                .json({ success: false, message: "Not subscribed to this creator" })
         }
 
         user.actions.subscriptions.splice(subscriptionIndex, 1)
-        creator.subscribers--
+        creator.subscribers = Math.max(0, creator.subscribers - 1)
 
         await Promise.all([user.save(), creator.save()])
 
@@ -692,7 +733,7 @@ const unsubscribeCreator = async (req, res) => {
         })
     } catch (error) {
         console.error("Error in unsubscribeCreator:", error)
-        return res.status(500).json({ message: "Internal server error" })
+        return res.status(500).json({ success: false, message: "Internal server error" })
     }
 }
 
@@ -705,7 +746,6 @@ module.exports = {
     getForFollowerArticles,
     getForSubscriberArticles,
     toggleFollow,
-    subscribeCreator,
     subscribeCreator,
     unsubscribeCreator,
 }

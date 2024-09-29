@@ -166,7 +166,7 @@ function ForYou() {
                             </div>
                         </Tabs.Content>
                         <Tabs.Content value="subscriptions" className="w-full">
-                            <div className="pn-5 flex w-full justify-between gap-2 pt-4 sm:pt-0">
+                            <div className="flex w-full justify-between gap-2 pb-5 pt-4 sm:pt-0">
                                 <span className="text-xl font-semibold sm:text-2xl">
                                     Subscriptions
                                 </span>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
-import { get } from "react-hook-form"
 import * as Dialog from "@radix-ui/react-dialog"
+import { toast } from "sonner"
 
-// Extracted formatDate and getNextBillingDate as utility functions
+import axiosInstance from "@/axios"
+
+// Utility functions remain the same
 const formatDate = (date) => {
     const options = { day: "2-digit", month: "short", year: "numeric" }
     return new Intl.DateTimeFormat("en-GB", options).format(date)
@@ -15,9 +17,31 @@ const getNextBillingDate = (type) => {
     return formatDate(nextDate)
 }
 
-function SubscriptionDetails({ subscription, paymentType, onChangePaymentType }) {
+function SubscriptionDetails({
+    creator,
+    subscription,
+    paymentType,
+    onChangePaymentType,
+    handleSubscribe,
+}) {
     const isMonthly = paymentType === "monthly"
-    const isAnnual = paymentType === "annual"
+
+    const handleSubscribeCreator = () => {
+        console.log(paymentType)
+        axiosInstance
+            .post(`/creator/${creator.id}/subscribe`, {
+                plan: paymentType,
+                price: isMonthly ? subscription.monthly.price : subscription.annual.price,
+            })
+            .then((response) => {
+                console.log(response)
+                handleSubscribe()
+            })
+            .catch((error) => {
+                console.error(error)
+                toast.error("Failed to subscribe to creator. Please try again.")
+            })
+    }
 
     return (
         <div className="mb-14 flex flex-col gap-4 sm:mb-0">
@@ -30,15 +54,16 @@ function SubscriptionDetails({ subscription, paymentType, onChangePaymentType })
                 <div className="flex items-center justify-between gap-2 text-lg font-medium">
                     <div className="flex items-center gap-1.5">
                         <span className="text-3xl font-semibold tracking-tight">
-                            ₹{isMonthly ? subscription.monthlyPrice : subscription.annualPrice}
+                            ₹
+                            {isMonthly ? subscription.monthly.price : subscription.annual.price}
                         </span>
                         <span className="text-base text-gray-600">
                             per {isMonthly ? "month" : "year"}
                         </span>
                     </div>
-                    {isAnnual && subscription.annualOffer.amount > 0 && (
+                    {!isMonthly && subscription.annual.discount.amount > 0 && (
                         <span className="rounded-full border border-green-100 bg-green-100 px-4 text-sm font-medium text-green-700">
-                            Save ₹{subscription.annualOffer.amount}
+                            Save ₹{subscription.annual.discount.amount}
                         </span>
                     )}
                 </div>
@@ -57,34 +82,32 @@ function SubscriptionDetails({ subscription, paymentType, onChangePaymentType })
                     <span className="text-base font-medium">
                         You will be charged ₹
                         {isMonthly
-                            ? `${subscription.monthlyPrice} per month `
-                            : `${subscription.annualPrice} `}
+                            ? `${subscription.monthly.price} per month `
+                            : `${subscription.annual.price} `}
                         for this subscription.
                     </span>
-                    {isMonthly && (
+                    {isMonthly ? (
                         <span className="text-sm text-gray-500">
-                            Your will be charged automatically on every month, you can cancel
+                            Your will be charged automatically every month, you can cancel
                             anytime.
                         </span>
-                    )}
-                    {isMonthly ? (
-                        <div className="mt-1 flex items-end gap-1 text-sm">
-                            <span className="w-fit text-gray-500">Next billing date:</span>
-                            <span className="font-medium">
-                                {getNextBillingDate(isMonthly ? "monthly" : "annual")}
-                            </span>
-                        </div>
                     ) : (
-                        <div className="mt-1 flex items-end gap-1 text-sm">
-                            <span className="w-fit text-gray-500">
-                                If subscribed, subscription ends on
-                            </span>
-                            <span className="font-medium">{getNextBillingDate("annual")}</span>
-                        </div>
-                    )}
-                    {isAnnual && (
                         <span className="text-sm text-gray-500">
-                            This will not auto renew. You will need to subscribe again.
+                            This is a one-time payment for a year of subscription.
+                        </span>
+                    )}
+                    <div className="mt-1 flex items-end gap-1 text-sm">
+                        <span className="w-fit text-gray-500">
+                            {isMonthly ? "Next billing date:" : "Subscription ends on:"}
+                        </span>
+                        <span className="font-medium">
+                            {getNextBillingDate(isMonthly ? "monthly" : "annual")}
+                        </span>
+                    </div>
+                    {!isMonthly && (
+                        <span className="text-sm text-gray-500">
+                            This will not auto-renew. You will need to subscribe again after a
+                            year.
                         </span>
                     )}
                 </div>
@@ -96,7 +119,9 @@ function SubscriptionDetails({ subscription, paymentType, onChangePaymentType })
                     <img className="h-5" src="/assets/icons/arrow-left.svg" alt="Go Back" />
                     Go Back
                 </button>
-                <button className="ml-auto h-9 w-fit gap-3 rounded-full border bg-rose-500 px-6 py-1 pr-5 font-medium text-white hover:bg-rose-600">
+                <button
+                    onClick={handleSubscribeCreator}
+                    className="ml-auto h-9 w-fit gap-3 rounded-full border bg-rose-500 px-6 py-1 pr-5 font-medium text-white hover:bg-rose-600">
                     Subscribe Now
                 </button>
             </div>
@@ -104,9 +129,11 @@ function SubscriptionDetails({ subscription, paymentType, onChangePaymentType })
     )
 }
 
-function SubscribePortal({ details }) {
+function SubscribePortal({ details, handleSubscribe }) {
     const [selectedSubscription, setSelectedSubscription] = useState(null)
     const [selectedPaymentType, setSelectedPaymentType] = useState(null)
+
+    console.log(details)
 
     useEffect(() => {
         if (details.subscriptions.length) {
@@ -179,19 +206,20 @@ function SubscribePortal({ details }) {
                                                 <span className="text-2xl font-semibold">
                                                     ₹
                                                     {plan === "monthly"
-                                                        ? selectedSubscription.monthlyPrice
-                                                        : selectedSubscription.annualPrice}
+                                                        ? selectedSubscription.monthly.price
+                                                        : selectedSubscription.annual.price}
                                                 </span>{" "}
                                                 <span className="text-sm font-medium text-gray-500">
                                                     per {plan === "monthly" ? "month" : "year"}
                                                 </span>
                                             </span>
                                             {plan === "annual" &&
-                                                selectedSubscription.annualOffer.amount > 0 && (
+                                                selectedSubscription.annual.discount.amount >
+                                                    0 && (
                                                     <span className="text-sm font-semibold text-green-500">
                                                         Save ₹
                                                         {
-                                                            selectedSubscription.annualOffer
+                                                            selectedSubscription.annual.discount
                                                                 .amount
                                                         }
                                                     </span>
@@ -212,9 +240,11 @@ function SubscribePortal({ details }) {
 
                 {selectedSubscription && selectedPaymentType && (
                     <SubscriptionDetails
+                        creator={details}
                         subscription={selectedSubscription}
                         paymentType={selectedPaymentType}
                         onChangePaymentType={setSelectedPaymentType}
+                        handleSubscribe={handleSubscribe}
                     />
                 )}
             </Dialog.Content>
